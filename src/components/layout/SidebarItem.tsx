@@ -23,10 +23,10 @@ export default function SidebarItem({
   return (
     <Link
       href={href}
-      className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition ${
+      className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-bold transition ${
         active
           ? "bg-primary text-white shadow-sm"
-          : "text-white/70 hover:bg-white/10 hover:text-white"
+          : "text-black hover:bg-gray-100"
       }`}
     >
       <Icon size={17} strokeWidth={2} className="shrink-0" />

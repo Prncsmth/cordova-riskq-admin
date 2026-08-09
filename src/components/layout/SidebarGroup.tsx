@@ -9,7 +9,7 @@ type SidebarGroupProps = {
 export default function SidebarGroup({ label, items }: SidebarGroupProps) {
   return (
     <div className="space-y-1">
-      <p className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+      <p className="px-4 text-[11px] font-bold uppercase tracking-[0.14em] text-black/50">
         {label}
       </p>
 

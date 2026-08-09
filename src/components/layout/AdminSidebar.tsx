@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Inter } from "next/font/google";
 import {
   LayoutDashboard,
   Siren,
@@ -20,12 +21,16 @@ import {
 } from "lucide-react";
 import SidebarGroup from "./SidebarGroup";
 
+const inter = Inter({ subsets: ["latin"], weight: ["600", "700"] });
+
 export default function AdminSidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col bg-primary-dark shadow-xl lg:flex">
+    <aside
+      className={`${inter.className} fixed inset-y-0 left-0 z-40 hidden w-72 flex-col bg-white shadow-xl lg:flex`}
+    >
 
       {/* Logo / Header */}
-      <div className="flex h-20 shrink-0 items-center border-b border-white/10 px-6">
+      <div className="flex h-20 shrink-0 items-center border-b border-border bg-white px-6">
         <div className="flex items-center gap-3">
 
           {/* Logo */}
@@ -41,12 +46,13 @@ export default function AdminSidebar() {
 
           {/* Text */}
           <div>
-            <h1 className="text-xl font-bold text-white">
-              CORDOVA RISKQ
+            <h1 className={`${inter.className} text-xl font-bold`}>
+              <span style={{ color: "#A70707" }}>CORDOVA</span>{" "}
+              <span style={{ color: "#FE6B47" }}>RISKQ</span>
             </h1>
 
-            <p className="text-xs text-white/50">
-              Emergency Admin Panel
+            <p className="text-xs font-bold text-black">
+               Admin Panel
             </p>
           </div>
 
@@ -102,11 +108,11 @@ export default function AdminSidebar() {
       </nav>
 
       {/* System status */}
-      <div className="shrink-0 border-t border-white/10 p-4">
-        <div className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-3 text-xs text-white/70">
+      <div className="shrink-0 border-t border-border p-4">
+        <div className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-3 text-xs font-bold text-black">
           <span className="h-2 w-2 shrink-0 rounded-full bg-success" />
           <span>
-            <span className="block font-medium text-white/90">System Status</span>
+            <span className="block font-bold text-black">System Status</span>
             All systems operational
           </span>
         </div>
