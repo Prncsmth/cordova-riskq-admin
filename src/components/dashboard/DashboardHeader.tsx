@@ -1,52 +1,33 @@
 "use client";
 
-import { Bell, ShieldCheck } from "lucide-react";
+function getGreeting(hour: number) {
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
 
 export default function DashboardHeader() {
-  const date = new Date();
+  const now = new Date();
 
   return (
-    <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
-        <h1 className="text-4xl font-bold text-slate-900">
-          Emergency Operations Center
+        <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
+          {getGreeting(now.getHours())}, Admin
         </h1>
 
-        <p className="mt-2 text-slate-500">
-          Monitor emergencies, responders, and incidents across Cordova.
+        <p className="mt-1 text-sm text-muted">
+          Here&apos;s what&apos;s happening in Cordova today.
         </p>
       </div>
 
-      <div className="flex items-center gap-4">
-
-        <div className="rounded-xl border bg-white px-5 py-3 shadow-sm">
-
-          <div className="flex items-center gap-2">
-
-            <ShieldCheck
-              size={18}
-              className="text-green-600"
-            />
-
-            <span className="font-semibold text-green-700">
-              System Online
-            </span>
-
-          </div>
-
-          <p className="mt-1 text-xs text-slate-500">
-            {date.toLocaleDateString()}
-          </p>
-
-        </div>
-
-        <button className="rounded-xl border bg-white p-3 shadow-sm transition hover:bg-red-50">
-          <Bell className="text-red-600" />
-        </button>
-
+      <div className="rounded-xl border border-border bg-white px-4 py-2.5 text-sm font-medium text-foreground shadow-sm">
+        {now.toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        })}
       </div>
-
     </div>
   );
 }

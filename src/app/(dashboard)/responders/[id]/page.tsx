@@ -9,7 +9,7 @@ export default async function ResponderDetailsPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">
+      <h1 className="text-2xl font-bold text-foreground">
         Responder Details
       </h1>
 

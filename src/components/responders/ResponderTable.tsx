@@ -24,24 +24,24 @@ const responders = [
 
 export default function ResponderTable() {
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50">
+          <thead className="bg-background">
             <tr>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">ID</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Name</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Phone</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Status</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Action</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">ID</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Name</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Phone</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Status</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
+          <tbody className="divide-y divide-border">
             {responders.map((responder) => (
-              <tr key={responder.id} className="hover:bg-slate-50">
-                <td className="p-4 font-semibold text-slate-900">{responder.id}</td>
-                <td className="p-4 text-slate-700">{responder.name}</td>
-                <td className="p-4 text-slate-700">{responder.phone}</td>
+              <tr key={responder.id} className="hover:bg-background">
+                <td className="p-4 font-semibold text-foreground">{responder.id}</td>
+                <td className="p-4 text-foreground">{responder.name}</td>
+                <td className="p-4 text-muted">{responder.phone}</td>
                 <td className="p-4">
                   <Badge
                     variant={
@@ -58,7 +58,7 @@ export default function ResponderTable() {
                 <td className="p-4">
                   <Link
                     href={`/responders/${responder.id}`}
-                    className="font-medium text-red-700 hover:text-red-900"
+                    className="font-medium text-primary hover:text-primary-dark"
                   >
                     View
                   </Link>

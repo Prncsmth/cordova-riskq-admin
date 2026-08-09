@@ -29,7 +29,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FE6B47]">
+    <main className="min-h-screen bg-primary-dark">
 
       <div className="grid min-h-screen lg:grid-cols-5">
 
@@ -47,7 +47,7 @@ export default function LoginPage() {
           
           {/* Overlay */}
 
-          <div className="absolute inset-0 bg-linear-to-r from-red-950/90 via-red-900/80 to-red-950/95" />
+          <div className="absolute inset-0 bg-linear-to-r from-primary-dark/95 via-primary/80 to-primary-dark/95" />
 
           {/* Watermark */}
 
@@ -64,7 +64,7 @@ export default function LoginPage() {
 
             <div>
 
-              <div className="w-12 h-1 bg-red-500 rounded-full mb-6" />
+              <div className="w-12 h-1 bg-white rounded-full mb-6" />
 
               <h2 className="text-5xl font-bold leading-tight">
 
@@ -90,7 +90,7 @@ export default function LoginPage() {
                 Emergency Operations
               </h3>
 
-              <p className="text-red-100">
+              <p className="text-white/70">
                 Always Ready. Always Here.
               </p>
 
@@ -138,7 +138,7 @@ export default function LoginPage() {
                   onChange={(e) =>
                     setEmail(e.target.value)
                   }
-                  className="w-full rounded-xl border pl-12 pr-4 py-4 outline-none focus:border-red-700"
+                  className="w-full rounded-xl border border-border pl-12 pr-4 py-4 outline-none focus:border-primary"
                 />
 
               </div>
@@ -157,7 +157,7 @@ export default function LoginPage() {
                   onChange={(e) =>
                     setPassword(e.target.value)
                   }
-                  className="w-full rounded-xl border pl-12 pr-12 py-4 outline-none focus:border-red-700"
+                  className="w-full rounded-xl border border-border pl-12 pr-12 py-4 outline-none focus:border-primary"
                 />
 
                 <Eye
@@ -178,7 +178,7 @@ export default function LoginPage() {
 
               <button
                 disabled={loading}
-                className="w-full rounded-xl bg-linear-to-r from-red-700 to-red-900 py-4 text-lg font-bold text-white shadow-lg hover:scale-[1.02] transition"
+                className="w-full rounded-xl bg-linear-to-r from-primary to-primary-dark py-4 text-lg font-bold text-white shadow-lg hover:scale-[1.02] transition disabled:opacity-70"
               >
                 {loading ? "Signing In..." : "Sign In"}
               </button>

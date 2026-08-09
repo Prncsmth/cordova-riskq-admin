@@ -8,9 +8,9 @@ export default function AdminLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <AdminSidebar /> 
-        
+    <div className="min-h-screen bg-background text-foreground">
+      <AdminSidebar />
+
       <div className="lg:pl-72">
         <AdminHeader />
 

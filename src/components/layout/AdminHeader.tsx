@@ -1,29 +1,25 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { Bell } from "lucide-react";
+import UserMenu from "./UserMenu";
 
 export default function AdminHeader() {
-  const router = useRouter();
-
-  function logout() {
-    localStorage.removeItem("riskq_admin_authenticated");
-    router.push("/login");
-  }
-
   return (
-    <header className="border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold text-slate-900">System Administrator</p>
-    
-        </div>
-
+    <header className="border-b border-border bg-white px-6 py-3 shadow-sm">
+      <div className="flex items-center justify-end gap-4">
         <button
-          onClick={logout}
-          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+          aria-label="Notifications"
+          className="relative flex h-10 w-10 items-center justify-center rounded-full text-muted transition hover:bg-primary-light/40 hover:text-primary"
         >
-          Logout
+          <Bell size={19} />
+          <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger text-[10px] font-semibold text-white">
+            8
+          </span>
         </button>
+
+        <span className="h-8 w-px bg-border" />
+
+        <UserMenu />
       </div>
     </header>
   );

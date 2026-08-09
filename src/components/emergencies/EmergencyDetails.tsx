@@ -15,22 +15,22 @@ export default function EmergencyDetails({
 
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           <div>
-            <p className="text-xs text-slate-500">Emergency ID</p>
+            <p className="text-xs text-muted">Emergency ID</p>
             <p className="font-semibold">{id}</p>
           </div>
 
           <div>
-            <p className="text-xs text-slate-500">Type</p>
+            <p className="text-xs text-muted">Type</p>
             <p className="font-semibold">Medical Emergency</p>
           </div>
 
           <div>
-            <p className="text-xs text-slate-500">Location</p>
+            <p className="text-xs text-muted">Location</p>
             <p className="font-semibold">Poblacion Occidental</p>
           </div>
 
           <div>
-            <p className="text-xs text-slate-500">Status</p>
+            <p className="text-xs text-muted">Status</p>
             <Badge variant="danger">Active</Badge>
           </div>
         </div>
@@ -42,12 +42,12 @@ export default function EmergencyDetails({
         <div className="mt-5">
           <p className="font-medium">Juan Dela Cruz</p>
 
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted">
             Available · 1.2 km away
           </p>
         </div>
 
-        <button className="mt-5 w-full rounded-lg bg-red-800 px-4 py-2 text-sm font-semibold text-white">
+        <button className="mt-5 w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white">
           Reassign Responder
         </button>
       </Card>

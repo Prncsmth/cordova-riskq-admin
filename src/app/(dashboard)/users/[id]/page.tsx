@@ -9,7 +9,7 @@ export default async function UserDetailsPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">User Details</h1>
+      <h1 className="text-2xl font-bold text-foreground">User Details</h1>
 
       <UserDetails id={id} />
     </div>

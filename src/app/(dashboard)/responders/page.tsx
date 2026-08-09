@@ -4,9 +4,9 @@ export default function RespondersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Responders</h1>
+        <h1 className="text-2xl font-bold text-foreground">Responders</h1>
 
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted">
           Monitor and manage emergency responders.
         </p>
       </div>

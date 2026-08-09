@@ -27,26 +27,26 @@ const emergencies = [
 
 export default function EmergencyTable() {
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50">
+          <thead className="bg-background">
             <tr>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">ID</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Type</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Location</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Responder</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Status</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Action</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">ID</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Type</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Location</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Responder</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Status</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
+          <tbody className="divide-y divide-border">
             {emergencies.map((emergency) => (
-              <tr key={emergency.id} className="hover:bg-slate-50">
-                <td className="p-4 font-semibold text-slate-900">{emergency.id}</td>
-                <td className="p-4 text-slate-700">{emergency.type}</td>
-                <td className="p-4 text-slate-700">{emergency.location}</td>
-                <td className="p-4 text-slate-700">{emergency.responder}</td>
+              <tr key={emergency.id} className="hover:bg-background">
+                <td className="p-4 font-semibold text-foreground">{emergency.id}</td>
+                <td className="p-4 text-foreground">{emergency.type}</td>
+                <td className="p-4 text-foreground">{emergency.location}</td>
+                <td className="p-4 text-foreground">{emergency.responder}</td>
                 <td className="p-4">
                   <Badge
                     variant={
@@ -63,7 +63,7 @@ export default function EmergencyTable() {
                 <td className="p-4">
                   <Link
                     href={`/emergencies/${emergency.id}`}
-                    className="font-medium text-red-700 hover:text-red-900"
+                    className="font-medium text-primary hover:text-primary-dark"
                   >
                     View
                   </Link>
