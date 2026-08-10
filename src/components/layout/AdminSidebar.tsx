@@ -40,6 +40,7 @@ export default function AdminSidebar() {
               alt="Cordova RISKQ Logo"
               fill
               priority
+              sizes="48px"
               className="object-contain"
             />
           </div>
@@ -52,7 +53,7 @@ export default function AdminSidebar() {
             </h1>
 
             <p className="text-xs font-bold text-black">
-               Admin Panel
+              
             </p>
           </div>
 

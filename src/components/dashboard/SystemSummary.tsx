@@ -1,9 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ShieldCheck } from "lucide-react";
 
 export default function SystemSummary() {
-  const now = new Date();
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setNow(new Date());
+  }, []);
 
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-border bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
@@ -17,7 +22,10 @@ export default function SystemSummary() {
       </div>
 
       <p className="text-xs text-muted">
-        Last updated: {now.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
+        Last updated:{" "}
+        {now
+          ? now.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
+          : "—"}
       </p>
     </div>
   );
