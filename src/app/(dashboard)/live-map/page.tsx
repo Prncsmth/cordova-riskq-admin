@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useSidebar } from "@/components/layout/SidebarContext";
 
 const LiveMap = dynamic(
   () => import("@/components/map/LiveMap"),
@@ -15,6 +16,16 @@ const LiveMap = dynamic(
 );
 
 export default function LiveMapPage() {
+  const { collapsed } = useSidebar();
+
+  if (collapsed) {
+    return (
+      <div className="fixed inset-0 z-40 bg-white">
+        <LiveMap />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div>

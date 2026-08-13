@@ -10,19 +10,18 @@
   },
   "dependencies": {
     "framer-motion": "^12.42.2",
-    "leaflet": "^1.9.4",
     "lucide-react": "^1.26.0",
+    "mapbox-gl": "^3.28.1",
     "next": "latest",
     "react": "latest",
     "react-countup": "^6.5.3",
     "react-dom": "latest",
-    "react-leaflet": "^5.0.0",
+    "react-map-gl": "^8.1.2",
     "recharts": "^3.10.0",
     "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "latest",
-    "@types/leaflet": "^1.9.21",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",

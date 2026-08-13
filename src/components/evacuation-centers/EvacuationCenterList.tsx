@@ -1,5 +1,17 @@
+"use client";
+
+import dynamic from "next/dynamic";
 import Badge from "@/components/ui/Badge";
 import type { EvacuationCenter } from "@/types/evacuation-center";
+
+const MiniMap = dynamic(() => import("@/components/map/MiniMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full items-center justify-center text-xs text-muted">
+      Loading map...
+    </div>
+  ),
+});
 
 // Mock data for UI — replace with real API data once backend endpoints are available.
 const centers: EvacuationCenter[] = [
@@ -23,22 +35,32 @@ export default function EvacuationCenterList() {
         const status = statusFor(pct);
 
         return (
-          <div key={center.id} className="rounded-2xl border border-border bg-white p-5 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="font-semibold text-foreground">{center.name}</p>
-                <p className="text-sm text-muted">{center.locationName}</p>
+          <div key={center.id} className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+            <div className="h-40 w-full">
+              <MiniMap
+                latitude={center.latitude}
+                longitude={center.longitude}
+                label={center.name}
+              />
+            </div>
+
+            <div className="p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-semibold text-foreground">{center.name}</p>
+                  <p className="text-sm text-muted">{center.locationName}</p>
+                </div>
+                <Badge variant={status.variant}>{status.label}</Badge>
               </div>
-              <Badge variant={status.variant}>{status.label}</Badge>
-            </div>
 
-            <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-background">
-              <div className={`h-full rounded-full ${status.bar}`} style={{ width: `${pct}%` }} />
-            </div>
+              <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-background">
+                <div className={`h-full rounded-full ${status.bar}`} style={{ width: `${pct}%` }} />
+              </div>
 
-            <div className="mt-2 flex justify-between text-xs text-muted">
-              <span>{center.occupants} / {center.capacity} occupants</span>
-              <span>{pct}% full</span>
+              <div className="mt-2 flex justify-between text-xs text-muted">
+                <span>{center.occupants} / {center.capacity} occupants</span>
+                <span>{pct}% full</span>
+              </div>
             </div>
           </div>
         );

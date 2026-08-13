@@ -1,21 +1,51 @@
+"use client";
+
 import { ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
+import { SidebarProvider, useSidebar } from "./SidebarContext";
 
-export default function AdminLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+function AdminLayoutInner({ children }: { children: ReactNode }) {
+  const { collapsed, toggle } = useSidebar();
+  const pathname = usePathname();
+  const isFullscreenMap = collapsed && pathname === "/live-map";
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <AdminSidebar />
 
-      <div className="lg:pl-72">
-        <AdminHeader />
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        className={`fixed top-24 z-50 hidden h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full border border-border bg-white text-foreground shadow-md transition-[left] duration-300 hover:bg-background lg:flex ${
+          collapsed ? "left-0" : "left-72"
+        }`}
+      >
+        <ChevronLeft
+          size={16}
+          strokeWidth={2.5}
+          className={`transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`}
+        />
+      </button>
 
-        <main className="p-6">{children}</main>
+      <div
+        className={`transition-[padding] duration-300 ${collapsed ? "lg:pl-0" : "lg:pl-72"}`}
+      >
+        {!isFullscreenMap && <AdminHeader />}
+
+        <main className={isFullscreenMap ? "" : "p-6"}>{children}</main>
       </div>
     </div>
+  );
+}
+
+export default function AdminLayout({ children }: { children: ReactNode }) {
+  return (
+    <SidebarProvider>
+      <AdminLayoutInner>{children}</AdminLayoutInner>
+    </SidebarProvider>
   );
 }

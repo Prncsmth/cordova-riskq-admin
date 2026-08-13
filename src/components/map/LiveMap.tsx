@@ -1,15 +1,11 @@
 "use client";
 
-import {
-  MapContainer,
-  TileLayer,
-  LayersControl,
-  Marker,
-  Popup,
-} from "react-leaflet";
+import { useCallback, useRef, useState } from "react";
+import Map, { Marker, Popup, NavigationControl } from "react-map-gl/mapbox";
+import type { MapRef } from "react-map-gl/mapbox";
+import type { LngLatBoundsLike } from "mapbox-gl";
 
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 export type LiveMapMarkerType = "incident" | "responder" | "evacuation";
 
@@ -26,22 +22,21 @@ const markerColor: Record<LiveMapMarkerType, string> = {
   evacuation: "#15803d",
 };
 
-function buildIcon(type: LiveMapMarkerType) {
-  return L.divIcon({
-    className: "",
-    html: `<span style="display:block;width:16px;height:16px;border-radius:9999px;background:${markerColor[type]};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></span>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
-  });
-}
-
 const center: [number, number] = [10.2531, 123.9495];
 
 // Keeps the map locked to Cordova, Cebu — no panning/zooming out to other areas.
-const CORDOVA_BOUNDS = L.latLngBounds(
-  L.latLng(10.20, 123.90),
-  L.latLng(10.32, 124.00)
-);
+const CORDOVA_BOUNDS: LngLatBoundsLike = [
+  [123.9, 10.2],
+  [124.0, 10.32],
+];
+
+const mapStyles = {
+  Road: "mapbox://styles/mapbox/streets-v12",
+  Satellite: "mapbox://styles/mapbox/satellite-streets-v12",
+  Terrain: "mapbox://styles/mapbox/outdoors-v12",
+} as const;
+
+type MapStyleName = keyof typeof mapStyles;
 
 // Mock markers for UI — replace with real API data once backend endpoints are available.
 export const defaultMarkers: LiveMapMarker[] = [
@@ -59,52 +54,114 @@ type LiveMapProps = {
   zoom?: number;
 };
 
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
 export default function LiveMap({
   markers = defaultMarkers,
   center: mapCenter = center,
   zoom = 14,
 }: LiveMapProps) {
+  const mapRef = useRef<MapRef>(null);
+  const [activeStyle, setActiveStyle] = useState<MapStyleName>("Road");
+  const [selectedMarker, setSelectedMarker] = useState<LiveMapMarker | null>(null);
+  const [mapReady, setMapReady] = useState(false);
+  const [minZoom, setMinZoom] = useState(13);
+
+  // Recomputes the tightest zoom that still fits the Cordova bounds to the
+  // current container size, so zooming out never reveals areas outside it.
+  const clampZoomToBounds = useCallback(() => {
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+
+    const fitted = map.cameraForBounds(CORDOVA_BOUNDS, { padding: 0 });
+    if (fitted && typeof fitted.zoom === "number") {
+      setMinZoom(fitted.zoom);
+    }
+  }, []);
+
+  if (!MAPBOX_TOKEN) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-slate-100 p-4 text-center text-sm text-muted">
+        Missing NEXT_PUBLIC_MAPBOX_TOKEN — set it in .env.local to load the map.
+      </div>
+    );
+  }
+
   return (
-    <MapContainer
-      center={mapCenter}
-      zoom={zoom}
-      minZoom={13}
+    <Map
+      ref={mapRef}
+      mapboxAccessToken={MAPBOX_TOKEN}
+      mapStyle={mapStyles[activeStyle]}
+      initialViewState={{
+        longitude: mapCenter[1],
+        latitude: mapCenter[0],
+        zoom,
+      }}
+      minZoom={minZoom}
       maxBounds={CORDOVA_BOUNDS}
-      maxBoundsViscosity={1.0}
-      className="h-full w-full"
+      onLoad={() => {
+        setMapReady(true);
+        clampZoomToBounds();
+      }}
+      onResize={clampZoomToBounds}
+      style={{ width: "100%", height: "100%" }}
     >
-      <LayersControl position="topright">
-        <LayersControl.BaseLayer checked name="Road">
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; OpenStreetMap contributors"
-          />
-        </LayersControl.BaseLayer>
+      <NavigationControl position="top-right" />
 
-        <LayersControl.BaseLayer name="Satellite">
-          <TileLayer
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            attribution="Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics"
-          />
-        </LayersControl.BaseLayer>
+      <div className="absolute right-2 top-24 z-10 overflow-hidden rounded-md border border-border bg-white text-xs shadow-sm">
+        {(Object.keys(mapStyles) as MapStyleName[]).map((name) => (
+          <button
+            key={name}
+            type="button"
+            onClick={() => setActiveStyle(name)}
+            className={`block w-full px-3 py-1.5 text-left hover:bg-slate-50 ${
+              activeStyle === name ? "bg-slate-100 font-medium" : ""
+            }`}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
 
-        <LayersControl.BaseLayer name="Terrain">
-          <TileLayer
-            url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
-            attribution="Map data: &copy; OpenStreetMap contributors, SRTM &mdash; Style: &copy; OpenTopoMap"
-          />
-        </LayersControl.BaseLayer>
-      </LayersControl>
+      {mapReady &&
+        markers.map((marker) => (
+          <Marker
+            key={marker.id}
+            longitude={marker.position[1]}
+            latitude={marker.position[0]}
+            anchor="center"
+            onClick={(event) => {
+              event.originalEvent.stopPropagation();
+              setSelectedMarker(marker);
+            }}
+          >
+            <span
+              style={{
+                display: "block",
+                width: 16,
+                height: 16,
+                borderRadius: 9999,
+                background: markerColor[marker.type],
+                border: "2px solid white",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
+                cursor: "pointer",
+              }}
+            />
+          </Marker>
+        ))}
 
-      {markers.map((marker) => (
-        <Marker
-          key={marker.id}
-          position={marker.position}
-          icon={buildIcon(marker.type)}
+      {mapReady && selectedMarker && (
+        <Popup
+          longitude={selectedMarker.position[1]}
+          latitude={selectedMarker.position[0]}
+          anchor="bottom"
+          offset={12}
+          closeOnClick={false}
+          onClose={() => setSelectedMarker(null)}
         >
-          <Popup>{marker.label}</Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+          {selectedMarker.label}
+        </Popup>
+      )}
+    </Map>
   );
 }

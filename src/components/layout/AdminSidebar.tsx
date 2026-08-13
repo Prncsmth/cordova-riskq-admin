@@ -20,13 +20,18 @@ import {
   ScrollText,
 } from "lucide-react";
 import SidebarGroup from "./SidebarGroup";
+import { useSidebar } from "./SidebarContext";
 
 const inter = Inter({ subsets: ["latin"], weight: ["600", "700"] });
 
 export default function AdminSidebar() {
+  const { collapsed } = useSidebar();
+
   return (
     <aside
-      className={`${inter.className} fixed inset-y-0 left-0 z-40 hidden w-72 flex-col bg-white shadow-xl lg:flex`}
+      className={`${inter.className} fixed inset-y-0 left-0 z-40 hidden w-72 flex-col bg-white shadow-xl transition-transform duration-300 lg:flex ${
+        collapsed ? "-translate-x-full" : "translate-x-0"
+      }`}
     >
 
       {/* Logo / Header */}
@@ -47,8 +52,19 @@ export default function AdminSidebar() {
 
           {/* Text */}
           <div>
-            <h1 className={`${inter.className} text-xl font-bold`}>
-              <span style={{ color: "#A70707" }}>CORDOVA</span>{" "}
+            <h1 className={`${inter.className} flex items-center text-xl font-bold`}>
+              <span className="inline-flex items-center" style={{ color: "#A70707" }}>
+                C
+                <Image
+                  src="/images/cordova-logo.png"
+                  alt="O"
+                  width={18}
+                  height={18}
+                  className="mx-0.5 inline-block object-contain"
+                />
+                RDOVA
+              </span>
+              &nbsp;
               <span style={{ color: "#FE6B47" }}>RISKQ</span>
             </h1>
 
