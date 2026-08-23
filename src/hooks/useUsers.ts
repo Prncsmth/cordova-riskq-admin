@@ -27,6 +27,7 @@ export function useUsers() {
   const { token } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -36,9 +37,16 @@ export function useUsers() {
 
     let cancelled = false;
 
+    setError(null);
+
     apiFetch<{ success: true; users: AdminUserRow[] }>("/admin/users", { token })
       .then((response) => {
         if (!cancelled) setUsers(response.users.map(toUser));
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load users.");
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -53,21 +61,26 @@ export function useUsers() {
     async (id: string, role: "citizen" | "responder") => {
       if (!token) return;
 
-      const response = await apiFetch<{ success: true; user: AdminUserRow }>(
-        `/admin/users/${id}/role`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({ role }),
-          token,
-        }
-      );
+      try {
+        const response = await apiFetch<{ success: true; user: AdminUserRow }>(
+          `/admin/users/${id}/role`,
+          {
+            method: "PATCH",
+            body: JSON.stringify({ role }),
+            token,
+          }
+        );
 
-      setUsers((prev) =>
-        prev.map((u) => (u.id === id ? toUser(response.user) : u))
-      );
+        setUsers((prev) =>
+          prev.map((u) => (u.id === id ? toUser(response.user) : u))
+        );
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to change role.");
+        throw err;
+      }
     },
     [token]
   );
 
-  return { users, loading, changeRole };
+  return { users, loading, error, changeRole };
 }
