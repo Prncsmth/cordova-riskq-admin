@@ -21,6 +21,8 @@ export default function UserMenu() {
 
   function logout() {
     localStorage.removeItem("riskq_admin_authenticated");
+    localStorage.removeItem("riskq_admin_token");
+    localStorage.removeItem("riskq_admin_user");
     router.push("/login");
   }
 
