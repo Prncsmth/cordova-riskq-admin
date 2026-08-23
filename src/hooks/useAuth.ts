@@ -26,14 +26,11 @@ function readStoredUser(): User | null {
 }
 
 export function useAuth() {
-  const [authenticated, setAuthenticated] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(AUTH_FLAG_KEY) === "true";
-  });
   const [user, setUser] = useState<User | null>(() => readStoredUser());
   const [token, setToken] = useState<string | null>(() =>
     typeof window === "undefined" ? null : localStorage.getItem(TOKEN_KEY)
   );
+  const authenticated = token !== null;
 
   const login = useCallback(async (email: string, password: string) => {
     const response = await apiFetch<LoginResponse>("/auth/login", {
@@ -58,7 +55,6 @@ export function useAuth() {
     localStorage.setItem(AUTH_FLAG_KEY, "true");
     setToken(response.token);
     setUser(nextUser);
-    setAuthenticated(true);
   }, []);
 
   const logout = useCallback(() => {
@@ -67,7 +63,6 @@ export function useAuth() {
     localStorage.removeItem(AUTH_FLAG_KEY);
     setToken(null);
     setUser(null);
-    setAuthenticated(false);
   }, []);
 
   return { authenticated, token, user, login, logout };

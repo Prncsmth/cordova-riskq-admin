@@ -28,6 +28,7 @@ export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -61,6 +62,8 @@ export function useUsers() {
     async (id: string, role: "citizen" | "responder") => {
       if (!token) return;
 
+      setActionError(null);
+
       try {
         const response = await apiFetch<{ success: true; user: AdminUserRow }>(
           `/admin/users/${id}/role`,
@@ -75,12 +78,12 @@ export function useUsers() {
           prev.map((u) => (u.id === id ? toUser(response.user) : u))
         );
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to change role.");
+        setActionError(err instanceof Error ? err.message : "Failed to change role.");
         throw err;
       }
     },
     [token]
   );
 
-  return { users, loading, error, changeRole };
+  return { users, loading, error, actionError, changeRole };
 }

@@ -15,7 +15,7 @@ const ROLE_BADGE_VARIANT: Record<User["role"], "info" | "success" | "default"> =
 };
 
 export default function UserTable() {
-  const { users, loading, error, changeRole } = useUsers();
+  const { users, loading, error, actionError, changeRole } = useUsers();
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   async function handleToggleRole(user: User) {
@@ -23,6 +23,8 @@ export default function UserTable() {
     setPendingId(user.id);
     try {
       await changeRole(user.id, nextRole);
+    } catch {
+      // surfaced via useUsers' actionError state, rendered below
     } finally {
       setPendingId(null);
     }
@@ -54,49 +56,57 @@ export default function UserTable() {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-background">
-            <tr>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">User</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Email</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Role</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {users.map((user) => (
-              <tr key={user.id} className="hover:bg-background">
-                <td className="p-4 font-medium text-foreground">{user.name}</td>
-                <td className="p-4 text-foreground">{user.email}</td>
-                <td className="p-4">
-                  <Badge variant={ROLE_BADGE_VARIANT[user.role]}>{user.role}</Badge>
-                </td>
-                <td className="p-4">
-                  <div className="flex items-center gap-4">
-                    <Link
-                      href={`/users/${user.id}`}
-                      className="font-medium text-primary hover:text-primary-dark"
-                    >
-                      View
-                    </Link>
+    <div className="space-y-4">
+      {actionError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          {actionError}
+        </div>
+      )}
 
-                    {user.role !== "admin" && (
-                      <Button
-                        variant="outline"
-                        disabled={pendingId === user.id}
-                        onClick={() => handleToggleRole(user)}
-                      >
-                        {user.role === "citizen" ? "Promote to Responder" : "Revert to Citizen"}
-                      </Button>
-                    )}
-                  </div>
-                </td>
+      <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-background">
+              <tr>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">User</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Email</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Role</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {users.map((user) => (
+                <tr key={user.id} className="hover:bg-background">
+                  <td className="p-4 font-medium text-foreground">{user.name}</td>
+                  <td className="p-4 text-foreground">{user.email}</td>
+                  <td className="p-4">
+                    <Badge variant={ROLE_BADGE_VARIANT[user.role]}>{user.role}</Badge>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-4">
+                      <Link
+                        href={`/users/${user.id}`}
+                        className="font-medium text-primary hover:text-primary-dark"
+                      >
+                        View
+                      </Link>
+
+                      {user.role !== "admin" && (
+                        <Button
+                          variant="outline"
+                          disabled={pendingId === user.id}
+                          onClick={() => handleToggleRole(user)}
+                        >
+                          {user.role === "citizen" ? "Promote to Responder" : "Revert to Citizen"}
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
