@@ -1,16 +1,29 @@
 "use client";
 
-import { ReactNode } from "react";
-import { usePathname } from "next/navigation";
+import { ReactNode, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
+import { useAuth } from "@/hooks/useAuth";
 
 function AdminLayoutInner({ children }: { children: ReactNode }) {
   const { collapsed, toggle } = useSidebar();
   const pathname = usePathname();
+  const router = useRouter();
+  const { authenticated } = useAuth();
   const isFullscreenMap = collapsed && pathname === "/live-map";
+
+  useEffect(() => {
+    if (!authenticated) {
+      router.replace("/login");
+    }
+  }, [authenticated, router]);
+
+  if (!authenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
