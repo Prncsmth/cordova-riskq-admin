@@ -21,6 +21,19 @@
   --font-geist-sans: "Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+:root.dark {
+  --background: #171313;
+  --surface: #241d1e;
+  --foreground: #f8eee9;
+  --muted: #b8a8a3;
+  --primary-light: #43272a;
+  --success-light: #153523;
+  --warning-light: #3b2b13;
+  --danger-light: #3b1d1f;
+  --info-light: #1c2c4b;
+  --border: #493d3b;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -55,6 +68,38 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+.dark .bg-white {
+  background-color: var(--surface) !important;
+}
+
+.dark .bg-gray-100,
+.dark .bg-slate-100 {
+  background-color: #302728 !important;
+}
+
+.dark .text-black {
+  color: var(--foreground) !important;
+}
+
+.dark .text-gray-500,
+.dark .text-gray-400,
+.dark .text-slate-800,
+.dark .text-slate-700,
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: var(--muted) !important;
+}
+
+.dark .border-slate-200,
+.dark .border-slate-300 {
+  border-color: var(--border) !important;
+}
+
+.dark .hover\:bg-gray-100:hover,
+.dark .hover\:bg-slate-50:hover {
+  background-color: #3a2f30 !important;
 }
 
 button,

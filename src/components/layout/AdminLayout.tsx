@@ -10,7 +10,11 @@ import { SidebarProvider, useSidebar } from "./SidebarContext";
 function AdminLayoutInner({ children }: { children: ReactNode }) {
   const { collapsed, toggle } = useSidebar();
   const pathname = usePathname();
-  const isFullscreenMap = collapsed && pathname === "/live-map";
+  // Treat the Live Map route as a fullscreen workspace: hide header and
+  // remove page padding so the map can fill the viewport next to the sidebar.
+  // Use a contains check since the route may include prefixes or trailing
+  // segments (e.g. localized or grouped routes).
+  const isFullscreenMap = typeof pathname === "string" && pathname.includes("live-map");
 
   return (
     <div className="min-h-screen bg-background text-foreground">

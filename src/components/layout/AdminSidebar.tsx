@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import SidebarGroup from "./SidebarGroup";
 import { useSidebar } from "./SidebarContext";
+import { ThemeToggle } from "./ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"], weight: ["600", "700"] });
 
@@ -126,12 +127,13 @@ export default function AdminSidebar() {
 
       {/* System status */}
       <div className="shrink-0 border-t border-border p-4">
-        <div className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-3 text-xs font-bold text-black">
+        <div className="flex items-center justify-between gap-2 rounded-lg bg-gray-100 px-4 py-3 text-xs font-bold text-black">
           <span className="h-2 w-2 shrink-0 rounded-full bg-success" />
           <span>
             <span className="block font-bold text-black">System Status</span>
             All systems operational
           </span>
+          <ThemeToggle />
         </div>
       </div>
 

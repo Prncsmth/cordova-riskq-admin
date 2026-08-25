@@ -2,11 +2,14 @@
 
 import { Bell } from "lucide-react";
 import UserMenu from "./UserMenu";
+import { ThemeToggle } from "./ThemeProvider";
 
 export default function AdminHeader() {
   return (
     <header className="border-b border-border bg-white px-6 py-3 shadow-sm">
       <div className="flex items-center justify-end gap-4">
+        <ThemeToggle />
+
         <button
           aria-label="Notifications"
           className="relative flex h-10 w-10 items-center justify-center rounded-full text-muted transition hover:bg-primary-light/40 hover:text-primary"
