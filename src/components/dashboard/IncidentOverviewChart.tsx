@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Activity } from "lucide-react";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -53,17 +54,22 @@ export default function IncidentOverviewChart() {
   const stats = summary[range];
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">Incident Overview</h2>
-          <p className="text-sm text-muted">Incidents and SOS alerts trend</p>
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
+            <Activity size={15} />
+          </span>
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Incident Overview</h2>
+            <p className="text-sm text-muted">Incidents and SOS alerts trend</p>
+          </div>
         </div>
 
         <select
           value={range}
           onChange={(e) => setRange(e.target.value as Range)}
-          className="rounded-lg border border-border bg-white px-3 py-1.5 text-sm font-medium text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="rounded-xl border border-border bg-white px-3 py-1.5 text-sm font-medium text-foreground shadow-xs transition hover:border-primary/40 focus:outline-none focus:ring-4 focus:ring-primary/15"
         >
           <option>Today</option>
           <option>This Week</option>
@@ -73,25 +79,35 @@ export default function IncidentOverviewChart() {
 
       <div className="mt-6 h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ left: -20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e7e0d8" />
-            <XAxis dataKey="label" tick={{ fontSize: 12, fill: "#6b6260" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 12, fill: "#6b6260" }} axisLine={false} tickLine={false} />
+          <AreaChart data={data} margin={{ left: -20 }}>
+            <defs>
+              <linearGradient id="incidentsFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#c8102e" stopOpacity={0.25} />
+                <stop offset="100%" stopColor="#c8102e" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="sosFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#b45309" stopOpacity={0.2} />
+                <stop offset="100%" stopColor="#b45309" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e6e9eb" />
+            <XAxis dataKey="label" tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} />
             <Tooltip
               contentStyle={{
                 borderRadius: 12,
-                border: "1px solid #e7e0d8",
+                border: "1px solid #e6e9eb",
                 fontSize: 13,
               }}
             />
             <Legend wrapperStyle={{ fontSize: 13 }} />
-            <Line type="monotone" dataKey="incidents" name="Incidents" stroke="#7a1128" strokeWidth={2.5} dot={false} />
-            <Line type="monotone" dataKey="sos" name="SOS Alerts" stroke="#b45309" strokeWidth={2.5} dot={false} />
-          </LineChart>
+            <Area type="monotone" dataKey="incidents" name="Incidents" stroke="#c8102e" strokeWidth={2.5} fill="url(#incidentsFill)" dot={false} />
+            <Area type="monotone" dataKey="sos" name="SOS Alerts" stroke="#b45309" strokeWidth={2.5} fill="url(#sosFill)" dot={false} />
+          </AreaChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 border-t border-border pt-5 sm:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-4 border-t border-border/70 pt-5 sm:grid-cols-4">
         <SummaryStat label="Total Incidents" value={stats.total} />
         <SummaryStat label="Total SOS Alerts" value={stats.sos} />
         <SummaryStat label="Resolved" value={stats.resolved} />

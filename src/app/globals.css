@@ -1,37 +1,74 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf7f2;
+  /* Palette matches CordovaRiskQ-Frontend's theme/colors.ts (LIGHT_COLORS),
+     with one deliberate deviation: reference's `background`/`surface` are
+     swapped here. A desktop admin dashboard viewed for hours reads as pure
+     glare on flat white; a soft light-gray canvas with crisp white cards
+     sitting on top gives the same palette actual depth instead. */
+  --background: #f5f7f8;
   --surface: #ffffff;
-  --foreground: #241214;
-  --muted: #6b6260;
-  --primary: #7a1128;
-  --primary-dark: #4f0b1a;
-  --primary-light: #fbeaea;
-  --secondary: #f59e0b;
-  --success: #15803d;
-  --success-light: #ecfdf3;
+  --foreground: #17181a;
+  --muted: #6b7280;
+  --primary: #c8102e;
+  --primary-dark: #9c0c24;
+  --primary-light: #f8e2e6;
+  --secondary: #ff6b35;
+  --tide: #0e7b86;
+  --tide-light: #e3f4f3;
+  --success: #1e8e3e;
+  --success-light: #eaf7ee;
   --warning: #b45309;
-  --warning-light: #fffbeb;
+  --warning-light: #fef3e2;
   --danger: #dc2626;
   --danger-light: #fef2f2;
   --info: #1d4ed8;
   --info-light: #eff6ff;
-  --border: #e7e0d8;
+  --border: #e6e9eb;
   --font-geist-sans: "Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Sidebar wordmark "CORDOVA" — pinned to match the logo.png asset's own
+     color, not the theme's --primary. Too dark to read on the dark-mode
+     sidebar as-is, so it gets its own brighter dark-mode value below. */
+  --brand-cordova: #a70707;
+
+  /* macOS-style vibrancy tokens */
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-strong: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(23, 24, 26, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.6);
+  --shadow-tint: 20, 14, 16;
+  --ring: rgba(200, 16, 46, 0.35);
 }
 
 :root.dark {
-  --background: #171313;
-  --surface: #241d1e;
-  --foreground: #f8eee9;
-  --muted: #b8a8a3;
-  --primary-light: #43272a;
-  --success-light: #153523;
-  --warning-light: #3b2b13;
+  /* Palette matches CordovaRiskQ-Frontend's theme/colors.ts (DARK_COLORS). */
+  --background: #0b0b0d;
+  --surface: #18191c;
+  --foreground: #f5f6f7;
+  --muted: #a8acb3;
+  --primary: #ff4d6d;
+  --primary-dark: #c8102e;
+  --primary-light: #3a1620;
+  --secondary: #ff8a5c;
+  --brand-cordova: #ff4d6d;
+  --tide: #4fd1c5;
+  --tide-light: #123a3a;
+  --success: #34d399;
+  --success-light: #123226;
+  --warning: #fbbf24;
+  --warning-light: #33260a;
+  --danger: #f87171;
   --danger-light: #3b1d1f;
   --info-light: #1c2c4b;
-  --border: #493d3b;
+  --border: #2a2c30;
+
+  --glass: rgba(36, 29, 30, 0.66);
+  --glass-strong: rgba(36, 29, 30, 0.86);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.05);
+  --shadow-tint: 0, 0, 0;
+  --ring: rgba(245, 246, 247, 0.3);
 }
 
 @theme inline {
@@ -43,6 +80,8 @@
   --color-primary-dark: var(--primary-dark);
   --color-primary-light: var(--primary-light);
   --color-secondary: var(--secondary);
+  --color-tide: var(--tide);
+  --color-tide-light: var(--tide-light);
   --color-success: var(--success);
   --color-success-light: var(--success-light);
   --color-warning: var(--warning);
@@ -52,6 +91,21 @@
   --color-info: var(--info);
   --color-info-light: var(--info-light);
   --color-border: var(--border);
+
+  /* Softer, more diffused elevation than Tailwind's defaults, in the
+     spirit of macOS/iOS panel shadows. */
+  --shadow-xs: 0 1px 2px rgba(var(--shadow-tint), 0.04);
+  --shadow-sm: 0 1px 3px rgba(var(--shadow-tint), 0.05), 0 1px 2px rgba(var(--shadow-tint), 0.04);
+  --shadow-md: 0 8px 20px -6px rgba(var(--shadow-tint), 0.12), 0 2px 6px -2px rgba(var(--shadow-tint), 0.06);
+  --shadow-lg: 0 20px 40px -12px rgba(var(--shadow-tint), 0.18), 0 6px 12px -4px rgba(var(--shadow-tint), 0.08);
+  --shadow-xl: 0 30px 60px -16px rgba(var(--shadow-tint), 0.22), 0 10px 20px -8px rgba(var(--shadow-tint), 0.1);
+  --shadow-2xl: 0 40px 80px -20px rgba(var(--shadow-tint), 0.28);
+
+  /* Slightly more generous corner radii for a premium, app-like feel. */
+  --radius-lg: 0.625rem;
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
 }
 
 * {
@@ -66,8 +120,26 @@ body {
 
 body {
   background: var(--background);
+  background-image:
+    radial-gradient(1200px circle at 8% -10%, rgba(200, 16, 46, 0.05), transparent 55%),
+    radial-gradient(900px circle at 100% 0%, rgba(255, 107, 53, 0.05), transparent 45%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:root.dark body {
+  background-image:
+    radial-gradient(1200px circle at 8% -10%, rgba(255, 77, 109, 0.12), transparent 55%),
+    radial-gradient(900px circle at 100% 0%, rgba(255, 138, 92, 0.04), transparent 45%);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring);
+  border-radius: 0.5rem;
 }
 
 .dark .bg-white {
@@ -114,18 +186,36 @@ a {
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #ede6dc;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c9bdae;
+  background-color: rgba(107, 98, 96, 0.28);
   border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ab9c88;
+  background-color: rgba(107, 98, 96, 0.45);
+  background-clip: padding-box;
+}
+
+/* Frosted-glass surface, used across sidebar/toolbar/panels for the
+   translucent "vibrancy" look. */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+.glass-strong {
+  background: var(--glass-strong);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
 }

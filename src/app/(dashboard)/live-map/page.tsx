@@ -18,19 +18,12 @@ const LiveMap = dynamic(
 export default function LiveMapPage() {
   const { collapsed } = useSidebar();
 
-  if (collapsed) {
-    return (
-      <div className="fixed inset-0 z-40 bg-white">
-        <LiveMap />
-      </div>
-    );
-  }
   // When the sidebar is collapsed, render the map as a fixed full-viewport
   // layer so it fills the entire screen width; keep the sidebar toggle
   // visible (it has a higher z-index) so the user can expand the sidebar.
   if (collapsed) {
     return (
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-0 bg-background">
         <LiveMap />
       </div>
     );

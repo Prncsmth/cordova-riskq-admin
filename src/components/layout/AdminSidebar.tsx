@@ -20,8 +20,8 @@ import {
   ScrollText,
 } from "lucide-react";
 import SidebarGroup from "./SidebarGroup";
+import SidebarItem from "./SidebarItem";
 import { useSidebar } from "./SidebarContext";
-import { ThemeToggle } from "./ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"], weight: ["600", "700"] });
 
@@ -30,17 +30,17 @@ export default function AdminSidebar() {
 
   return (
     <aside
-      className={`${inter.className} fixed inset-y-0 left-0 z-40 hidden w-72 flex-col bg-white shadow-xl transition-transform duration-300 lg:flex ${
+      className={`${inter.className} glass fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-(--glass-border) shadow-xl transition-transform duration-300 lg:flex ${
         collapsed ? "-translate-x-full" : "translate-x-0"
       }`}
     >
 
       {/* Logo / Header */}
-      <div className="flex h-20 shrink-0 items-center border-b border-border bg-white px-6">
+      <div className="flex h-20 shrink-0 items-center border-b border-(--glass-border) px-6">
         <div className="flex items-center gap-3">
 
           {/* Logo */}
-          <div className="relative h-12 w-12 shrink-0">
+          <div className="relative h-12 w-12 shrink-0 drop-shadow-sm">
             <Image
               src="/images/logo.png"
               alt="Cordova RISKQ Logo"
@@ -53,8 +53,8 @@ export default function AdminSidebar() {
 
           {/* Text */}
           <div>
-            <h1 className={`${inter.className} flex items-center text-xl font-bold`}>
-              <span className="inline-flex items-center" style={{ color: "#A70707" }}>
+            <h1 className={`${inter.className} flex items-center text-xl font-bold tracking-tight`}>
+              <span className="inline-flex items-center" style={{ color: "var(--brand-cordova)" }}>
                 C
                 <Image
                   src="/images/cordova-logo.png"
@@ -68,10 +68,6 @@ export default function AdminSidebar() {
               &nbsp;
               <span style={{ color: "#FE6B47" }}>RISKQ</span>
             </h1>
-
-            <p className="text-xs font-bold text-black">
-              
-            </p>
           </div>
 
         </div>
@@ -79,12 +75,9 @@ export default function AdminSidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-6 overflow-y-auto p-4">
-        <SidebarGroup
-          label="Overview"
-          items={[
-            { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-          ]}
-        />
+        <div className="space-y-1">
+          <SidebarItem href="/dashboard" label="Dashboard" icon={LayoutDashboard} />
+        </div>
 
         <SidebarGroup
           label="Emergency Operations"
@@ -124,18 +117,6 @@ export default function AdminSidebar() {
           ]}
         />
       </nav>
-
-      {/* System status */}
-      <div className="shrink-0 border-t border-border p-4">
-        <div className="flex items-center justify-between gap-2 rounded-lg bg-gray-100 px-4 py-3 text-xs font-bold text-black">
-          <span className="h-2 w-2 shrink-0 rounded-full bg-success" />
-          <span>
-            <span className="block font-bold text-black">System Status</span>
-            All systems operational
-          </span>
-          <ThemeToggle />
-        </div>
-      </div>
 
     </aside>
   );

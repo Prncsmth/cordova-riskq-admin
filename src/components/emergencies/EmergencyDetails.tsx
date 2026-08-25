@@ -47,7 +47,7 @@ export default function EmergencyDetails({
           </p>
         </div>
 
-        <button className="mt-5 w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white">
+        <button className="mt-5 w-full rounded-xl bg-linear-to-b from-primary to-primary-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:brightness-110 active:scale-[0.98]">
           Reassign Responder
         </button>
       </Card>
