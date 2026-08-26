@@ -1,124 +1,112 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
 import Badge from "@/components/ui/Badge";
-import { MOCK_USERS as users } from "@/lib/mockUsers";
+import Button from "@/components/ui/Button";
+import EmptyState from "@/components/ui/EmptyState";
+import { useUsers } from "@/hooks/useUsers";
+import { User } from "@/types/user";
 
-const statusFilters = ["All", "Active", "Suspended"] as const;
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
+const ROLE_BADGE_VARIANT: Record<User["role"], "info" | "success" | "default"> = {
+  admin: "info",
+  responder: "success",
+  citizen: "default",
+};
 
 export default function UserTable() {
-  const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("All");
+  const { users, loading, error, actionError, changeRole } = useUsers();
+  const [pendingId, setPendingId] = useState<string | null>(null);
 
-  const filtered = useMemo(() => {
-    return users.filter((user) => {
-      const matchesStatus = statusFilter === "All" || user.status === statusFilter;
+  async function handleToggleRole(user: User) {
+    const nextRole = user.role === "citizen" ? "responder" : "citizen";
+    setPendingId(user.id);
+    try {
+      await changeRole(user.id, nextRole);
+    } catch {
+      // surfaced via useUsers' actionError state, rendered below
+    } finally {
+      setPendingId(null);
+    }
+  }
 
-      const q = query.trim().toLowerCase();
-      const matchesQuery =
-        q.length === 0 ||
-        user.name.toLowerCase().includes(q) ||
-        user.email.toLowerCase().includes(q) ||
-        user.id.toLowerCase().includes(q);
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-white p-10 text-center text-sm text-muted shadow-sm">
+        Loading users…
+      </div>
+    );
+  }
 
-      return matchesStatus && matchesQuery;
-    });
-  }, [query, statusFilter]);
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700 shadow-sm">
+        {error}
+      </div>
+    );
+  }
+
+  if (users.length === 0) {
+    return (
+      <EmptyState
+        title="No users yet"
+        description="Registered citizens and responders will appear here."
+      />
+    );
+  }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
-      <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:max-w-xs">
-          <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search name, email, ID..."
-            className="w-full rounded-xl border border-border bg-background/60 py-2 pl-9 pr-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
-          />
+    <div className="space-y-4">
+      {actionError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          {actionError}
         </div>
+      )}
 
-        <div className="flex flex-wrap items-center gap-1.5">
-          {statusFilters.map((status) => (
-            <button
-              key={status}
-              type="button"
-              onClick={() => setStatusFilter(status)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
-                statusFilter === status
-                  ? "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm"
-                  : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
-              }`}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-background/60">
-            <tr>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">User</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Email</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Joined</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Status</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/70">
-            {filtered.map((user) => (
-              <tr key={user.id} className="transition-colors hover:bg-background/70">
-                <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-b from-primary to-primary-dark text-xs font-semibold text-white shadow-sm">
-                      {initials(user.name)}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="font-medium text-foreground">{user.name}</p>
-                      <p className="text-xs text-muted">{user.id}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4 text-foreground">{user.email}</td>
-                <td className="p-4 text-muted">{user.createdAt}</td>
-                <td className="p-4">
-                  <Badge variant={user.status === "Active" ? "success" : "danger"} solid={user.status === "Suspended"}>
-                    {user.status}
-                  </Badge>
-                </td>
-                <td className="p-4">
-                  <Link
-                    href={`/users/${user.id}`}
-                    className="font-medium text-primary hover:text-primary-dark"
-                  >
-                    View
-                  </Link>
-                </td>
-              </tr>
-            ))}
-
-            {filtered.length === 0 && (
+      <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-background">
               <tr>
-                <td colSpan={5} className="p-10 text-center text-sm text-muted">
-                  No users match your filters.
-                </td>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">User</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Email</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Role</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Action</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {users.map((user) => (
+                <tr key={user.id} className="hover:bg-background">
+                  <td className="p-4 font-medium text-foreground">{user.name}</td>
+                  <td className="p-4 text-foreground">{user.email}</td>
+                  <td className="p-4">
+                    <Badge variant={ROLE_BADGE_VARIANT[user.role]}>{user.role}</Badge>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-4">
+                      <Link
+                        href={`/users/${user.id}`}
+                        className="font-medium text-primary hover:text-primary-dark"
+                      >
+                        View
+                      </Link>
+
+                      {user.role !== "admin" && (
+                        <Button
+                          variant="outline"
+                          disabled={pendingId === user.id}
+                          onClick={() => handleToggleRole(user)}
+                        >
+                          {user.role === "citizen" ? "Promote to Responder" : "Revert to Citizen"}
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

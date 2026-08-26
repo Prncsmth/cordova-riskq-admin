@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function UserMenu() {
   const router = useRouter();
+  const { logout: clearSession } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -20,7 +22,7 @@ export default function UserMenu() {
   }, []);
 
   function logout() {
-    localStorage.removeItem("riskq_admin_authenticated");
+    clearSession();
     router.push("/login");
   }
 

@@ -1,8 +1,15 @@
-import { Mail, Phone, Calendar, Hash, UserX, UserCheck } from "lucide-react";
+import { Mail, Phone, Calendar, Hash } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import { MOCK_USERS } from "@/lib/mockUsers";
+import type { User } from "@/types/user";
+
+const ROLE_BADGE_VARIANT: Record<User["role"], "info" | "success" | "default"> = {
+  admin: "info",
+  responder: "success",
+  citizen: "default",
+};
 
 function initials(name: string) {
   return name
@@ -25,11 +32,9 @@ export default function UserDetails({ id }: { id: string }) {
     );
   }
 
-  const isActive = user.status === "Active";
-
   return (
-    <div className="grid gap-6 md:grid-cols-3">
-      <Card className="md:col-span-2">
+    <div className="grid gap-6">
+      <Card>
         <div className="flex flex-wrap items-center gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-linear-to-b from-primary to-primary-dark text-xl font-bold text-white shadow-sm ring-1 ring-primary/10">
             {initials(user.name)}
@@ -40,9 +45,7 @@ export default function UserDetails({ id }: { id: string }) {
             <p className="text-sm text-muted">{user.id}</p>
           </div>
 
-          <Badge variant={isActive ? "success" : "danger"} solid={!isActive}>
-            {user.status}
-          </Badge>
+          <Badge variant={ROLE_BADGE_VARIANT[user.role]}>{user.role}</Badge>
         </div>
 
         <div className="mt-8 grid gap-5 sm:grid-cols-2">
@@ -86,25 +89,6 @@ export default function UserDetails({ id }: { id: string }) {
             </div>
           </div>
         </div>
-      </Card>
-
-      <Card>
-        <h2 className="font-semibold text-foreground">Account Actions</h2>
-        <p className="mt-1 text-sm text-muted">
-          {isActive
-            ? "Suspend this account if it violates platform guidelines."
-            : "This account is currently suspended and cannot sign in."}
-        </p>
-
-        <button
-          type="button"
-          className={`mt-5 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:brightness-110 active:scale-[0.98] ${
-            isActive ? "bg-linear-to-b from-danger to-danger/80" : "bg-linear-to-b from-success to-success/80"
-          }`}
-        >
-          {isActive ? <UserX size={16} /> : <UserCheck size={16} />}
-          {isActive ? "Suspend Account" : "Reactivate Account"}
-        </button>
       </Card>
     </div>
   );

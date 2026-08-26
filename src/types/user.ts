@@ -1,10 +1,10 @@
-export type UserStatus = "Active" | "Suspended";
+export type UserRole = "citizen" | "responder" | "admin";
 
 export interface User {
   id: string;
   name: string;
   email: string;
   phone?: string;
-  status: UserStatus;
+  role: UserRole;
   createdAt: string;
 }

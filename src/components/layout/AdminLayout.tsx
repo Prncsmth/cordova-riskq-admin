@@ -1,20 +1,33 @@
 "use client";
 
-import { ReactNode } from "react";
-import { usePathname } from "next/navigation";
+import { ReactNode, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
+import { useAuth } from "@/hooks/useAuth";
 
 function AdminLayoutInner({ children }: { children: ReactNode }) {
   const { collapsed, toggle } = useSidebar();
   const pathname = usePathname();
+  const router = useRouter();
+  const { authenticated } = useAuth();
   // Treat the Live Map route as a fullscreen workspace: hide header and
   // remove page padding so the map can fill the viewport next to the sidebar.
   // Use a contains check since the route may include prefixes or trailing
   // segments (e.g. localized or grouped routes).
   const isFullscreenMap = typeof pathname === "string" && pathname.includes("live-map");
+
+  useEffect(() => {
+    if (!authenticated) {
+      router.replace("/login");
+    }
+  }, [authenticated, router]);
+
+  if (!authenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen text-foreground">

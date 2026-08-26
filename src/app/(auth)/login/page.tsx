@@ -4,18 +4,20 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
@@ -23,13 +25,16 @@ export default function LoginPage() {
       return;
     }
 
-    setError("");
+    setError(null);
     setLoading(true);
 
-    setTimeout(() => {
-      localStorage.setItem("riskq_admin_authenticated", "true");
+    try {
+      await login(email, password);
       router.push("/dashboard");
-    }, 800);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed. Please try again.");
+      setLoading(false);
+    }
   }
 
   return (
