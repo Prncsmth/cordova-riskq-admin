@@ -1,15 +1,20 @@
-import { FileText, Clock, CheckCircle2, FileEdit } from "lucide-react";
+"use client";
+
+import { FileText, Clock, Radio, CheckCircle2 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import IncidentReportTable from "@/components/incident-reports/IncidentReportTable";
-
-const stats = [
-  { label: "Total Reports", value: "5", icon: FileText, color: "text-primary", bg: "bg-primary-light" },
-  { label: "Awaiting Review", value: "2", icon: Clock, color: "text-warning", bg: "bg-warning-light" },
-  { label: "Reviewed", value: "2", icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
-  { label: "Drafts", value: "1", icon: FileEdit, color: "text-info", bg: "bg-info-light" },
-];
+import { useIncidentReports } from "@/hooks/useIncidentReports";
 
 export default function IncidentReportsPage() {
+  const { reports, loading, error } = useIncidentReports();
+
+  const stats = [
+    { label: "Total Reports", value: reports.length, icon: FileText, color: "text-primary", bg: "bg-primary-light" },
+    { label: "Active", value: reports.filter((r) => r.status === "Active").length, icon: Clock, color: "text-danger", bg: "bg-danger-light" },
+    { label: "Responding", value: reports.filter((r) => r.status === "Responding").length, icon: Radio, color: "text-warning", bg: "bg-warning-light" },
+    { label: "Resolved", value: reports.filter((r) => r.status === "Resolved").length, icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -36,7 +41,7 @@ export default function IncidentReportsPage() {
         })}
       </div>
 
-      <IncidentReportTable />
+      <IncidentReportTable reports={reports} loading={loading} error={error} />
     </div>
   );
 }

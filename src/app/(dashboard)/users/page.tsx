@@ -1,15 +1,24 @@
-import { Users as UsersIcon, UserCheck, UserX, UserPlus } from "lucide-react";
+"use client";
+
+import { Users as UsersIcon, UserPlus } from "lucide-react";
 import Card from "@/components/ui/Card";
 import UserTable from "@/components/users/UserTable";
+import { useUsers } from "@/hooks/useUsers";
 
-const stats = [
-  { label: "Total Users", value: "5", icon: UsersIcon, color: "text-primary", bg: "bg-primary-light" },
-  { label: "Active", value: "3", icon: UserCheck, color: "text-success", bg: "bg-success-light" },
-  { label: "Suspended", value: "2", icon: UserX, color: "text-danger", bg: "bg-danger-light" },
-  { label: "New This Week", value: "3", icon: UserPlus, color: "text-info", bg: "bg-info-light" },
-];
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 export default function UsersPage() {
+  const { users, loading, error, actionError, changeRole } = useUsers();
+
+  const newThisWeek = users.filter(
+    (u) => Date.now() - new Date(u.createdAt).getTime() < ONE_WEEK_MS
+  ).length;
+
+  const stats = [
+    { label: "Total Users", value: users.length, icon: UsersIcon, color: "text-primary", bg: "bg-primary-light" },
+    { label: "New This Week", value: newThisWeek, icon: UserPlus, color: "text-info", bg: "bg-info-light" },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -20,7 +29,7 @@ export default function UsersPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -37,7 +46,13 @@ export default function UsersPage() {
         })}
       </div>
 
-      <UserTable />
+      <UserTable
+        users={users}
+        loading={loading}
+        error={error}
+        actionError={actionError}
+        changeRole={changeRole}
+      />
     </div>
   );
 }

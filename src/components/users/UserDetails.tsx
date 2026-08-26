@@ -1,8 +1,11 @@
+"use client";
+
 import { Mail, Phone, Calendar, Hash } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
-import { MOCK_USERS } from "@/lib/mockUsers";
+import { useUsers } from "@/hooks/useUsers";
+import { formatDate } from "@/lib/utils";
 import type { User } from "@/types/user";
 
 const ROLE_BADGE_VARIANT: Record<User["role"], "info" | "success" | "default"> = {
@@ -21,7 +24,24 @@ function initials(name: string) {
 }
 
 export default function UserDetails({ id }: { id: string }) {
-  const user = MOCK_USERS.find((u) => u.id === id);
+  const { users, loading, error } = useUsers();
+  const user = users.find((u) => u.id === id);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-white p-10 text-center text-sm text-muted shadow-sm">
+        Loading user…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700 shadow-sm">
+        {error}
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -75,7 +95,7 @@ export default function UserDetails({ id }: { id: string }) {
             </span>
             <div>
               <p className="text-xs text-muted">Joined</p>
-              <p className="text-sm font-medium text-foreground">{user.createdAt}</p>
+              <p className="text-sm font-medium text-foreground">{formatDate(user.createdAt)}</p>
             </div>
           </div>
 

@@ -1,54 +1,73 @@
+"use client";
+
 import Card from "@/components/ui/Card";
-import Badge from "@/components/ui/Badge";
+import EmptyState from "@/components/ui/EmptyState";
+import { useResponders } from "@/hooks/useResponders";
+import { formatDate } from "@/lib/utils";
 
 export default function ResponderDetails({
   id,
 }: {
   id: string;
 }) {
+  const { responders, loading, error } = useResponders();
+  const responder = responders.find((r) => r.id === id);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-white p-10 text-center text-sm text-muted shadow-sm">
+        Loading responder…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700 shadow-sm">
+        {error}
+      </div>
+    );
+  }
+
+  if (!responder) {
+    return (
+      <EmptyState
+        title="Responder not found"
+        description={`No responder matches "${id}". They may have been reverted to citizen.`}
+      />
+    );
+  }
+
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <Card>
-        <h2 className="font-semibold">Responder Information</h2>
+    <Card>
+      <h2 className="font-semibold">Responder Information</h2>
 
-        <div className="mt-5 space-y-4">
-          <div>
-            <p className="text-xs text-muted">Responder ID</p>
-            <p>{id}</p>
-          </div>
-
-          <div>
-            <p className="text-xs text-muted">Name</p>
-            <p>Juan Dela Cruz</p>
-          </div>
-
-          <div>
-            <p className="text-xs text-muted">Contact</p>
-            <p>09123456789</p>
-          </div>
-
-          <div>
-            <p className="text-xs text-muted">Status</p>
-            <Badge variant="success">Available</Badge>
-          </div>
+      <div className="mt-5 space-y-4">
+        <div>
+          <p className="text-xs text-muted">Responder ID</p>
+          <p>{responder.id}</p>
         </div>
-      </Card>
 
-      <Card>
-        <h2 className="font-semibold">Responder Statistics</h2>
-
-        <div className="mt-5 grid grid-cols-2 gap-4">
-          <div className="rounded-xl border border-border/60 bg-background/60 p-4">
-            <p className="text-xs text-muted">Completed</p>
-            <p className="mt-1 text-2xl font-bold">42</p>
-          </div>
-
-          <div className="rounded-xl border border-border/60 bg-background/60 p-4">
-            <p className="text-xs text-muted">Active</p>
-            <p className="mt-1 text-2xl font-bold">1</p>
-          </div>
+        <div>
+          <p className="text-xs text-muted">Name</p>
+          <p>{responder.name}</p>
         </div>
-      </Card>
-    </div>
+
+        <div>
+          <p className="text-xs text-muted">Email</p>
+          <p>{responder.email}</p>
+        </div>
+
+        <div>
+          <p className="text-xs text-muted">Contact</p>
+          <p>{responder.phone ?? "Not provided"}</p>
+        </div>
+
+        <div>
+          <p className="text-xs text-muted">Joined</p>
+          <p>{formatDate(responder.createdAt)}</p>
+        </div>
+      </div>
+    </Card>
   );
 }

@@ -1,15 +1,45 @@
+"use client";
+
 import { Siren, Radio, CheckCircle2, XCircle } from "lucide-react";
 import Card from "@/components/ui/Card";
 import EmergencyTable from "@/components/emergencies/EmergencyTable";
-
-const stats = [
-  { label: "Active", value: "2", icon: Siren, color: "text-danger", bg: "bg-danger-light", pulse: true },
-  { label: "Responding", value: "1", icon: Radio, color: "text-warning", bg: "bg-warning-light" },
-  { label: "Resolved Today", value: "1", icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
-  { label: "Cancelled", value: "1", icon: XCircle, color: "text-muted", bg: "bg-background" },
-];
+import { useEmergencies } from "@/hooks/useEmergencies";
 
 export default function EmergenciesPage() {
+  const { emergencies, loading, error } = useEmergencies();
+
+  const stats = [
+    {
+      label: "Active",
+      value: emergencies.filter((e) => e.status === "Active").length,
+      icon: Siren,
+      color: "text-danger",
+      bg: "bg-danger-light",
+      pulse: true,
+    },
+    {
+      label: "Responding",
+      value: emergencies.filter((e) => e.status === "Responding").length,
+      icon: Radio,
+      color: "text-warning",
+      bg: "bg-warning-light",
+    },
+    {
+      label: "Resolved",
+      value: emergencies.filter((e) => e.status === "Resolved").length,
+      icon: CheckCircle2,
+      color: "text-success",
+      bg: "bg-success-light",
+    },
+    {
+      label: "Cancelled",
+      value: emergencies.filter((e) => e.status === "Cancelled").length,
+      icon: XCircle,
+      color: "text-muted",
+      bg: "bg-background",
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -42,7 +72,7 @@ export default function EmergenciesPage() {
         })}
       </div>
 
-      <EmergencyTable />
+      <EmergencyTable emergencies={emergencies} loading={loading} error={error} />
     </div>
   );
 }

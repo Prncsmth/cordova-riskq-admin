@@ -1,23 +1,22 @@
+"use client";
+
 import Link from "next/link";
 import { Siren } from "lucide-react";
 import Badge from "@/components/ui/Badge";
-
-// Mock data for UI — replace with real API data once backend endpoints are available.
-const incidents = [
-  { id: "INC-2026-0091", type: "Fire Incident", location: "Poblacion, Cordova", time: "10 min ago", status: "Active" as const },
-  { id: "INC-2026-0090", type: "Medical Emergency", location: "Gabi, Cordova", time: "25 min ago", status: "Active" as const },
-  { id: "INC-2026-0089", type: "Flood Report", location: "Day-as, Cordova", time: "1 hr ago", status: "Investigating" as const },
-  { id: "INC-2026-0088", type: "Road Accident", location: "San Miguel, Cordova", time: "2 hr ago", status: "Investigating" as const },
-  { id: "INC-2026-0087", type: "Fire Incident", location: "Poblacion, Cordova", time: "3 hr ago", status: "Resolved" as const },
-];
+import { useEmergencies } from "@/hooks/useEmergencies";
+import { timeAgo } from "@/lib/utils";
 
 const statusVariant = {
   Active: "danger",
-  Investigating: "warning",
+  Responding: "warning",
   Resolved: "success",
+  Cancelled: "default",
 } as const;
 
 export default function RecentIncidents() {
+  const { emergencies, loading, error } = useEmergencies();
+  const recent = emergencies.slice(0, 5);
+
   return (
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
       <div className="flex items-center justify-between border-b border-border/70 p-5">
@@ -32,32 +31,40 @@ export default function RecentIncidents() {
         </Link>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-background/60">
-            <tr>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Type</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Location</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Time</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/70">
-            {incidents.map((incident) => (
-              <tr key={incident.id} className="transition-colors hover:bg-background/70">
-                <td className="p-4 font-medium text-foreground">{incident.type}</td>
-                <td className="p-4 text-muted">{incident.location}</td>
-                <td className="p-4 text-muted">{incident.time}</td>
-                <td className="p-4">
-                  <Badge variant={statusVariant[incident.status]} solid={incident.status === "Active"}>
-                    {incident.status}
-                  </Badge>
-                </td>
+      {loading ? (
+        <p className="p-10 text-center text-sm text-muted">Loading incidents…</p>
+      ) : error ? (
+        <p className="p-10 text-center text-sm text-red-700">{error}</p>
+      ) : recent.length === 0 ? (
+        <p className="p-10 text-center text-sm text-muted">No active incidents.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-background/60">
+              <tr>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Type</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Location</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Time</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-border/70">
+              {recent.map((incident) => (
+                <tr key={incident.id} className="transition-colors hover:bg-background/70">
+                  <td className="p-4 font-medium text-foreground">{incident.type}</td>
+                  <td className="p-4 text-muted">{incident.locationName}</td>
+                  <td className="p-4 text-muted">{timeAgo(incident.createdAt)}</td>
+                  <td className="p-4">
+                    <Badge variant={statusVariant[incident.status]} solid={incident.status === "Active"}>
+                      {incident.status}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

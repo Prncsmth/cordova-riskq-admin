@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Waves, Sun, CloudSun, CloudLightning } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 function getGreeting(hour: number) {
   if (hour < 12) return "Good morning";
@@ -39,6 +40,7 @@ const tideStyles = {
 };
 
 export default function DashboardHeader() {
+  const { user } = useAuth();
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -56,7 +58,8 @@ export default function DashboardHeader() {
       <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            {now ? getGreeting(now.getHours()) : "Welcome"}, Admin
+            {now ? getGreeting(now.getHours()) : "Welcome"}
+            {user?.name ? `, ${user.name}` : ""}
           </h1>
 
           <p className="mt-1 text-sm text-muted">

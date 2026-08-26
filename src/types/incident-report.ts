@@ -1,10 +1,10 @@
-export type IncidentReportStatus = "Draft" | "Submitted" | "Reviewed";
+import type { EmergencyStatus, EmergencyType } from "@/types/emergency";
 
 export interface IncidentReport {
   id: string;
-  incidentId: string;
-  type: string;
+  type: EmergencyType;
+  locationName: string;
   submittedBy: string;
-  status: IncidentReportStatus;
+  status: EmergencyStatus;
   createdAt: string;
 }

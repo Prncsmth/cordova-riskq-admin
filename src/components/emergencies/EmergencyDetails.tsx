@@ -1,11 +1,39 @@
+"use client";
+
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import { useEmergency } from "@/hooks/useEmergencies";
+
+const statusVariant = {
+  Active: "danger",
+  Responding: "warning",
+  Resolved: "success",
+  Cancelled: "default",
+} as const;
 
 export default function EmergencyDetails({
   id,
 }: {
   id: string;
 }) {
+  const { emergency, loading, error } = useEmergency(id);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-white p-10 text-center text-sm text-muted shadow-sm">
+        Loading incident…
+      </div>
+    );
+  }
+
+  if (error || !emergency) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700 shadow-sm">
+        {error ?? "Incident not found."}
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <Card className="lg:col-span-2">
@@ -16,23 +44,30 @@ export default function EmergencyDetails({
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           <div>
             <p className="text-xs text-muted">Emergency ID</p>
-            <p className="font-semibold">{id}</p>
+            <p className="font-semibold">{emergency.id}</p>
           </div>
 
           <div>
             <p className="text-xs text-muted">Type</p>
-            <p className="font-semibold">Medical Emergency</p>
+            <p className="font-semibold">{emergency.type}</p>
           </div>
 
           <div>
             <p className="text-xs text-muted">Location</p>
-            <p className="font-semibold">Poblacion Occidental</p>
+            <p className="font-semibold">{emergency.locationName}</p>
           </div>
 
           <div>
             <p className="text-xs text-muted">Status</p>
-            <Badge variant="danger">Active</Badge>
+            <Badge variant={statusVariant[emergency.status]}>{emergency.status}</Badge>
           </div>
+
+          {emergency.description && (
+            <div className="sm:col-span-2">
+              <p className="text-xs text-muted">Details</p>
+              <p className="font-medium">{emergency.description}</p>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -40,16 +75,12 @@ export default function EmergencyDetails({
         <h2 className="font-semibold">Assigned Responder</h2>
 
         <div className="mt-5">
-          <p className="font-medium">Juan Dela Cruz</p>
-
-          <p className="text-sm text-muted">
-            Available · 1.2 km away
-          </p>
+          {emergency.responderId ? (
+            <p className="font-medium">{emergency.responderId}</p>
+          ) : (
+            <p className="text-sm text-muted">No responder assigned yet.</p>
+          )}
         </div>
-
-        <button className="mt-5 w-full rounded-xl bg-linear-to-b from-primary to-primary-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:brightness-110 active:scale-[0.98]">
-          Reassign Responder
-        </button>
       </Card>
     </div>
   );

@@ -5,31 +5,9 @@ import Link from "next/link";
 import { Search, HeartPulse, Flame, Car, ShieldAlert, CloudRain, FileQuestion } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Badge from "@/components/ui/Badge";
+import EmptyState from "@/components/ui/EmptyState";
 import type { Emergency } from "@/types/emergency";
-import { CORDOVA_BARANGAYS, jitter } from "@/lib/cordovaBarangays";
-
-function barangay(id: string) {
-  const found = CORDOVA_BARANGAYS.find((b) => b.id === id);
-  if (!found) throw new Error(`Unknown Cordova barangay: ${id}`);
-  return found;
-}
-
-const [poblacionPos, dapitanPos, catarmanPos, gabiPos, cogonPos] = [
-  jitter(barangay("poblacion"), 0),
-  jitter(barangay("dapitan"), 1),
-  jitter(barangay("catarman"), 2),
-  jitter(barangay("gabi"), 3),
-  jitter(barangay("cogon"), 4),
-];
-
-// Mock data for UI — replace with real API data once backend endpoints are available.
-const emergencies: Emergency[] = [
-  { id: "EMG-001", type: "Medical", locationName: "Poblacion, Cordova", latitude: poblacionPos[0], longitude: poblacionPos[1], status: "Active", userId: "USR-014", responderId: "RES-001", createdAt: "12 min ago", updatedAt: "2 min ago" },
-  { id: "EMG-002", type: "Fire", locationName: "Dapitan, Cordova", latitude: dapitanPos[0], longitude: dapitanPos[1], status: "Responding", userId: "USR-022", responderId: "RES-002", createdAt: "28 min ago", updatedAt: "5 min ago" },
-  { id: "EMG-003", type: "Accident", locationName: "Catarman, Cordova", latitude: catarmanPos[0], longitude: catarmanPos[1], status: "Resolved", userId: "USR-031", responderId: "RES-003", createdAt: "1 hr ago", updatedAt: "40 min ago" },
-  { id: "EMG-004", type: "Disaster", locationName: "Gabi, Cordova", latitude: gabiPos[0], longitude: gabiPos[1], status: "Active", userId: "USR-018", createdAt: "3 min ago", updatedAt: "3 min ago" },
-  { id: "EMG-005", type: "Other", locationName: "Cogon, Cordova", latitude: cogonPos[0], longitude: cogonPos[1], status: "Cancelled", userId: "USR-009", createdAt: "2 hr ago", updatedAt: "1 hr ago" },
-];
+import { timeAgo } from "@/lib/utils";
 
 const statusStyle = {
   Active: { variant: "danger" as const, solid: true },
@@ -50,7 +28,15 @@ const defaultTypeStyle = { icon: FileQuestion, tile: "bg-background text-muted" 
 
 const statusFilters = ["All", "Active", "Responding", "Resolved", "Cancelled"] as const;
 
-export default function EmergencyTable() {
+export default function EmergencyTable({
+  emergencies,
+  loading,
+  error,
+}: {
+  emergencies: Emergency[];
+  loading: boolean;
+  error: string | null;
+}) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("All");
 
@@ -67,7 +53,32 @@ export default function EmergencyTable() {
 
       return matchesStatus && matchesQuery;
     });
-  }, [query, statusFilter]);
+  }, [emergencies, query, statusFilter]);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-white p-10 text-center text-sm text-muted shadow-sm">
+        Loading incidents…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700 shadow-sm">
+        {error}
+      </div>
+    );
+  }
+
+  if (emergencies.length === 0) {
+    return (
+      <EmptyState
+        title="No active incidents"
+        description="Reported emergencies will appear here as they come in."
+      />
+    );
+  }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
@@ -131,7 +142,7 @@ export default function EmergencyTable() {
                       </span>
                       <div className="min-w-0">
                         <p className="font-medium text-foreground">{emergency.type}</p>
-                        <p className="text-xs text-muted">{emergency.id} &middot; {emergency.createdAt}</p>
+                        <p className="text-xs text-muted">{emergency.id} &middot; {timeAgo(emergency.createdAt)}</p>
                       </div>
                     </div>
                   </td>

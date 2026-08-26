@@ -5,7 +5,6 @@ import Link from "next/link";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
-import { useUsers } from "@/hooks/useUsers";
 import { User } from "@/types/user";
 
 const ROLE_BADGE_VARIANT: Record<User["role"], "info" | "success" | "default"> = {
@@ -14,8 +13,19 @@ const ROLE_BADGE_VARIANT: Record<User["role"], "info" | "success" | "default"> =
   citizen: "default",
 };
 
-export default function UserTable() {
-  const { users, loading, error, actionError, changeRole } = useUsers();
+export default function UserTable({
+  users,
+  loading,
+  error,
+  actionError,
+  changeRole,
+}: {
+  users: User[];
+  loading: boolean;
+  error: string | null;
+  actionError: string | null;
+  changeRole: (id: string, role: "citizen" | "responder") => Promise<void>;
+}) {
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   async function handleToggleRole(user: User) {
