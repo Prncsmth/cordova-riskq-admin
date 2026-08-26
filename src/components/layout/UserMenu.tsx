@@ -28,9 +28,9 @@ export default function UserMenu() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-3 rounded-lg px-2 py-1.5 text-left transition hover:bg-primary-light/40"
+        className="flex items-center gap-3 rounded-xl px-2 py-1.5 text-left transition-all duration-150 hover:bg-primary-light/40 active:scale-[0.98]"
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-b from-primary to-primary-dark text-sm font-semibold text-white shadow-sm">
           AU
         </span>
 
@@ -43,15 +43,15 @@ export default function UserMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-border bg-white p-1.5 shadow-lg">
-          <div className="border-b border-border px-3 py-2 sm:hidden">
+        <div className="glass-strong absolute right-0 z-50 mt-2 w-52 origin-top-right rounded-2xl border border-(--glass-border) p-1.5 shadow-lg">
+          <div className="border-b border-(--glass-border) px-3 py-2 sm:hidden">
             <p className="text-sm font-semibold text-foreground">Admin User</p>
             <p className="text-xs text-muted">Super Admin</p>
           </div>
 
           <button
             onClick={() => router.push("/settings")}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition hover:bg-primary-light/40"
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition hover:bg-primary-light/40"
           >
             <User size={16} />
             Account Settings
@@ -59,7 +59,7 @@ export default function UserMenu() {
 
           <button
             onClick={logout}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-danger transition hover:bg-danger-light"
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-danger transition hover:bg-danger-light"
           >
             <LogOut size={16} />
             Logout

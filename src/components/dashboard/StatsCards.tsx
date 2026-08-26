@@ -33,7 +33,7 @@ const cards = [
     delta: "78% of total",
     color: "text-success",
     bg: "bg-success-light",
-    stroke: "#15803d",
+    stroke: "#1e8e3e",
     icon: ShieldCheck,
     trend: [50, 54, 58, 55, 60, 62, 64],
   },
@@ -62,7 +62,8 @@ export default function StatsCards() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.06 }}
-            className="rounded-2xl border border-border bg-white p-6 shadow-sm"
+            style={{ borderLeftColor: card.stroke }}
+            className="rounded-2xl border border-l-4 border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md"
           >
             <div className="flex items-start justify-between">
               <div>
@@ -78,7 +79,7 @@ export default function StatsCards() {
                 </p>
               </div>
 
-              <div className={`rounded-full p-3 ${card.bg}`}>
+              <div className={`rounded-full p-3 ring-1 ring-black/3 ${card.bg}`}>
                 <Icon size={22} className={card.color} />
               </div>
             </div>

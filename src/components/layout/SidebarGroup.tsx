@@ -18,12 +18,12 @@ export default function SidebarGroup({ label, items }: SidebarGroupProps) {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between px-4 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-black/50 transition hover:text-black/70"
+        className="flex w-full items-center justify-between gap-2 px-4 py-1 text-[10px] font-bold uppercase tracking-wide text-primary/80 transition hover:text-primary"
         aria-expanded={open}
       >
-        <span>{label}</span>
+        <span className="min-w-0 truncate">{label}</span>
         <ChevronDown
-          size={14}
+          size={12}
           strokeWidth={2.5}
           className={`shrink-0 transition-transform duration-200 ${
             open ? "rotate-0" : "-rotate-90"

@@ -19,7 +19,7 @@ export default function MiniMap({ latitude, longitude, label, zoom = 15 }: MiniM
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-slate-100 text-center text-xs text-muted">
+      <div className="flex h-full w-full items-center justify-center bg-background text-center text-xs text-muted">
         Missing NEXT_PUBLIC_MAPBOX_TOKEN
       </div>
     );
@@ -50,7 +50,7 @@ export default function MiniMap({ latitude, longitude, label, zoom = 15 }: MiniM
               width: 14,
               height: 14,
               borderRadius: 9999,
-              background: "#15803d",
+              background: "#1e8e3e",
               border: "2px solid white",
               boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
             }}

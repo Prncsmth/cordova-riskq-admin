@@ -18,8 +18,8 @@ const LiveMap = dynamic(
 
 export default function LiveMapPreview() {
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-border p-4">
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
+      <div className="flex items-center justify-between border-b border-border/70 p-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Live Map Overview</h2>
           <p className="text-sm text-muted">Active incidents, responders, and evacuation centers</p>
@@ -38,7 +38,7 @@ export default function LiveMapPreview() {
         <LiveMap />
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 border-t border-border px-4 py-3 text-xs text-muted">
+      <div className="flex flex-wrap items-center gap-4 border-t border-border/70 px-4 py-3 text-xs text-muted">
         <LegendDot color="bg-danger" label="Active Incident" />
         <LegendDot color="bg-info" label="Responder" />
         <LegendDot color="bg-success" label="Evacuation Center" />

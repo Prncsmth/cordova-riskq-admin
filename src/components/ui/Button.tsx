@@ -10,16 +10,17 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const styles = {
-    primary: "bg-primary text-white hover:bg-primary-dark",
-    secondary: "bg-warning text-white hover:opacity-90",
-    danger: "bg-danger text-white hover:opacity-90",
-    outline: "border border-border bg-white text-foreground hover:bg-primary-light/40",
+    primary:
+      "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm hover:brightness-110 active:brightness-95",
+    secondary: "bg-linear-to-b from-warning to-warning/90 text-white shadow-sm hover:brightness-110",
+    danger: "bg-linear-to-b from-danger to-danger/90 text-white shadow-sm hover:brightness-110",
+    outline: "border border-border bg-white text-foreground shadow-xs hover:bg-primary-light/40",
   };
 
   return (
     <button
       {...props}
-      className={`rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${styles[variant]} ${className}`}
+      className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100 ${styles[variant]} ${className}`}
     />
   );
 }
