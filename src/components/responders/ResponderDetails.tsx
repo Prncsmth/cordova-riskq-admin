@@ -38,12 +38,12 @@ export default function ResponderDetails({
         <h2 className="font-semibold">Responder Statistics</h2>
 
         <div className="mt-5 grid grid-cols-2 gap-4">
-          <div className="rounded-lg bg-background p-4">
+          <div className="rounded-xl border border-border/60 bg-background/60 p-4">
             <p className="text-xs text-muted">Completed</p>
             <p className="mt-1 text-2xl font-bold">42</p>
           </div>
 
-          <div className="rounded-lg bg-background p-4">
+          <div className="rounded-xl border border-border/60 bg-background/60 p-4">
             <p className="text-xs text-muted">Active</p>
             <p className="mt-1 text-2xl font-bold">1</p>
           </div>

@@ -1,59 +1,126 @@
-import Badge from "@/components/ui/Badge";
-import Link from "next/link";
+"use client";
 
-const responders = [
-  {
-    id: "RES-001",
-    name: "Juan Dela Cruz",
-    phone: "09123456789",
-    status: "Available",
-  },
-  {
-    id: "RES-002",
-    name: "Pedro Santos",
-    phone: "09234567890",
-    status: "On Duty",
-  },
-  {
-    id: "RES-003",
-    name: "Maria Garcia",
-    phone: "09345678901",
-    status: "Offline",
-  },
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { Search } from "lucide-react";
+import Badge from "@/components/ui/Badge";
+import type { Responder } from "@/types/responder";
+
+// Mock data for UI — replace with real API data once backend endpoints are available.
+const responders: Responder[] = [
+  { id: "RES-001", name: "Juan Dela Cruz", email: "juan.delacruz@cordovariskq.gov.ph", phone: "09123456789", status: "Available", verified: true, createdAt: "3 months ago" },
+  { id: "RES-002", name: "Pedro Santos", email: "pedro.santos@cordovariskq.gov.ph", phone: "09234567890", status: "On Duty", verified: true, createdAt: "5 months ago" },
+  { id: "RES-003", name: "Maria Garcia", email: "maria.garcia@cordovariskq.gov.ph", phone: "09345678901", status: "Offline", verified: true, createdAt: "1 year ago" },
+  { id: "RES-004", name: "Ana Reyes", email: "ana.reyes@cordovariskq.gov.ph", phone: "09456789012", status: "Available", verified: true, createdAt: "2 months ago" },
+  { id: "RES-005", name: "Mark Villanueva", email: "mark.villanueva@cordovariskq.gov.ph", phone: "09567890123", status: "On Duty", verified: false, createdAt: "1 week ago" },
 ];
 
+const statusFilters = ["All", "Available", "On Duty", "Offline"] as const;
+
+function initials(name: string) {
+  return name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 export default function ResponderTable() {
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("All");
+
+  const filtered = useMemo(() => {
+    return responders.filter((responder) => {
+      const matchesStatus = statusFilter === "All" || responder.status === statusFilter;
+
+      const q = query.trim().toLowerCase();
+      const matchesQuery =
+        q.length === 0 ||
+        responder.name.toLowerCase().includes(q) ||
+        responder.email.toLowerCase().includes(q) ||
+        responder.id.toLowerCase().includes(q);
+
+      return matchesStatus && matchesQuery;
+    });
+  }, [query, statusFilter]);
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
+      <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-xs">
+          <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search name, email, ID..."
+            className="w-full rounded-xl border border-border bg-background/60 py-2 pl-9 pr-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5">
+          {statusFilters.map((status) => (
+            <button
+              key={status}
+              type="button"
+              onClick={() => setStatusFilter(status)}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
+                statusFilter === status
+                  ? "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm"
+                  : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-background">
+          <thead className="bg-background/60">
             <tr>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">ID</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Name</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Responder</th>
               <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Phone</th>
               <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Status</th>
               <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
-            {responders.map((responder) => (
-              <tr key={responder.id} className="hover:bg-background">
-                <td className="p-4 font-semibold text-foreground">{responder.id}</td>
-                <td className="p-4 text-foreground">{responder.name}</td>
+          <tbody className="divide-y divide-border/70">
+            {filtered.map((responder) => (
+              <tr key={responder.id} className="transition-colors hover:bg-background/70">
+                <td className="p-4">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-b from-primary to-primary-dark text-xs font-semibold text-white shadow-sm">
+                      {initials(responder.name)}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-medium text-foreground">{responder.name}</p>
+                      <p className="text-xs text-muted">{responder.email}</p>
+                    </div>
+                  </div>
+                </td>
                 <td className="p-4 text-muted">{responder.phone}</td>
                 <td className="p-4">
-                  <Badge
-                    variant={
-                      responder.status === "Available"
-                        ? "success"
-                        : responder.status === "On Duty"
-                          ? "warning"
-                          : "default"
-                    }
-                  >
-                    {responder.status}
-                  </Badge>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <Badge
+                      variant={
+                        responder.status === "Available"
+                          ? "success"
+                          : responder.status === "On Duty"
+                            ? "warning"
+                            : "default"
+                      }
+                    >
+                      {responder.status}
+                    </Badge>
+
+                    {!responder.verified && (
+                      <Badge variant="warning" solid>
+                        Unverified
+                      </Badge>
+                    )}
+                  </div>
                 </td>
                 <td className="p-4">
                   <Link
@@ -65,6 +132,14 @@ export default function ResponderTable() {
                 </td>
               </tr>
             ))}
+
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={4} className="p-10 text-center text-sm text-muted">
+                  No responders match your filters.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

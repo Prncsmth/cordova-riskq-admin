@@ -18,34 +18,21 @@ const LiveMap = dynamic(
 export default function LiveMapPage() {
   const { collapsed } = useSidebar();
 
+  // When the sidebar is collapsed, render the map as a fixed full-viewport
+  // layer so it fills the entire screen width; keep the sidebar toggle
+  // visible (it has a higher z-index) so the user can expand the sidebar.
   if (collapsed) {
     return (
-      <div className="fixed inset-0 z-40 bg-white">
+      <div className="fixed inset-0 z-0 bg-background">
         <LiveMap />
       </div>
     );
   }
 
+  // Otherwise render the map to fill the available content area height.
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Live Map</h1>
-        <p className="text-sm text-muted">
-          Real-time view of active incidents, responders, and evacuation centers across Cordova.
-        </p>
-      </div>
-
-      <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-        <div className="h-[calc(100vh-14rem)] min-h-[420px] w-full">
-          <LiveMap />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-4 border-t border-border px-4 py-3 text-xs text-muted">
-          <LegendDot color="bg-danger" label="Active Incident" />
-          <LegendDot color="bg-info" label="Responder" />
-          <LegendDot color="bg-success" label="Evacuation Center" />
-        </div>
-      </div>
+    <div className="h-screen w-full">
+      <LiveMap />
     </div>
   );
 }

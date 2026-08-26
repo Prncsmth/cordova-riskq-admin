@@ -23,13 +23,13 @@ export default function SidebarItem({
   return (
     <Link
       href={href}
-      className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-bold transition ${
+      className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-bold transition-all duration-150 ${
         active
-          ? "bg-primary text-white shadow-sm"
-          : "text-black hover:bg-gray-100"
+          ? "bg-linear-to-b from-primary to-primary-dark text-white shadow-[0_4px_12px_-2px_rgba(122,17,40,0.4)]"
+          : "text-foreground/80 hover:bg-black/4 hover:text-foreground active:scale-[0.98] dark:hover:bg-white/6"
       }`}
     >
-      <Icon size={17} strokeWidth={2} className="shrink-0" />
+      <Icon size={17} strokeWidth={2.25} className={`shrink-0 ${active ? "drop-shadow-sm" : ""}`} />
       {label}
     </Link>
   );

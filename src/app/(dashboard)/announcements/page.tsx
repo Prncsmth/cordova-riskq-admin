@@ -1,6 +1,26 @@
-import Card from "@/components/ui/Card";
+"use client";
+
+import { useState } from "react";
+import AnnouncementForm from "@/components/announcements/AnnouncementForm";
+import AnnouncementPreview from "@/components/announcements/AnnouncementPreview";
+import AnnouncementTable from "@/components/announcements/AnnouncementTable";
+import type { AnnouncementAudience, AnnouncementPriority } from "@/types/announcement";
 
 export default function AnnouncementsPage() {
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [priority, setPriority] = useState<AnnouncementPriority>("Normal");
+  const [audience, setAudience] = useState<AnnouncementAudience>("All Users");
+
+  function handlePublish() {
+    // No backend endpoint yet — this just resets the draft so the flow is
+    // demonstrable end-to-end once the API is wired up.
+    setTitle("");
+    setBody("");
+    setPriority("Normal");
+    setAudience("All Users");
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -11,28 +31,26 @@ export default function AnnouncementsPage() {
         </p>
       </div>
 
-      <Card>
-        <h2 className="font-semibold text-foreground">
-          Create Announcement
-        </h2>
+      <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr] xl:items-start">
+        <AnnouncementForm
+          title={title}
+          body={body}
+          priority={priority}
+          audience={audience}
+          onTitleChange={setTitle}
+          onBodyChange={setBody}
+          onPriorityChange={setPriority}
+          onAudienceChange={setAudience}
+          onPublish={handlePublish}
+        />
 
-        <form className="mt-5 space-y-4">
-          <input
-            placeholder="Announcement title"
-            className="w-full rounded-lg border border-border p-3 outline-none focus:border-primary"
-          />
+        <AnnouncementPreview title={title} body={body} priority={priority} audience={audience} />
+      </div>
 
-          <textarea
-            placeholder="Write announcement..."
-            rows={5}
-            className="w-full rounded-lg border border-border p-3 outline-none focus:border-primary"
-          />
-
-          <button className="rounded-lg bg-primary px-5 py-3 font-semibold text-white transition hover:bg-primary-dark">
-            Publish Announcement
-          </button>
-        </form>
-      </Card>
+      <div>
+        <h2 className="px-1 pb-3 text-xs font-bold uppercase tracking-widest text-muted">Recent Announcements</h2>
+        <AnnouncementTable />
+      </div>
     </div>
   );
 }

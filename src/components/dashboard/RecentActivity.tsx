@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BellRing, ShieldCheck, CheckCircle2, Building2, UserPlus } from "lucide-react";
+import { BellRing, ShieldCheck, CheckCircle2, Building2, UserPlus, History } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 type Activity = {
@@ -57,19 +57,24 @@ const activities: Activity[] = [
 
 export default function RecentActivity() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-border p-5">
-        <h2 className="text-lg font-semibold text-foreground">Recent Activity</h2>
+    <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
+      <div className="flex items-center justify-between border-b border-border/70 p-5">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
+            <History size={15} />
+          </span>
+          <h2 className="text-lg font-semibold text-foreground">Recent Activity</h2>
+        </div>
         <Link href="/audit-logs" className="text-sm font-medium text-primary hover:text-primary-dark">
           View All
         </Link>
       </div>
 
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border/70">
         {activities.map((activity, index) => {
           const Icon = activity.icon;
           return (
-            <div key={index} className="flex items-start gap-3 p-4">
+            <div key={index} className="flex items-start gap-3 p-4 transition-colors hover:bg-background/50">
               <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${activity.bg}`}>
                 <Icon size={16} className={activity.color} />
               </span>
