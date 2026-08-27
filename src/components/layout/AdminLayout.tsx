@@ -12,7 +12,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
   const { collapsed, toggle } = useSidebar();
   const pathname = usePathname();
   const router = useRouter();
-  const { authenticated } = useAuth();
+  const { authenticated, isHydrated } = useAuth();
   // Treat the Live Map route as a fullscreen workspace: hide header and
   // remove page padding so the map can fill the viewport next to the sidebar.
   // Use a contains check since the route may include prefixes or trailing
@@ -20,13 +20,21 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
   const isFullscreenMap = typeof pathname === "string" && pathname.includes("live-map");
 
   useEffect(() => {
-    if (!authenticated) {
+    if (isHydrated && !authenticated) {
       router.replace("/login");
     }
-  }, [authenticated, router]);
+  }, [isHydrated, authenticated, router]);
 
-  if (!authenticated) {
-    return null;
+  // Auth is only known after the localStorage-backed token has been read on
+  // the client, so render a stable loading shell for the SSR pass and the
+  // first client render instead of branching on `authenticated` early —
+  // that branch is what caused the hydration mismatch this replaces.
+  if (!isHydrated || !authenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <span className="h-6 w-6 animate-spin rounded-full border-2 border-border border-t-primary" />
+      </div>
+    );
   }
 
   return (

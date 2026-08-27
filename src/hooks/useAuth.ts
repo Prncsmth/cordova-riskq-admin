@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { User } from "@/types/user";
 
@@ -26,10 +26,16 @@ function readStoredUser(): User | null {
 }
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(() => readStoredUser());
-  const [token, setToken] = useState<string | null>(() =>
-    typeof window === "undefined" ? null : localStorage.getItem(TOKEN_KEY)
-  );
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setToken(localStorage.getItem(TOKEN_KEY));
+    setUser(readStoredUser());
+    setIsHydrated(true);
+  }, []);
+
   const authenticated = token !== null;
 
   const login = useCallback(async (email: string, password: string) => {
@@ -65,5 +71,5 @@ export function useAuth() {
     setUser(null);
   }, []);
 
-  return { authenticated, token, user, login, logout };
+  return { authenticated, isHydrated, token, user, login, logout };
 }
