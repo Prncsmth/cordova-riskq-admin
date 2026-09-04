@@ -8,7 +8,7 @@ export interface Announcement {
   content: string;
   priority: AnnouncementPriority;
   audience: AnnouncementAudience;
-  published: boolean;
+  barangayName?: string | null;
   createdAt: string;
   updatedAt: string;
 }
