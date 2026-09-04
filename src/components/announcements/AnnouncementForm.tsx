@@ -1,5 +1,6 @@
 import { Megaphone } from "lucide-react";
 import Card from "@/components/ui/Card";
+import { CORDOVA_BARANGAY_NAMES } from "@/constants/barangays";
 import type { AnnouncementAudience, AnnouncementPriority } from "@/types/announcement";
 
 const priorities: AnnouncementPriority[] = ["Normal", "Urgent"];
@@ -10,10 +11,12 @@ type AnnouncementFormProps = {
   body: string;
   priority: AnnouncementPriority;
   audience: AnnouncementAudience;
+  barangay: string;
   onTitleChange: (value: string) => void;
   onBodyChange: (value: string) => void;
   onPriorityChange: (value: AnnouncementPriority) => void;
   onAudienceChange: (value: AnnouncementAudience) => void;
+  onBarangayChange: (value: string) => void;
   onPublish: () => void;
 };
 
@@ -22,10 +25,12 @@ export default function AnnouncementForm({
   body,
   priority,
   audience,
+  barangay,
   onTitleChange,
   onBodyChange,
   onPriorityChange,
   onAudienceChange,
+  onBarangayChange,
   onPublish,
 }: AnnouncementFormProps) {
   return (
@@ -103,6 +108,27 @@ export default function AnnouncementForm({
             </select>
           </div>
         </div>
+
+        {audience === "Specific Barangay" && (
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">Barangay</label>
+            <select
+              value={barangay}
+              onChange={(e) => onBarangayChange(e.target.value)}
+              required
+              className="w-full rounded-xl border border-border bg-white p-2.5 text-sm shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+            >
+              <option value="" disabled>
+                Select a barangay
+              </option>
+              {CORDOVA_BARANGAY_NAMES.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <button
           type="submit"
