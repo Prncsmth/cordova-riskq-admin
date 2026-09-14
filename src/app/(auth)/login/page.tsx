@@ -39,9 +39,6 @@ export default function LoginPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-background">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-secondary/10 blur-3xl" />
-
       <div className="relative grid min-h-screen lg:grid-cols-5">
         {/* LEFT PANEL */}
         <section
@@ -55,7 +52,7 @@ export default function LoginPage() {
           {/* Vignette instead of a flat wash — keeps the top/bottom text
               zones legible while letting the photo itself read clearly
               through the middle. */}
-          <div className="absolute inset-0 bg-linear-to-t from-primary-dark/90 via-primary-dark/20 to-primary-dark/60" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/35 to-black/55" />
 
           <div className="relative z-10 flex h-full flex-col p-12 text-white">
             <div className="inline-flex w-fit items-center gap-3 rounded-2xl border border-white/15 bg-black/35 px-4 py-3 shadow-lg backdrop-blur-xl">
@@ -65,36 +62,43 @@ export default function LoginPage() {
               <div>
                 <p className="text-base font-bold leading-tight tracking-wide">CORDOVA RISKQ</p>
                 <p className="text-[10px] font-medium uppercase leading-tight tracking-wider text-white/70">
-                  Geolocation Emergency Based and Assistance Coordination
+                  Geolocation-Based Emergency and Assistance Coordination
                 </p>
               </div>
             </div>
 
             <div className="flex flex-1 flex-col justify-center">
-              <div className="mb-6 h-1 w-12 rounded-full bg-white" />
-              <h2 className="text-5xl font-bold leading-tight">
-                Powered by
+              <div className="mb-6 h-1 w-12 rounded-full bg-danger" />
+              <h2 className="text-4xl font-bold leading-tight tracking-tight">
+                Coordinated emergency
                 <br />
-                GEOLOCATION,
+                response for Cordova,
                 <br />
-                COORDINATION,
-                <br />
-                RESPONSE
+                Cebu.
               </h2>
+              <p className="mt-4 max-w-sm text-sm text-white/70">
+                Real-time monitoring, dispatch, and incident coordination for
+                the Municipal Disaster Risk Reduction and Management Office.
+              </p>
+            </div>
+
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-black/35 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white/80 backdrop-blur-xl">
+              <span className="h-1.5 w-1.5 rounded-full bg-danger" />
+              MDRRMO &middot; Cordova, Cebu
             </div>
           </div>
         </section>
 
         {/* RIGHT PANEL */}
         <section className="flex items-center justify-center p-6 lg:col-span-3 lg:p-10">
-          <div className="w-full max-w-md rounded-3xl border border-border/70 bg-white p-8 shadow-xl sm:p-10">
+          <div className="w-full max-w-md rounded-3xl border border-border/70 bg-surface p-8 shadow-lg sm:p-10">
             <div className="flex flex-col items-center text-center">
               <div className="relative h-14 w-14">
                 <Image src="/images/logo.png" alt="Cordova RISKQ" fill sizes="56px" className="object-contain" />
               </div>
 
               <h1 className="mt-4 text-2xl font-bold text-foreground">Administrator Login</h1>
-              <p className="mt-1 text-sm text-muted">Sign in to the Cordova RISKQ admin portal.</p>
+              <p className="mt-1 text-sm text-text-tertiary">Sign in to the Cordova RISKQ admin portal.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
@@ -113,7 +117,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="email"
-                  className="w-full rounded-xl border border-border bg-white py-3.5 pl-12 pr-4 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+                  className="w-full rounded-xl border border-border bg-input-bg py-3.5 pl-12 pr-4 text-sm text-foreground shadow-xs outline-none transition-all duration-200 focus:border-primary focus:bg-surface focus:ring-4 focus:ring-primary/15"
                 />
               </div>
 
@@ -125,7 +129,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
-                  className="w-full rounded-xl border border-border bg-white py-3.5 pl-12 pr-12 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+                  className="w-full rounded-xl border border-border bg-input-bg py-3.5 pl-12 pr-12 text-sm text-foreground shadow-xs outline-none transition-all duration-200 focus:border-primary focus:bg-surface focus:ring-4 focus:ring-primary/15"
                 />
                 <button
                   type="button"
@@ -156,7 +160,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-b from-primary to-primary-dark py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 disabled:active:scale-100"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white shadow-xs transition-all duration-200 hover:bg-primary-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 disabled:active:scale-100"
               >
                 {loading && (
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />

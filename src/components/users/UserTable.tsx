@@ -42,7 +42,7 @@ export default function UserTable({
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border bg-white p-10 text-center text-sm text-muted shadow-sm">
+      <div className="rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted shadow-sm">
         Loading users…
       </div>
     );
@@ -73,15 +73,15 @@ export default function UserTable({
         </div>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-background">
               <tr>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">User</th>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Email</th>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Role</th>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Action</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">User</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Email</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Role</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">

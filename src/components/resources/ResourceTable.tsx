@@ -49,7 +49,7 @@ export default function ResourceTable() {
   }, [query, categoryFilter]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
       <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:max-w-xs">
           <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
@@ -69,7 +69,7 @@ export default function ResourceTable() {
               onClick={() => setCategoryFilter(category)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
                 categoryFilter === category
-                  ? "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm"
+                  ? "bg-primary text-white shadow-xs"
                   : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
               }`}
             >
@@ -83,11 +83,11 @@ export default function ResourceTable() {
         <table className="w-full text-left text-sm">
           <thead className="bg-background/60">
             <tr>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Equipment</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Category</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Qty</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Location</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-muted">Status</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Equipment</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Category</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Qty</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Location</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/70">

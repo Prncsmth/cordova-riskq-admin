@@ -57,7 +57,7 @@ const activities: Activity[] = [
 
 export default function RecentActivity() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
       <div className="flex items-center justify-between border-b border-border/70 p-5">
         <div className="flex items-center gap-2.5">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
@@ -84,7 +84,7 @@ export default function RecentActivity() {
                 <p className="truncate text-sm text-muted">{activity.detail}</p>
               </div>
 
-              <span className="shrink-0 text-xs text-muted">{activity.time}</span>
+              <span className="shrink-0 text-xs text-text-tertiary">{activity.time}</span>
             </div>
           );
         })}

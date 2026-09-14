@@ -44,7 +44,7 @@ export default function NotificationsPage() {
           <button
             type="button"
             onClick={markAllRead}
-            className="flex items-center gap-1.5 self-start rounded-xl border border-border bg-white px-3.5 py-2 text-sm font-medium text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97] sm:self-auto"
+            className="flex items-center gap-1.5 self-start rounded-xl border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97] sm:self-auto"
           >
             <MailOpen size={14} />
             Mark all as read
@@ -58,7 +58,7 @@ export default function NotificationsPage() {
             <Bell size={19} />
           </span>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">Total</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Total</p>
             <p className="mt-1 text-2xl font-bold text-foreground">{notifications.length}</p>
           </div>
         </Card>
@@ -73,7 +73,7 @@ export default function NotificationsPage() {
             </span>
           </span>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">Unread</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Unread</p>
             <p className="mt-1 text-2xl font-bold text-foreground">{unreadCount}</p>
           </div>
         </Card>
@@ -83,13 +83,13 @@ export default function NotificationsPage() {
             <MailOpen size={19} />
           </span>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">Read</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Read</p>
             <p className="mt-1 text-2xl font-bold text-foreground">{notifications.length - unreadCount}</p>
           </div>
         </Card>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
         <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-xs">
             <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
@@ -109,7 +109,7 @@ export default function NotificationsPage() {
                 onClick={() => setTypeFilter(type)}
                 className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
                   typeFilter === type
-                    ? "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm"
+                    ? "bg-primary text-white shadow-sm hover:bg-primary-dark"
                     : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
                 }`}
               >
@@ -136,7 +136,7 @@ export default function NotificationsPage() {
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-foreground">{n.title}</p>
                   <p className="text-sm text-muted">{n.detail}</p>
-                  <p className="mt-1 text-xs text-muted">{n.time}</p>
+                  <p className="mt-1 text-xs text-text-tertiary">{n.time}</p>
                 </div>
 
                 {!n.read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}

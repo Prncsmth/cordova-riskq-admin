@@ -7,7 +7,7 @@ export default function AdminProfile() {
       <div className="pointer-events-none absolute -right-10 -top-16 h-40 w-40 rounded-full bg-primary/8 blur-3xl" />
 
       <div className="relative flex items-center gap-5">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-linear-to-b from-primary to-primary-dark text-xl font-bold text-white shadow-sm ring-1 ring-primary/10">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-xl font-bold text-white shadow-xs ring-1 ring-primary/10">
           AU
         </div>
 
@@ -22,7 +22,7 @@ export default function AdminProfile() {
 
         <button
           type="button"
-          className="flex items-center gap-1.5 rounded-xl border border-border bg-white px-3.5 py-2 text-sm font-medium text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97]"
+          className="flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97]"
         >
           <Pencil size={14} />
           Edit Profile

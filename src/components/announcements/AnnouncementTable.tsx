@@ -47,7 +47,7 @@ export default function AnnouncementTable({
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border bg-white p-10 text-center text-sm text-muted shadow-sm">
+      <div className="rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted shadow-sm">
         Loading announcements…
       </div>
     );
@@ -69,7 +69,7 @@ export default function AnnouncementTable({
         </div>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
+      <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
         <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-xs">
             <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
@@ -89,7 +89,7 @@ export default function AnnouncementTable({
                 onClick={() => setPriorityFilter(p)}
                 className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
                   priorityFilter === p
-                    ? "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm"
+                    ? "bg-primary text-white shadow-xs"
                     : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
                 }`}
               >
@@ -114,7 +114,7 @@ export default function AnnouncementTable({
                   </Badge>
                 </div>
                 <p className="mt-1 line-clamp-2 text-sm text-muted">{a.content}</p>
-                <p className="mt-1.5 text-xs text-muted">
+                <p className="mt-1.5 text-xs text-text-tertiary">
                   {a.audience}
                   {a.barangayName ? ` (${a.barangayName})` : ""} &middot; {new Date(a.createdAt).toLocaleString()}
                 </p>

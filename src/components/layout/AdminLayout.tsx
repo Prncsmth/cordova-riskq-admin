@@ -45,15 +45,15 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
         type="button"
         onClick={toggle}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className={`glass fixed top-1/2 z-50 hidden h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-(--glass-border) text-foreground shadow-md transition-[left] duration-300 hover:scale-110 active:scale-95 lg:flex ${
-          collapsed ? "left-0" : "left-72"
+        className={`glass fixed top-1/2 z-50 hidden h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-(--glass-border) text-foreground shadow-md transition-[left] duration-200 ease-in-out hover:scale-110 active:scale-95 lg:flex ${
+          collapsed ? "left-18" : "left-64"
         }`}
       >
         {collapsed ? <PanelLeftOpen size={15} strokeWidth={2.25} /> : <PanelLeftClose size={15} strokeWidth={2.25} />}
       </button>
 
       <div
-        className={`transition-[padding] duration-300 ${collapsed ? "lg:pl-0" : "lg:pl-72"}`}
+        className={`transition-[padding] duration-200 ease-in-out ${collapsed ? "lg:pl-18" : "lg:pl-64"}`}
       >
         {!isFullscreenMap && <AdminHeader />}
 

@@ -3,7 +3,7 @@ export type BadgeVariant = "success" | "warning" | "danger" | "info" | "default"
 type BadgeProps = {
   children: React.ReactNode;
   variant?: BadgeVariant;
-  /** Gradient-filled, high-emphasis pill for the most urgent/active state in a list (e.g. "Active", "New"). Soft tint otherwise. */
+  /** Flat, high-emphasis pill for the most urgent/active state in a list (e.g. "Active", "New"). Soft tint otherwise. */
   solid?: boolean;
 };
 
@@ -21,11 +21,11 @@ export default function Badge({
   };
 
   const solidStyles = {
-    success: "bg-linear-to-br from-success to-success/80 text-white shadow-[0_2px_8px_-1px_rgba(21,128,61,0.45)]",
-    warning: "bg-linear-to-br from-warning to-warning/80 text-white shadow-[0_2px_8px_-1px_rgba(180,83,9,0.45)]",
-    danger: "bg-linear-to-br from-danger to-danger/80 text-white shadow-[0_2px_8px_-1px_rgba(220,38,38,0.45)]",
-    info: "bg-linear-to-br from-info to-info/80 text-white shadow-[0_2px_8px_-1px_rgba(29,78,216,0.45)]",
-    default: "bg-linear-to-br from-muted to-muted/80 text-white shadow-sm",
+    success: "bg-success text-white shadow-xs",
+    warning: "bg-warning text-white shadow-xs",
+    danger: "bg-danger text-white shadow-xs",
+    info: "bg-info text-white shadow-xs",
+    default: "bg-muted text-white shadow-xs",
   };
 
   return (

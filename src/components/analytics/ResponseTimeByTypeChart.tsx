@@ -15,7 +15,7 @@ const data = [
 
 export default function ResponseTimeByTypeChart() {
   return (
-    <div className="rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <h2 className="text-lg font-semibold text-foreground">Response Time by Type</h2>
       <p className="text-sm text-muted">Average minutes from report to dispatch, by incident type</p>
 

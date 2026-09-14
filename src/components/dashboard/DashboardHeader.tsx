@@ -51,11 +51,8 @@ export default function DashboardHeader() {
   const WeatherIcon = weatherIcons[weather.condition].icon;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-linear-to-br from-primary-light/70 via-white to-secondary/10 p-6 shadow-sm lg:p-8">
-      <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -left-10 h-56 w-56 rounded-full bg-secondary/10 blur-3xl" />
-
-      <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="rounded-3xl border border-border/60 bg-surface p-6 shadow-xs lg:p-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             {now ? getGreeting(now.getHours()) : "Welcome"}

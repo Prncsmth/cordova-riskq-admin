@@ -50,29 +50,29 @@ export default function AnnouncementForm({
         }}
       >
         <div>
-          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">Title</label>
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-tertiary">Title</label>
           <input
             value={title}
             onChange={(e) => onTitleChange(e.target.value)}
             placeholder="Announcement title"
-            className="w-full rounded-xl border border-border bg-white p-3 text-sm shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+            className="w-full rounded-xl border border-border bg-surface p-3 text-sm shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
           />
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">Message</label>
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-tertiary">Message</label>
           <textarea
             value={body}
             onChange={(e) => onBodyChange(e.target.value)}
             placeholder="Write announcement..."
             rows={5}
-            className="w-full rounded-xl border border-border bg-white p-3 text-sm shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+            className="w-full rounded-xl border border-border bg-surface p-3 text-sm shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
           />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">Priority</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-tertiary">Priority</label>
             <div className="flex gap-1.5">
               {priorities.map((p) => (
                 <button
@@ -82,9 +82,9 @@ export default function AnnouncementForm({
                   className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold transition-all duration-150 active:scale-[0.97] ${
                     priority === p
                       ? p === "Urgent"
-                        ? "bg-linear-to-b from-danger to-danger/80 text-white shadow-sm"
-                        : "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm"
-                      : "border border-border bg-white text-muted hover:bg-primary-light/30"
+                        ? "bg-danger text-white shadow-xs"
+                        : "bg-primary text-white shadow-xs"
+                      : "border border-border bg-surface text-muted hover:bg-primary-light/30"
                   }`}
                 >
                   {p}
@@ -94,11 +94,11 @@ export default function AnnouncementForm({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">Audience</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-tertiary">Audience</label>
             <select
               value={audience}
               onChange={(e) => onAudienceChange(e.target.value as AnnouncementAudience)}
-              className="w-full rounded-xl border border-border bg-white p-2.5 text-sm shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+              className="w-full rounded-xl border border-border bg-surface p-2.5 text-sm shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
             >
               {audiences.map((a) => (
                 <option key={a} value={a}>
@@ -111,12 +111,12 @@ export default function AnnouncementForm({
 
         {audience === "Specific Barangay" && (
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">Barangay</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-tertiary">Barangay</label>
             <select
               value={barangay}
               onChange={(e) => onBarangayChange(e.target.value)}
               required
-              className="w-full rounded-xl border border-border bg-white p-2.5 text-sm shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+              className="w-full rounded-xl border border-border bg-surface p-2.5 text-sm shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
             >
               <option value="" disabled>
                 Select a barangay
@@ -132,7 +132,7 @@ export default function AnnouncementForm({
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-linear-to-b from-primary to-primary-dark px-5 py-3 font-semibold text-white shadow-sm transition-all duration-150 hover:brightness-110 active:scale-[0.98] sm:w-auto"
+          className="w-full rounded-xl bg-primary px-5 py-3 font-semibold text-white shadow-xs transition-all duration-150 hover:bg-primary-dark active:scale-[0.98] sm:w-auto"
         >
           Publish Announcement
         </button>

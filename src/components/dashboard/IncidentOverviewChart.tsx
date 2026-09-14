@@ -3,7 +3,7 @@ import EmptyState from "@/components/ui/EmptyState";
 
 export default function IncidentOverviewChart() {
   return (
-    <div className="rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <div className="flex items-center gap-2.5">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
           <Activity size={15} />

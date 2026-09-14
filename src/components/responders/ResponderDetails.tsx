@@ -15,7 +15,7 @@ export default function ResponderDetails({
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border bg-white p-10 text-center text-sm text-muted shadow-sm">
+      <div className="rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted shadow-sm">
         Loading responder…
       </div>
     );

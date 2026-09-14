@@ -14,7 +14,7 @@ const data = [
 
 export default function EmergencyChart() {
   return (
-    <div className="rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <h2 className="text-lg font-semibold text-foreground">Emergency Status Overview</h2>
       <p className="text-sm text-muted">Monthly emergencies by resolution status</p>
 

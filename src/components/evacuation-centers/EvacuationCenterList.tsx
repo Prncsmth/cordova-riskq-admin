@@ -41,9 +41,9 @@ const centers: EvacuationCenter[] = [
 ];
 
 function statusFor(pct: number) {
-  if (pct >= 90) return { label: "Full", variant: "danger" as const, bar: "bg-danger", accent: "border-l-danger" };
-  if (pct >= 60) return { label: "Near Capacity", variant: "warning" as const, bar: "bg-warning", accent: "border-l-warning" };
-  return { label: "Available", variant: "success" as const, bar: "bg-success", accent: "border-l-success" };
+  if (pct >= 90) return { label: "Full", variant: "danger" as const, bar: "bg-danger" };
+  if (pct >= 60) return { label: "Near Capacity", variant: "warning" as const, bar: "bg-warning" };
+  return { label: "Available", variant: "success" as const, bar: "bg-success" };
 }
 
 const statusFilters = ["All", "Available", "Near Capacity", "Full"] as const;
@@ -70,7 +70,7 @@ export default function EvacuationCenterList() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-3 rounded-2xl border border-border/70 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border border-border/70 bg-surface p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:max-w-xs">
           <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
           <input
@@ -89,7 +89,7 @@ export default function EvacuationCenterList() {
               onClick={() => setStatusFilter(status)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
                 statusFilter === status
-                  ? "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm"
+                  ? "bg-primary hover:bg-primary-dark text-white shadow-sm"
                   : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
               }`}
             >
@@ -100,7 +100,7 @@ export default function EvacuationCenterList() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-white/60 p-10 text-center">
+        <div className="rounded-2xl border border-dashed border-border bg-surface/60 p-10 text-center">
           <p className="font-semibold text-foreground">No centers match your filters</p>
           <p className="mt-1 text-sm text-muted">Try a different search term or status.</p>
         </div>
@@ -113,7 +113,7 @@ export default function EvacuationCenterList() {
             return (
               <div
                 key={center.id}
-                className={`overflow-hidden rounded-2xl border border-l-4 border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md ${status.accent}`}
+                className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs"
               >
                 <div className="h-40 w-full">
                   <MiniMap
@@ -138,7 +138,7 @@ export default function EvacuationCenterList() {
                     <div className={`h-full rounded-full ${status.bar}`} style={{ width: `${pct}%` }} />
                   </div>
 
-                  <div className="mt-2 flex justify-between text-xs text-muted">
+                  <div className="mt-2 flex justify-between text-xs text-text-tertiary">
                     <span>{center.occupants} / {center.capacity} occupants</span>
                     <span>{pct}% full</span>
                   </div>

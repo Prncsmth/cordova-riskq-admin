@@ -11,7 +11,7 @@ export default function SystemSummary() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border/70 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border/70 bg-surface p-5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-3">
         <span className="relative flex h-9 w-9 shrink-0 items-center justify-center">
           <span className="absolute inline-flex h-9 w-9 animate-ping rounded-full bg-success opacity-20" />
@@ -24,7 +24,7 @@ export default function SystemSummary() {
         </p>
       </div>
 
-      <p className="text-xs text-muted">
+      <p className="text-xs text-text-tertiary">
         Last updated:{" "}
         {now
           ? now.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
