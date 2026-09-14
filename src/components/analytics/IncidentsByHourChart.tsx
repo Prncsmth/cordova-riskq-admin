@@ -12,7 +12,7 @@ const data = [
 
 export default function IncidentsByHourChart() {
   return (
-    <div className="rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <h2 className="text-lg font-semibold text-foreground">Incidents by Time of Day</h2>
       <p className="text-sm text-muted">Peak reporting hours across the selected period</p>
 

@@ -18,7 +18,6 @@ export default function StatsCards() {
       value: activeIncidents,
       color: "text-danger",
       bg: "bg-danger-light",
-      stroke: "#dc2626",
       icon: AlertTriangle,
     },
     {
@@ -26,7 +25,6 @@ export default function StatsCards() {
       value: null,
       color: "text-warning",
       bg: "bg-warning-light",
-      stroke: "#b45309",
       icon: BellRing,
     },
     {
@@ -34,7 +32,6 @@ export default function StatsCards() {
       value: responders.length,
       color: "text-success",
       bg: "bg-success-light",
-      stroke: "#1e8e3e",
       icon: ShieldCheck,
     },
     {
@@ -42,7 +39,6 @@ export default function StatsCards() {
       value: null,
       color: "text-info",
       bg: "bg-info-light",
-      stroke: "#1d4ed8",
       icon: HeartHandshake,
     },
   ];
@@ -58,8 +54,7 @@ export default function StatsCards() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.06 }}
-            style={{ borderLeftColor: card.stroke }}
-            className="rounded-2xl border border-l-4 border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md"
+            className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs"
           >
             <div className="flex items-start justify-between">
               <div>
@@ -73,7 +68,7 @@ export default function StatsCards() {
                   )}
                 </h2>
 
-                <p className="mt-1 text-xs font-medium text-muted">
+                <p className="mt-1 text-xs font-medium text-text-tertiary">
                   {card.value === null ? "Not tracked yet" : "Live"}
                 </p>
               </div>

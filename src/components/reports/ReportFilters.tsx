@@ -18,8 +18,8 @@ export default function ReportFilters() {
             onClick={() => setRange(r)}
             className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
               range === r
-                ? "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm"
-                : "border border-border bg-white text-muted hover:bg-primary-light/40 hover:text-primary"
+                ? "bg-primary text-white shadow-sm hover:bg-primary-dark"
+                : "border border-border bg-surface text-muted hover:bg-primary-light/40 hover:text-primary"
             }`}
           >
             {r}
@@ -29,7 +29,7 @@ export default function ReportFilters() {
 
       <button
         type="button"
-        className="flex items-center gap-1.5 self-start rounded-xl border border-border bg-white px-3.5 py-2 text-sm font-medium text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97] sm:self-auto"
+        className="flex items-center gap-1.5 self-start rounded-xl border border-border bg-surface px-3.5 py-2 text-sm font-medium text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97] sm:self-auto"
       >
         <Download size={14} />
         Export Report

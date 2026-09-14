@@ -15,7 +15,7 @@ const total = data.reduce((sum, d) => sum + d.value, 0);
 
 export default function ResponderStatusDonut() {
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="flex h-full flex-col rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <div className="flex items-center gap-2.5">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-success-light text-success">
           <ShieldCheck size={15} />
@@ -26,11 +26,6 @@ export default function ResponderStatusDonut() {
       <div className="relative mx-auto mt-3 h-44 w-44">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <defs>
-              <filter id="donutShadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.18" />
-              </filter>
-            </defs>
             <Pie
               data={data}
               dataKey="value"
@@ -38,7 +33,6 @@ export default function ResponderStatusDonut() {
               outerRadius={78}
               paddingAngle={4}
               stroke="none"
-              filter="url(#donutShadow)"
             >
               {data.map((entry) => (
                 <Cell key={entry.name} fill={entry.color} />
@@ -49,7 +43,7 @@ export default function ResponderStatusDonut() {
 
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-3xl font-bold text-foreground">{total}</span>
-          <span className="text-xs font-medium text-muted">Responders</span>
+          <span className="text-xs font-medium text-text-tertiary">Responders</span>
         </div>
       </div>
 
@@ -72,7 +66,7 @@ export default function ResponderStatusDonut() {
 
       <Link
         href="/responders"
-        className="mt-5 block w-full rounded-xl bg-linear-to-b from-primary to-primary-dark py-2.5 text-center text-sm font-medium text-white shadow-sm transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
+        className="mt-5 block w-full rounded-xl bg-primary py-2.5 text-center text-sm font-medium text-white shadow-xs transition-all duration-150 hover:bg-primary-dark active:scale-[0.98]"
       >
         View Responders
       </Link>

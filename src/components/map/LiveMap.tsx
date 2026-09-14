@@ -25,7 +25,6 @@ import "mapbox-gl/dist/mapbox-gl.css";
 export type LiveMapMarkerType = "incident" | "responder" | "evacuation";
 
 import { useSidebar } from "@/components/layout/SidebarContext";
-import { ThemeToggle } from "@/components/layout/ThemeProvider";
 import { CORDOVA_BARANGAYS, CORDOVA_CENTER, CORDOVA_MAP_BOUNDS, jitter } from "@/lib/cordovaBarangays";
 
 export type LiveMapMarker = {
@@ -78,6 +77,10 @@ type LiveMapProps = {
   markers?: LiveMapMarker[];
   center?: [number, number];
   zoom?: number;
+  // Hides the floating layers/zoom/recenter controls — for small embedded
+  // previews (e.g. the dashboard card) where those controls have no room to
+  // breathe and just duplicate what the full /live-map page already offers.
+  controls?: boolean;
 };
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -86,6 +89,7 @@ export default function LiveMap({
   markers = defaultMarkers,
   center: mapCenter = center,
   zoom = 14,
+  controls = true,
 }: LiveMapProps) {
   const mapRef = useRef<MapRef>(null);
   const { collapsed } = useSidebar();
@@ -152,48 +156,51 @@ export default function LiveMap({
         style={{ width: "100%", height: "100%" }}
       >
         {/* Zoom + recenter controls, grouped bottom-right like a native map app */}
-        <div className="absolute bottom-6 right-4 z-40 flex flex-col items-center gap-2.5">
-          <button
-            type="button"
-            aria-label="Recenter on Cordova"
-            title="Recenter on Cordova"
-            onClick={() => {
-              mapRef.current?.getMap().flyTo({
-                center: [CORDOVA_CENTER.longitude, CORDOVA_CENTER.latitude],
-                zoom,
-                duration: 800,
-              });
-            }}
-            className="glass-strong flex h-10 w-10 items-center justify-center rounded-full border border-(--glass-border) shadow-md transition-all duration-150 hover:scale-105 active:scale-95"
-          >
-            <MapPin size={18} strokeWidth={2} className="text-primary" fill="currentColor" fillOpacity={0.15} />
-          </button>
+        {controls && (
+          <div className="absolute bottom-6 right-4 z-40 flex flex-col items-center gap-2.5">
+            <button
+              type="button"
+              aria-label="Recenter on Cordova"
+              title="Recenter on Cordova"
+              onClick={() => {
+                mapRef.current?.getMap().flyTo({
+                  center: [CORDOVA_CENTER.longitude, CORDOVA_CENTER.latitude],
+                  zoom,
+                  duration: 800,
+                });
+              }}
+              className="glass-strong flex h-10 w-10 items-center justify-center rounded-full border border-(--glass-border) shadow-md transition-all duration-150 hover:scale-105 active:scale-95"
+            >
+              <MapPin size={18} strokeWidth={2} className="text-primary" fill="currentColor" fillOpacity={0.15} />
+            </button>
 
-          <div className="glass-strong flex flex-col overflow-hidden rounded-2xl border border-(--glass-border) shadow-md">
-            <button
-              type="button"
-              aria-label="Zoom in"
-              onClick={() => mapRef.current?.getMap().zoomIn({ duration: 200 })}
-              className="flex h-10 w-10 items-center justify-center text-foreground transition-colors hover:bg-primary-light/40 active:scale-90"
-            >
-              <Plus size={17} strokeWidth={2.5} />
-            </button>
-            <div className="h-px bg-(--glass-border)" />
-            <button
-              type="button"
-              aria-label="Zoom out"
-              onClick={() => mapRef.current?.getMap().zoomOut({ duration: 200 })}
-              className="flex h-10 w-10 items-center justify-center text-foreground transition-colors hover:bg-primary-light/40 active:scale-90"
-            >
-              <Minus size={17} strokeWidth={2.5} />
-            </button>
+            <div className="glass-strong flex flex-col overflow-hidden rounded-2xl border border-(--glass-border) shadow-md">
+              <button
+                type="button"
+                aria-label="Zoom in"
+                onClick={() => mapRef.current?.getMap().zoomIn({ duration: 200 })}
+                className="flex h-10 w-10 items-center justify-center text-foreground transition-colors hover:bg-primary-light/40 active:scale-90"
+              >
+                <Plus size={17} strokeWidth={2.5} />
+              </button>
+              <div className="h-px bg-(--glass-border)" />
+              <button
+                type="button"
+                aria-label="Zoom out"
+                onClick={() => mapRef.current?.getMap().zoomOut({ duration: 200 })}
+                className="flex h-10 w-10 items-center justify-center text-foreground transition-colors hover:bg-primary-light/40 active:scale-90"
+              >
+                <Minus size={17} strokeWidth={2.5} />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Layers control — basemap style + data layer visibility */}
+        {controls && (
         <div className="absolute left-4 top-4 z-50">
           <button
-            aria-label="Map layers"
+            aria-label="Map layers and filters"
             onClick={() => setShowLayerMenu((s) => !s)}
             className="glass-strong flex h-10 w-10 items-center justify-center rounded-full border border-(--glass-border) text-foreground shadow-md transition-all duration-150 hover:scale-105 active:scale-95"
           >
@@ -201,8 +208,8 @@ export default function LiveMap({
           </button>
 
           {showLayerMenu && (
-            <div className="glass-strong mt-2 w-56 overflow-hidden rounded-2xl border border-(--glass-border) shadow-lg">
-              <p className="px-3.5 pt-3 pb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-muted">
+            <div className="glass-strong mt-2 w-56 overflow-hidden rounded-2xl border border-(--glass-border) shadow-md">
+              <p className="px-3.5 pt-3 pb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-text-tertiary">
                 Map Style
               </p>
 
@@ -227,7 +234,7 @@ export default function LiveMap({
                 })}
               </div>
 
-              <p className="border-t border-(--glass-border) px-3.5 pt-2.5 pb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-muted">
+              <p className="border-t border-(--glass-border) px-3.5 pt-2.5 pb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-text-tertiary">
                 Show on Map
               </p>
 
@@ -252,11 +259,11 @@ export default function LiveMap({
                         <Icon size={11} color="white" strokeWidth={2.5} />
                       </span>
                       <span className="flex-1">
-                        {config.label} <span className="text-muted">({count})</span>
+                        {config.label} <span className="text-text-tertiary">({count})</span>
                       </span>
                       <span
                         className={`relative inline-flex h-4.5 w-8 shrink-0 items-center rounded-full transition-colors duration-200 ${
-                          on ? "bg-linear-to-b from-primary to-primary-dark" : "bg-border"
+                          on ? "bg-primary" : "bg-border"
                         }`}
                       >
                         <span
@@ -272,33 +279,7 @@ export default function LiveMap({
             </div>
           )}
         </div>
-
-        {/* Legend */}
-        <div className="glass-strong absolute bottom-6 left-4 z-40 hidden rounded-2xl border border-(--glass-border) px-3.5 py-3 shadow-md sm:block">
-          <div className="space-y-1.5">
-            {(Object.keys(markerConfig) as LiveMapMarkerType[]).map((type) => {
-              const config = markerConfig[type];
-              const Icon = config.icon;
-              return (
-                <div key={type} className="flex items-center gap-2 text-xs font-medium text-foreground">
-                  <span
-                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full ring-2 ring-white"
-                    style={{ background: config.color }}
-                  >
-                    <Icon size={11} color="white" strokeWidth={2.5} />
-                  </span>
-                  {config.label}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* AdminHeader is hidden on this fullscreen route, so this is the
-            only theme toggle reachable here — keep it visible at all sizes. */}
-        <div className="glass-strong absolute right-4 top-4 z-50 rounded-full border border-(--glass-border) shadow-md">
-          <ThemeToggle />
-        </div>
+        )}
 
         {mapReady &&
           visibleMarkers.map((marker) => {
@@ -323,12 +304,12 @@ export default function LiveMap({
                 >
                   {marker.type === "incident" && (
                     <span
-                      className="absolute inline-flex h-8 w-8 animate-ping rounded-full opacity-40"
+                      className="absolute inline-flex h-8 w-8 animate-ping rounded-full opacity-30"
                       style={{ background: config.color }}
                     />
                   )}
                   <span
-                    className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-white shadow-[0_2px_6px_rgba(0,0,0,0.35)] transition-transform duration-150 group-hover:scale-110"
+                    className="relative flex h-8 w-8 items-center justify-center rounded-full shadow-md transition-transform duration-150 group-hover:scale-110"
                     style={{ background: config.color }}
                   >
                     <Icon size={15} color="white" strokeWidth={2.5} />

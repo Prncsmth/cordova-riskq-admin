@@ -54,7 +54,7 @@ export default function AuditLogTable() {
   }, [query, entityFilter]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
       <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:max-w-xs">
           <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
@@ -74,7 +74,7 @@ export default function AuditLogTable() {
               onClick={() => setEntityFilter(entity)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
                 entityFilter === entity
-                  ? "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm"
+                  ? "bg-primary text-white shadow-xs"
                   : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
               }`}
             >
@@ -88,10 +88,10 @@ export default function AuditLogTable() {
         <table className="w-full text-left text-sm">
           <thead className="bg-background/60">
             <tr>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted">Action</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted">Admin</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted">Entity</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted">When</th>
+              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Action</th>
+              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Admin</th>
+              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Entity</th>
+              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">When</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/70">
@@ -115,7 +115,7 @@ export default function AuditLogTable() {
 
                   <td className="p-4">
                     <div className="flex items-center gap-2.5">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-linear-to-b from-primary to-primary-dark text-[10px] font-semibold text-white">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
                         {initials(log.adminId)}
                       </span>
                       <span className="text-foreground">{log.adminId}</span>

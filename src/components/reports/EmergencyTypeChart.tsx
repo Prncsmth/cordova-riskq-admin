@@ -15,7 +15,7 @@ const total = data.reduce((sum, d) => sum + d.value, 0);
 
 export default function EmergencyTypeChart() {
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="flex h-full flex-col rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <h2 className="text-lg font-semibold text-foreground">Emergencies by Type</h2>
       <p className="text-sm text-muted">Share of total emergencies this period</p>
 
@@ -33,7 +33,7 @@ export default function EmergencyTypeChart() {
 
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-2xl font-bold text-foreground">{total}</span>
-          <span className="text-xs text-muted">Total</span>
+          <span className="text-xs text-text-tertiary">Total</span>
         </div>
       </div>
 
@@ -44,7 +44,7 @@ export default function EmergencyTypeChart() {
               <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: entry.color }} />
               {entry.name}
             </span>
-            <span className="font-medium text-muted">{Math.round((entry.value / total) * 100)}%</span>
+            <span className="font-medium text-text-tertiary">{Math.round((entry.value / total) * 100)}%</span>
           </div>
         ))}
       </div>

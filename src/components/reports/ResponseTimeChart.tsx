@@ -14,7 +14,7 @@ const data = [
 
 export default function ResponseTimeChart() {
   return (
-    <div className="rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <h2 className="text-lg font-semibold text-foreground">Average Response Time</h2>
       <p className="text-sm text-muted">Minutes from report to first responder dispatch</p>
 

@@ -29,7 +29,7 @@ export default function UserDetails({ id }: { id: string }) {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border bg-white p-10 text-center text-sm text-muted shadow-sm">
+      <div className="rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted shadow-sm">
         Loading user…
       </div>
     );
@@ -56,7 +56,7 @@ export default function UserDetails({ id }: { id: string }) {
     <div className="grid gap-6">
       <Card>
         <div className="flex flex-wrap items-center gap-5">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-linear-to-b from-primary to-primary-dark text-xl font-bold text-white shadow-sm ring-1 ring-primary/10">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-xl font-bold text-white shadow-xs ring-1 ring-primary/10">
             {initials(user.name)}
           </div>
 

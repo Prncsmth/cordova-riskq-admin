@@ -17,7 +17,7 @@ export default function SecuritySettings() {
   return (
     <section className="space-y-6">
       <div>
-        <h2 className="px-1 pb-2 text-xs font-bold uppercase tracking-[0.12em] text-muted">
+        <h2 className="px-1 pb-2 text-xs font-bold uppercase tracking-[0.12em] text-text-tertiary">
           Security
         </h2>
 
@@ -25,7 +25,7 @@ export default function SecuritySettings() {
           <SettingRow icon={Lock} label="Password" description="Last changed 3 months ago">
             <button
               type="button"
-              className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97]"
+              className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97]"
             >
               Change
             </button>
@@ -42,7 +42,7 @@ export default function SecuritySettings() {
           <SettingRow icon={Monitor} label="Active Sessions" description="1 device currently signed in">
             <button
               type="button"
-              className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97]"
+              className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97]"
             >
               Manage
             </button>
@@ -51,7 +51,7 @@ export default function SecuritySettings() {
       </div>
 
       <div>
-        <h2 className="px-1 pb-2 text-xs font-bold uppercase tracking-[0.12em] text-muted">
+        <h2 className="px-1 pb-2 text-xs font-bold uppercase tracking-[0.12em] text-text-tertiary">
           Account
         </h2>
 

@@ -12,7 +12,7 @@ export default function Card({
   return (
     <div
       {...props}
-      className={`rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md ${className}`}
+      className={`rounded-2xl border border-border/70 bg-surface p-6 shadow-xs transition-colors duration-200 ${className}`}
     >
       {children}
     </div>

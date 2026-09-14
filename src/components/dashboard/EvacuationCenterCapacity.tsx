@@ -10,14 +10,14 @@ const centers = [
 ];
 
 function statusFor(pct: number) {
-  if (pct >= 90) return { label: "Full", variant: "danger" as const, bar: "from-danger to-danger/80", glow: "shadow-[0_0_8px_rgba(220,38,38,0.45)]" };
-  if (pct >= 60) return { label: "Near Capacity", variant: "warning" as const, bar: "from-warning to-warning/80", glow: "shadow-[0_0_8px_rgba(180,83,9,0.4)]" };
-  return { label: "Available", variant: "success" as const, bar: "from-success to-success/80", glow: "shadow-[0_0_8px_rgba(30,142,62,0.4)]" };
+  if (pct >= 90) return { label: "Full", variant: "danger" as const, bar: "bg-danger" };
+  if (pct >= 60) return { label: "Near Capacity", variant: "warning" as const, bar: "bg-warning" };
+  return { label: "Available", variant: "success" as const, bar: "bg-success" };
 }
 
 export default function EvacuationCenterCapacity() {
   return (
-    <div className="rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-info-light text-info">
@@ -46,12 +46,12 @@ export default function EvacuationCenterCapacity() {
 
               <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-background">
                 <div
-                  className={`h-full rounded-full bg-linear-to-r ${status.bar} ${status.glow} transition-all duration-500`}
+                  className={`h-full rounded-full ${status.bar} transition-all duration-500`}
                   style={{ width: `${pct}%` }}
                 />
               </div>
 
-              <div className="mt-1.5 flex justify-between text-xs text-muted">
+              <div className="mt-1.5 flex justify-between text-xs text-text-tertiary">
                 <span>{center.occupants} / {center.capacity} occupants</span>
                 <span className="font-medium">{pct}%</span>
               </div>

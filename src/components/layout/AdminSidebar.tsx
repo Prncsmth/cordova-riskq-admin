@@ -30,29 +30,33 @@ export default function AdminSidebar() {
 
   return (
     <aside
-      className={`${inter.className} glass fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-(--glass-border) shadow-xl transition-transform duration-300 lg:flex ${
-        collapsed ? "-translate-x-full" : "translate-x-0"
+      className={`${inter.className} glass fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-(--glass-border) shadow-xl transition-[width] duration-200 ease-in-out lg:flex ${
+        collapsed ? "w-18" : "w-64"
       }`}
     >
 
       {/* Logo / Header */}
-      <div className="flex h-20 shrink-0 items-center border-b border-(--glass-border) px-6">
+      <div className="flex h-20 shrink-0 items-center overflow-hidden border-b border-(--glass-border) px-4">
         <div className="flex items-center gap-3">
 
           {/* Logo */}
-          <div className="relative h-12 w-12 shrink-0 drop-shadow-sm">
+          <div className="relative h-10 w-10 shrink-0 drop-shadow-sm">
             <Image
               src="/images/logo.png"
               alt="Cordova RISKQ Logo"
               fill
               priority
-              sizes="48px"
+              sizes="40px"
               className="object-contain"
             />
           </div>
 
           {/* Text */}
-          <div>
+          <div
+            className={`overflow-hidden whitespace-nowrap transition-all duration-200 ease-in-out ${
+              collapsed ? "w-0 -translate-x-2 opacity-0" : "w-auto translate-x-0 opacity-100"
+            }`}
+          >
             <h1 className={`${inter.className} flex items-center text-xl font-bold tracking-tight`}>
               <span className="inline-flex items-center" style={{ color: "var(--brand-cordova)" }}>
                 C

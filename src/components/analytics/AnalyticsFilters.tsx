@@ -16,8 +16,8 @@ export default function AnalyticsFilters() {
           onClick={() => setRange(r)}
           className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
             range === r
-              ? "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm"
-              : "border border-border bg-white text-muted hover:bg-primary-light/40 hover:text-primary"
+              ? "bg-primary text-white shadow-sm hover:bg-primary-dark"
+              : "border border-border bg-surface text-muted hover:bg-primary-light/40 hover:text-primary"
           }`}
         >
           {r}

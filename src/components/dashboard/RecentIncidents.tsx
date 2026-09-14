@@ -18,7 +18,7 @@ export default function RecentIncidents() {
   const recent = emergencies.slice(0, 5);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
       <div className="flex items-center justify-between border-b border-border/70 p-5">
         <div className="flex items-center gap-2.5">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-danger-light text-danger">
@@ -42,10 +42,10 @@ export default function RecentIncidents() {
           <table className="w-full text-left text-sm">
             <thead className="bg-background/60">
               <tr>
-                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Type</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Location</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Time</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted">Status</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Type</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Location</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Time</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/70">

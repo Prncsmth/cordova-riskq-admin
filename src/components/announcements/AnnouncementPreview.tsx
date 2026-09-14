@@ -16,7 +16,7 @@ export default function AnnouncementPreview({ title, body, priority, audience }:
 
   return (
     <Card>
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted">Live Preview</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Live Preview</p>
       <p className="mt-0.5 text-xs text-muted">How this will appear to {audience.toLowerCase()}</p>
 
       <div
@@ -32,7 +32,7 @@ export default function AnnouncementPreview({ title, body, priority, audience }:
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <p className="text-xs font-bold text-foreground">Cordova RISKQ</p>
-              <span className="text-[11px] text-muted">now</span>
+              <span className="text-[11px] text-text-tertiary">now</span>
             </div>
 
             <p className="mt-1 truncate text-sm font-semibold text-foreground">

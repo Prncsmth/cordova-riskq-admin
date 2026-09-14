@@ -10,11 +10,10 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const styles = {
-    primary:
-      "bg-linear-to-b from-primary to-primary-dark text-white shadow-sm hover:brightness-110 active:brightness-95",
-    secondary: "bg-linear-to-b from-warning to-warning/90 text-white shadow-sm hover:brightness-110",
-    danger: "bg-linear-to-b from-danger to-danger/90 text-white shadow-sm hover:brightness-110",
-    outline: "border border-border bg-white text-foreground shadow-xs hover:bg-primary-light/40",
+    primary: "bg-primary text-white shadow-xs hover:bg-primary-dark active:brightness-95",
+    secondary: "bg-warning text-white shadow-xs hover:brightness-95 active:brightness-90",
+    danger: "bg-danger text-white shadow-xs hover:brightness-95 active:brightness-90",
+    outline: "border border-border bg-surface text-foreground shadow-xs hover:bg-primary-light/40",
   };
 
   return (
