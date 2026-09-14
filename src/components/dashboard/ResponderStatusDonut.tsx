@@ -5,10 +5,13 @@ import { ShieldCheck } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 // Mock data for UI — replace with real API data once backend endpoints are available.
+// Colors reference the theme's CSS vars directly (not Tailwind classes,
+// since Recharts needs a real color value for SVG `fill`) so they switch
+// with dark mode instead of staying pinned to their light-mode hex.
 const data = [
-  { name: "Online", value: 64, color: "#1e8e3e" },
-  { name: "Busy", value: 12, color: "#b45309" },
-  { name: "Offline", value: 6, color: "#d6cfc6" },
+  { name: "Online", value: 64, color: "var(--success)" },
+  { name: "Busy", value: 12, color: "var(--warning)" },
+  { name: "Offline", value: 6, color: "var(--muted)" },
 ];
 
 const total = data.reduce((sum, d) => sum + d.value, 0);
@@ -54,7 +57,7 @@ export default function ResponderStatusDonut() {
             className="flex items-center justify-between rounded-xl px-2 py-1.5 text-sm transition-colors hover:bg-background/60"
           >
             <span className="flex items-center gap-2 text-foreground">
-              <span className="h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-white" style={{ backgroundColor: entry.color, boxShadow: `0 0 0 1px ${entry.color}33` }} />
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: entry.color }} />
               {entry.name}
             </span>
             <span className="font-medium text-muted">

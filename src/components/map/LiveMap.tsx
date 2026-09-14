@@ -169,12 +169,12 @@ export default function LiveMap({
                   duration: 800,
                 });
               }}
-              className="glass-strong flex h-10 w-10 items-center justify-center rounded-full border border-(--glass-border) shadow-md transition-all duration-150 hover:scale-105 active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-surface shadow-md transition-all duration-150 hover:scale-105 active:scale-95"
             >
               <MapPin size={18} strokeWidth={2} className="text-primary" fill="currentColor" fillOpacity={0.15} />
             </button>
 
-            <div className="glass-strong flex flex-col overflow-hidden rounded-2xl border border-(--glass-border) shadow-md">
+            <div className="flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-md">
               <button
                 type="button"
                 aria-label="Zoom in"
@@ -183,7 +183,7 @@ export default function LiveMap({
               >
                 <Plus size={17} strokeWidth={2.5} />
               </button>
-              <div className="h-px bg-(--glass-border)" />
+              <div className="h-px bg-border/70" />
               <button
                 type="button"
                 aria-label="Zoom out"
@@ -202,13 +202,13 @@ export default function LiveMap({
           <button
             aria-label="Map layers and filters"
             onClick={() => setShowLayerMenu((s) => !s)}
-            className="glass-strong flex h-10 w-10 items-center justify-center rounded-full border border-(--glass-border) text-foreground shadow-md transition-all duration-150 hover:scale-105 active:scale-95"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-surface text-foreground shadow-md transition-all duration-150 hover:scale-105 active:scale-95"
           >
-            <Layers size={18} strokeWidth={2} />
+            <Layers size={20} strokeWidth={2.25} />
           </button>
 
           {showLayerMenu && (
-            <div className="glass-strong mt-2 w-56 overflow-hidden rounded-2xl border border-(--glass-border) shadow-md">
+            <div className="mt-2 w-56 overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-md">
               <p className="px-3.5 pt-3 pb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-text-tertiary">
                 Map Style
               </p>
@@ -226,7 +226,7 @@ export default function LiveMap({
                         active ? "bg-primary-light/60 text-primary" : "text-foreground hover:bg-primary-light/30"
                       }`}
                     >
-                      <StyleIcon size={14} strokeWidth={2.25} className="shrink-0" />
+                      <StyleIcon size={15} strokeWidth={2.5} className="shrink-0" />
                       <span className="flex-1">{name}</span>
                       {active && <Check size={14} strokeWidth={2.5} />}
                     </button>
@@ -234,7 +234,7 @@ export default function LiveMap({
                 })}
               </div>
 
-              <p className="border-t border-(--glass-border) px-3.5 pt-2.5 pb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-text-tertiary">
+              <p className="border-t border-border/70 px-3.5 pt-2.5 pb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-text-tertiary">
                 Show on Map
               </p>
 
@@ -253,10 +253,10 @@ export default function LiveMap({
                       className="flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-xs font-medium text-foreground transition-colors hover:bg-primary-light/30"
                     >
                       <span
-                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
                         style={{ background: config.color }}
                       >
-                        <Icon size={11} color="white" strokeWidth={2.5} />
+                        <Icon size={13} color="white" strokeWidth={2.5} />
                       </span>
                       <span className="flex-1">
                         {config.label} <span className="text-text-tertiary">({count})</span>
@@ -312,7 +312,7 @@ export default function LiveMap({
                     className="relative flex h-8 w-8 items-center justify-center rounded-full shadow-md transition-transform duration-150 group-hover:scale-110"
                     style={{ background: config.color }}
                   >
-                    <Icon size={15} color="white" strokeWidth={2.5} />
+                    <Icon size={18} color="white" strokeWidth={2.5} />
                   </span>
                 </button>
               </Marker>
@@ -336,7 +336,7 @@ export default function LiveMap({
               >
                 {(() => {
                   const Icon = markerConfig[selectedMarker.type].icon;
-                  return <Icon size={13} color="white" strokeWidth={2.5} />;
+                  return <Icon size={14} color="white" strokeWidth={2.5} />;
                 })()}
               </span>
               <div className="min-w-0">

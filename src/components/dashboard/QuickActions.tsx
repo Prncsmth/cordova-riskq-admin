@@ -26,12 +26,12 @@ export default function QuickActions() {
             <Link
               key={action.label}
               href={action.href}
-              className={`flex flex-col items-start gap-3 rounded-xl border border-border/50 p-4 transition-all duration-150 hover:brightness-95 active:scale-[0.98] ${action.bg}`}
+              className="flex flex-col items-start gap-3 rounded-xl border border-border/70 bg-background p-4 transition-colors duration-150 hover:border-primary/30 hover:bg-primary-light/20 active:scale-[0.98]"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 shadow-xs ring-1 ring-black/5">
+              <span className={`flex h-9 w-9 items-center justify-center rounded-full ${action.bg}`}>
                 <Icon size={17} className={action.color} />
               </span>
-              <span className={`text-sm font-medium ${action.color}`}>{action.label}</span>
+              <span className="text-sm font-medium text-foreground">{action.label}</span>
             </Link>
           );
         })}
