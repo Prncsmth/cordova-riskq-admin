@@ -3,14 +3,16 @@
 import CountUp from "react-countup";
 import { motion } from "framer-motion";
 import { AlertTriangle, BellRing, ShieldCheck, HeartHandshake } from "lucide-react";
-import { useEmergencies } from "@/hooks/useEmergencies";
+import { useEmergenciesWithHistory } from "@/hooks/useEmergenciesWithHistory";
 import { useResponders } from "@/hooks/useResponders";
+import { isToday } from "@/lib/utils";
 
 export default function StatsCards() {
-  const { emergencies } = useEmergencies();
+  const { emergencies } = useEmergenciesWithHistory();
   const { responders } = useResponders();
 
   const activeIncidents = emergencies.filter((e) => e.status === "Active").length;
+  const sosAlertsToday = emergencies.filter((e) => e.source === "sos" && isToday(e.createdAt)).length;
 
   const cards = [
     {
@@ -22,7 +24,7 @@ export default function StatsCards() {
     },
     {
       title: "SOS Alerts Today",
-      value: null,
+      value: sosAlertsToday,
       color: "text-warning",
       bg: "bg-warning-light",
       icon: BellRing,

@@ -14,10 +14,11 @@ See `PROGRESS.md` for the one-time visual redesign summary this builds on.
 - [x] Dashboard: Responder Status donut — real, derived from `useResponders()` (On Duty / Off Duty; the old mock "Busy" category was dropped, the backend only tracks a boolean duty status)
 - [x] Incident Reports — real, uses the same `useEmergenciesWithHistory()` merge as Emergencies so its Active/Responding/Resolved/Cancelled filters all populate too
 - [x] Live Map + Dashboard live map preview — incident markers are real (`useLiveMapMarkers()` -> `useEmergencies()`), each with a "View Details" popup link to `/emergencies/[id]`. Responder/evacuation layers intentionally render empty (0) — no backend data exists for either (see Known gaps)
+- [x] Dashboard: KPI cards — Active Incidents, SOS Alerts Today (new `Emergency.source` field, `"sos"` vs `"report"`, plus a new `isToday()` helper), and Total Responders are all real now. People Assisted stays "Not tracked yet" — no backend concept exists for it.
 
 ## Mock (static UI only, no backend wiring)
 
-- [ ] Dashboard — KPI cards (partial: Total Responders is real, Active Incidents/SOS Alerts Today/People Assisted aren't), incident trend chart, evacuation center capacity, quick actions, system summary
+- [ ] Dashboard — incident trend chart, evacuation center capacity, quick actions, system summary
 - [ ] Analytics
 - [ ] SOS Alerts
 - [ ] Reports
@@ -35,10 +36,10 @@ See `PROGRESS.md` for the one-time visual redesign summary this builds on.
 - [ ] Live Map's evacuation-center layer has no data source — no backend model exists for evacuation centers yet
 - [ ] Responder detail page has no assignment/incident history — deliberately deferred (see `docs/superpowers/specs/2026-08-23-admin-role-management-design.md`); needs a new backend endpoint over `IncidentResponder`
 - [ ] `UserMenu`'s "Admin User" / "Super Admin" display name isn't wired to the real logged-in admin
+- [ ] The admin-facing `GET /incidents/:id` response (`buildResponderFacingIncident`) doesn't include `source` or `reporterId` at all — `useEmergency(id)` (the detail hook) silently gets `source: "report"` (defaulted) and `userId: undefined` for every incident viewed via detail. Only affects the single-incident detail view; the list endpoint (`GET /incidents`, used everywhere else) has both fields.
 
 ## Next steps (pick one — each is independent)
 
-- Wire remaining Dashboard KPI cards (Active Incidents, SOS Alerts Today derivable from `useEmergencies()`; People Assisted has no backend concept yet)
 - Incident Overview trend chart — needs to reconcile live (`useEmergencies`) + historical (`/admin/history`) data into one time series; scope carefully before starting
 - Reports page — check whether it's a duplicate of Incident Reports or something distinct (e.g. generated/exportable reports); `GET /admin/history`'s filters (date range, category, barangay) may already cover it
 - Wire SOS Alerts to the real `SosAlert` backend model

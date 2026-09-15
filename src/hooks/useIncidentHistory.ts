@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 export type HistoryRecord = {
   id: string;
   category: string;
+  source: string;
   locationLabel: string;
   latitude: number | null;
   longitude: number | null;

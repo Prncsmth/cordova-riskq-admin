@@ -9,6 +9,10 @@ import { Emergency, EmergencyStatus } from "@/types/emergency";
 type RawIncident = {
   id: string;
   category: string;
+  // "sos" | "report" on the list endpoint (GET /incidents); the admin-facing
+  // detail endpoint (GET /incidents/:id) doesn't return this field at all,
+  // so it's optional here and defaults to "report" in toEmergency().
+  source?: string;
   details?: string | null;
   locationLabel: string;
   latitude?: number | null;
@@ -38,6 +42,7 @@ function toEmergency(raw: RawIncident): Emergency {
     longitude: raw.longitude ?? 0,
     locationName: raw.locationLabel,
     status: STATUS_TO_EMERGENCY_STATUS[raw.status] ?? "Active",
+    source: raw.source === "sos" ? "sos" : "report",
     userId: raw.reporterId,
     responderId: raw.acceptedByResponderId ?? undefined,
     createdAt: raw.createdAt,

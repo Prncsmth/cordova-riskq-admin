@@ -20,6 +20,7 @@ export interface Emergency {
   longitude: number;
   locationName: string;
   status: EmergencyStatus;
+  source: "report" | "sos";
   userId: string;
   responderId?: string;
   createdAt: string;

@@ -16,6 +16,7 @@ function toEmergency(record: HistoryRecord): Emergency {
     longitude: record.longitude ?? 0,
     locationName: record.locationLabel,
     status: record.status === "completed" ? "Resolved" : "Cancelled",
+    source: record.source === "sos" ? "sos" : "report",
     userId: record.reporter.id,
     responderId: respondedBy?.id,
     createdAt: record.createdAt,
