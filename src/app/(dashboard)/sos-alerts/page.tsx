@@ -1,15 +1,45 @@
+"use client";
+
 import { BellRing, CheckCheck, ShieldCheck, Siren } from "lucide-react";
 import Card from "@/components/ui/Card";
 import SosAlertTable from "@/components/sos-alerts/SosAlertTable";
-
-const stats = [
-  { label: "Total Alerts", value: "4", icon: Siren, color: "text-primary", bg: "bg-primary-light" },
-  { label: "New", value: "1", icon: BellRing, color: "text-danger", bg: "bg-danger-light", pulse: true },
-  { label: "Acknowledged", value: "1", icon: CheckCheck, color: "text-warning", bg: "bg-warning-light" },
-  { label: "Resolved", value: "2", icon: ShieldCheck, color: "text-success", bg: "bg-success-light" },
-];
+import { useSosAlerts } from "@/hooks/useSosAlerts";
 
 export default function SosAlertsPage() {
+  const { alerts, loading, error } = useSosAlerts();
+
+  const stats = [
+    {
+      label: "Total Alerts",
+      value: String(alerts.length),
+      icon: Siren,
+      color: "text-primary",
+      bg: "bg-primary-light",
+    },
+    {
+      label: "New",
+      value: String(alerts.filter((a) => a.status === "New").length),
+      icon: BellRing,
+      color: "text-danger",
+      bg: "bg-danger-light",
+      pulse: true,
+    },
+    {
+      label: "Acknowledged",
+      value: String(alerts.filter((a) => a.status === "Acknowledged").length),
+      icon: CheckCheck,
+      color: "text-warning",
+      bg: "bg-warning-light",
+    },
+    {
+      label: "Resolved",
+      value: String(alerts.filter((a) => a.status === "Resolved").length),
+      icon: ShieldCheck,
+      color: "text-success",
+      bg: "bg-success-light",
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -41,7 +71,7 @@ export default function SosAlertsPage() {
         })}
       </div>
 
-      <SosAlertTable />
+      <SosAlertTable alerts={alerts} loading={loading} error={error} />
     </div>
   );
 }

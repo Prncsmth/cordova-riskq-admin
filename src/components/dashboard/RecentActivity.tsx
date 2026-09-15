@@ -1,61 +1,20 @@
 import Link from "next/link";
 import { BellRing, ShieldCheck, CheckCircle2, Building2, UserPlus, History } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useRecentActivity, type AdminActivityType } from "@/hooks/useRecentActivity";
+import { timeAgo } from "@/lib/utils";
 
-type Activity = {
-  icon: LucideIcon;
-  color: string;
-  bg: string;
-  title: string;
-  detail: string;
-  time: string;
+const ICON_BY_TYPE: Record<AdminActivityType, { icon: LucideIcon; color: string; bg: string }> = {
+  sos_alert: { icon: BellRing, color: "text-danger", bg: "bg-danger-light" },
+  responder_joined: { icon: ShieldCheck, color: "text-info", bg: "bg-info-light" },
+  incident_resolved: { icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
+  evacuation_center_updated: { icon: Building2, color: "text-warning", bg: "bg-warning-light" },
+  user_registered: { icon: UserPlus, color: "text-primary", bg: "bg-primary-light" },
 };
 
-// Mock data for UI — replace with real API/socket data once backend endpoints are available.
-const activities: Activity[] = [
-  {
-    icon: BellRing,
-    color: "text-danger",
-    bg: "bg-danger-light",
-    title: "New SOS alert received",
-    detail: "Poblacion, Cordova",
-    time: "2 min ago",
-  },
-  {
-    icon: ShieldCheck,
-    color: "text-info",
-    bg: "bg-info-light",
-    title: "Responder Mark Dela Cruz",
-    detail: "accepted an incident",
-    time: "5 min ago",
-  },
-  {
-    icon: CheckCircle2,
-    color: "text-success",
-    bg: "bg-success-light",
-    title: "Incident #INC-2026-0089",
-    detail: "has been resolved",
-    time: "12 min ago",
-  },
-  {
-    icon: Building2,
-    color: "text-warning",
-    bg: "bg-warning-light",
-    title: "Evacuation center updated",
-    detail: "Gabi Evacuation Center",
-    time: "20 min ago",
-  },
-  {
-    icon: UserPlus,
-    color: "text-primary",
-    bg: "bg-primary-light",
-    title: "New user registered",
-    detail: "Juan Dela Cruz",
-    time: "35 min ago",
-  },
-];
-
 export default function RecentActivity() {
+  const { activities, loading, error } = useRecentActivity();
+
   return (
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
       <div className="flex items-center justify-between border-b border-border/70 p-5">
@@ -70,25 +29,33 @@ export default function RecentActivity() {
         </Link>
       </div>
 
-      <div className="divide-y divide-border/70">
-        {activities.map((activity, index) => {
-          const Icon = activity.icon;
-          return (
-            <div key={index} className="flex items-start gap-3 p-4 transition-colors hover:bg-background/50">
-              <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${activity.bg}`}>
-                <Icon size={16} className={activity.color} />
-              </span>
+      {loading ? (
+        <p className="p-10 text-center text-sm text-muted">Loading recent activity…</p>
+      ) : error ? (
+        <p className="p-10 text-center text-sm text-red-700">{error}</p>
+      ) : activities.length === 0 ? (
+        <p className="p-10 text-center text-sm text-muted">No recent activity.</p>
+      ) : (
+        <div className="divide-y divide-border/70">
+          {activities.map((activity, index) => {
+            const { icon: Icon, color, bg } = ICON_BY_TYPE[activity.type];
+            return (
+              <div key={index} className="flex items-start gap-3 p-4 transition-colors hover:bg-background/50">
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${bg}`}>
+                  <Icon size={16} className={color} />
+                </span>
 
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">{activity.title}</p>
-                <p className="truncate text-sm text-muted">{activity.detail}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">{activity.title}</p>
+                  <p className="truncate text-sm text-muted">{activity.detail}</p>
+                </div>
+
+                <span className="shrink-0 text-xs text-text-tertiary">{timeAgo(activity.occurredAt)}</span>
               </div>
-
-              <span className="shrink-0 text-xs text-text-tertiary">{activity.time}</span>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -18,12 +18,13 @@ See `PROGRESS.md` for the one-time visual redesign summary this builds on.
 - [x] Dashboard: Incident Overview trend chart — real, 14-day daily bucket of `useEmergenciesWithHistory()` split into "Incidents" and "SOS Alerts" series (`isSameDay()` helper). Note: history is capped at the most recent 100 terminal incidents (ordered by `updatedAt`, not `createdAt`) — fine at current volume, could under-count older days once the city has more than ~100 resolved/cancelled incidents total.
 - [x] Dashboard: Quick Actions — no data, just navigation links; nothing to wire
 - [x] Dashboard: System Summary — static status banner + a live client-side clock; nothing to wire
+- [x] Dashboard: Recent Activity widget — real via new `GET /admin/activity` (derives a feed from `SosAlert`/`IncidentResponder`/`Incident`/`EvacuationCenter`/`User`, no dedicated audit-log model) for the initial load, plus live `admin:activity` socket events pushed from the 5 write sites that produce each activity type. "View All" still links to Audit Logs, which stays mock.
+- [x] SOS Alerts — real via the already-existing `GET /admin/sos-alerts` (backend route/controller/service were already built, just unused by the frontend). `SosAlert.status` itself never changes after creation, so the New/Acknowledged/Resolved badge is derived from the linked Incident's status instead (`pending` -> New, `lobby`/`on_the_way`/`arrived` -> Acknowledged, `completed`/`cancelled` -> Resolved), same pattern as `useEmergencies.ts`. Stat cards on the page are now real counts.
 
 ## Mock (static UI only, no backend wiring)
 
 - [ ] Dashboard: Evacuation Center Capacity — blocked on the same missing `EvacuationCenter` backend model as the full Evacuation Centers page (see Next steps)
 - [ ] Analytics
-- [ ] SOS Alerts
 - [ ] Reports
 - [ ] Announcements
 - [ ] Audit Logs
@@ -44,6 +45,5 @@ See `PROGRESS.md` for the one-time visual redesign summary this builds on.
 ## Next steps (pick one — each is independent)
 
 - Reports page — check whether it's a duplicate of Incident Reports or something distinct (e.g. generated/exportable reports); `GET /admin/history`'s filters (date range, category, barangay) may already cover it
-- Wire SOS Alerts to the real `SosAlert` backend model
-- Wire Announcements to the real `Announcement` model (already used by the mobile citizen notification pipeline)
+- Wire Announcements to the real `Announcement` model — the backend route (`GET /admin/announcements`) already exists too, same situation SOS Alerts was just in
 - Evacuation Centers / Resources / Witnesses have no backend models yet — would need schema design first

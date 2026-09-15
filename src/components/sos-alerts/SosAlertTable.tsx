@@ -4,30 +4,13 @@ import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import type { SosAlert } from "@/types/sos-alert";
-import { CORDOVA_BARANGAYS, jitter } from "@/lib/cordovaBarangays";
+import { timeAgo } from "@/lib/utils";
 
-function barangay(id: string) {
-  const found = CORDOVA_BARANGAYS.find((b) => b.id === id);
-  if (!found) throw new Error(`Unknown Cordova barangay: ${id}`);
-  return found;
-}
-
-// Mock data for UI — replace with real API data once backend endpoints are available.
-// Positions are each barangay's real coordinate (see lib/cordovaBarangays)
-// with a small jitter, so the pin actually lands inside the named barangay.
-const [poblacionPos, dayAsPos, gabiPos, sanMiguelPos] = [
-  jitter(barangay("poblacion"), 0),
-  jitter(barangay("day-as"), 1),
-  jitter(barangay("gabi"), 2),
-  jitter(barangay("san-miguel"), 3),
-];
-
-const alerts: SosAlert[] = [
-  { id: "SOS-1042", userName: "Ana Reyes", locationName: "Poblacion, Cordova", latitude: poblacionPos[0], longitude: poblacionPos[1], status: "New", receivedAt: "2 min ago" },
-  { id: "SOS-1041", userName: "Mark Villanueva", locationName: "Day-as, Cordova", latitude: dayAsPos[0], longitude: dayAsPos[1], status: "Acknowledged", receivedAt: "18 min ago" },
-  { id: "SOS-1040", userName: "Liza Fernandez", locationName: "Gabi, Cordova", latitude: gabiPos[0], longitude: gabiPos[1], status: "Resolved", receivedAt: "1 hr ago" },
-  { id: "SOS-1039", userName: "Carlo Bautista", locationName: "San Miguel, Cordova", latitude: sanMiguelPos[0], longitude: sanMiguelPos[1], status: "Resolved", receivedAt: "3 hr ago" },
-];
+type SosAlertTableProps = {
+  alerts: SosAlert[];
+  loading: boolean;
+  error: string | null;
+};
 
 const statusVariant = {
   New: "danger",
@@ -46,7 +29,7 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export default function SosAlertTable() {
+export default function SosAlertTable({ alerts, loading, error }: SosAlertTableProps) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("All");
 
@@ -63,7 +46,7 @@ export default function SosAlertTable() {
 
       return matchesStatus && matchesQuery;
     });
-  }, [query, statusFilter]);
+  }, [alerts, query, statusFilter]);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
@@ -96,58 +79,64 @@ export default function SosAlertTable() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-background/60">
-            <tr>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">User</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Location</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Received</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/70">
-            {filtered.map((alert) => (
-              <tr
-                key={alert.id}
-                className={`transition-colors hover:bg-background/70 ${alert.status === "New" ? "bg-danger-light/20" : ""}`}
-              >
-                <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <span className="relative flex h-9 w-9 shrink-0 items-center justify-center">
-                      {alert.status === "New" && (
-                        <span className="absolute inline-flex h-9 w-9 animate-ping rounded-full bg-danger opacity-30" />
-                      )}
-                      <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white shadow-xs">
-                        {initials(alert.userName)}
-                      </span>
-                    </span>
-                    <div className="min-w-0">
-                      <p className="font-medium text-foreground">{alert.userName}</p>
-                      <p className="text-xs text-muted">{alert.id}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4 text-muted">{alert.locationName}</td>
-                <td className="p-4 text-muted">{alert.receivedAt}</td>
-                <td className="p-4">
-                  <Badge variant={statusVariant[alert.status]} solid={alert.status === "New"}>
-                    {alert.status}
-                  </Badge>
-                </td>
-              </tr>
-            ))}
-
-            {filtered.length === 0 && (
+      {loading ? (
+        <p className="p-10 text-center text-sm text-muted">Loading SOS alerts…</p>
+      ) : error ? (
+        <p className="p-10 text-center text-sm text-red-700">{error}</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-background/60">
               <tr>
-                <td colSpan={4} className="p-10 text-center text-sm text-muted">
-                  No SOS alerts match your filters.
-                </td>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">User</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Location</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Received</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Status</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-border/70">
+              {filtered.map((alert) => (
+                <tr
+                  key={alert.id}
+                  className={`transition-colors hover:bg-background/70 ${alert.status === "New" ? "bg-danger-light/20" : ""}`}
+                >
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center">
+                        {alert.status === "New" && (
+                          <span className="absolute inline-flex h-9 w-9 animate-ping rounded-full bg-danger opacity-30" />
+                        )}
+                        <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white shadow-xs">
+                          {initials(alert.userName)}
+                        </span>
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground">{alert.userName}</p>
+                        <p className="text-xs text-muted">{alert.id}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-muted">{alert.locationName}</td>
+                  <td className="p-4 text-muted">{timeAgo(alert.createdAt)}</td>
+                  <td className="p-4">
+                    <Badge variant={statusVariant[alert.status]} solid={alert.status === "New"}>
+                      {alert.status}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="p-10 text-center text-sm text-muted">
+                    {alerts.length === 0 ? "No SOS alerts yet." : "No SOS alerts match your filters."}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

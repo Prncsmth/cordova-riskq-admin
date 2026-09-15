@@ -7,5 +7,5 @@ export interface SosAlert {
   latitude: number;
   longitude: number;
   status: SosAlertStatus;
-  receivedAt: string;
+  createdAt: string;
 }
