@@ -36,7 +36,7 @@ export default function RecentActivity() {
       ) : activities.length === 0 ? (
         <p className="p-10 text-center text-sm text-muted">No recent activity.</p>
       ) : (
-        <div className="divide-y divide-border/70">
+        <div className="max-h-[420px] divide-y divide-border/70 overflow-y-auto">
           {activities.map((activity, index) => {
             const { icon: Icon, color, bg } = ICON_BY_TYPE[activity.type];
             return (

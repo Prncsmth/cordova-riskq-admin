@@ -38,7 +38,7 @@ export default function RecentIncidents() {
       ) : recent.length === 0 ? (
         <p className="p-10 text-center text-sm text-muted">No active incidents.</p>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="max-h-[420px] overflow-x-auto overflow-y-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-background/60">
               <tr>
