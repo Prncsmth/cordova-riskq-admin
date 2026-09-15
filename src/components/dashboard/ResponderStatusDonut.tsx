@@ -1,22 +1,43 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { useResponders } from "@/hooks/useResponders";
 
-// Mock data for UI — replace with real API data once backend endpoints are available.
 // Colors reference the theme's CSS vars directly (not Tailwind classes,
 // since Recharts needs a real color value for SVG `fill`) so they switch
 // with dark mode instead of staying pinned to their light-mode hex.
-const data = [
-  { name: "Online", value: 64, color: "var(--success)" },
-  { name: "Busy", value: 12, color: "var(--warning)" },
-  { name: "Offline", value: 6, color: "var(--muted)" },
-];
-
-const total = data.reduce((sum, d) => sum + d.value, 0);
-
 export default function ResponderStatusDonut() {
+  const { responders, loading, error } = useResponders();
+
+  const data = useMemo(() => {
+    const onDuty = responders.filter((r) => r.isOnDuty).length;
+    return [
+      { name: "On Duty", value: onDuty, color: "var(--success)" },
+      { name: "Off Duty", value: responders.length - onDuty, color: "var(--muted)" },
+    ];
+  }, [responders]);
+
+  const total = responders.length;
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center rounded-2xl border border-border/70 bg-surface p-6 text-center text-sm text-muted shadow-xs">
+        Loading responder status…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-full items-center justify-center rounded-2xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-700 shadow-xs">
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full flex-col rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <div className="flex items-center gap-2.5">
@@ -26,6 +47,12 @@ export default function ResponderStatusDonut() {
         <h2 className="text-lg font-semibold text-foreground">Responder Status</h2>
       </div>
 
+      {total === 0 ? (
+        <div className="flex flex-1 items-center justify-center py-8 text-center text-sm text-muted">
+          No responders yet.
+        </div>
+      ) : (
+        <>
       <div className="relative mx-auto mt-3 h-44 w-44">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -73,6 +100,8 @@ export default function ResponderStatusDonut() {
       >
         View Responders
       </Link>
+        </>
+      )}
     </div>
   );
 }
