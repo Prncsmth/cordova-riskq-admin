@@ -16,10 +16,12 @@ See `PROGRESS.md` for the one-time visual redesign summary this builds on.
 - [x] Live Map + Dashboard live map preview — incident markers are real (`useLiveMapMarkers()` -> `useEmergencies()`), each with a "View Details" popup link to `/emergencies/[id]`. Responder/evacuation layers intentionally render empty (0) — no backend data exists for either (see Known gaps)
 - [x] Dashboard: KPI cards — Active Incidents, SOS Alerts Today (new `Emergency.source` field, `"sos"` vs `"report"`, plus a new `isToday()` helper), and Total Responders are all real now. People Assisted stays "Not tracked yet" — no backend concept exists for it.
 - [x] Dashboard: Incident Overview trend chart — real, 14-day daily bucket of `useEmergenciesWithHistory()` split into "Incidents" and "SOS Alerts" series (`isSameDay()` helper). Note: history is capped at the most recent 100 terminal incidents (ordered by `updatedAt`, not `createdAt`) — fine at current volume, could under-count older days once the city has more than ~100 resolved/cancelled incidents total.
+- [x] Dashboard: Quick Actions — no data, just navigation links; nothing to wire
+- [x] Dashboard: System Summary — static status banner + a live client-side clock; nothing to wire
 
 ## Mock (static UI only, no backend wiring)
 
-- [ ] Dashboard — evacuation center capacity, quick actions, system summary
+- [ ] Dashboard: Evacuation Center Capacity — blocked on the same missing `EvacuationCenter` backend model as the full Evacuation Centers page (see Next steps)
 - [ ] Analytics
 - [ ] SOS Alerts
 - [ ] Reports
