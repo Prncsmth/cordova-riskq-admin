@@ -39,3 +39,9 @@ export function isSameDay(a: string | Date, b: string | Date) {
 export function isToday(date: string | Date) {
   return isSameDay(date, new Date());
 }
+
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+export function isWithinLastWeek(date: string | Date) {
+  return Date.now() - new Date(date).getTime() < ONE_WEEK_MS;
+}

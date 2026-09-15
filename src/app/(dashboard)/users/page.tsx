@@ -4,15 +4,12 @@ import { Users as UsersIcon, UserPlus } from "lucide-react";
 import Card from "@/components/ui/Card";
 import UserTable from "@/components/users/UserTable";
 import { useUsers } from "@/hooks/useUsers";
-
-const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+import { isWithinLastWeek } from "@/lib/utils";
 
 export default function UsersPage() {
   const { users, loading, error, actionError, changeRole } = useUsers();
 
-  const newThisWeek = users.filter(
-    (u) => Date.now() - new Date(u.createdAt).getTime() < ONE_WEEK_MS
-  ).length;
+  const newThisWeek = users.filter((u) => isWithinLastWeek(u.createdAt)).length;
 
   const stats = [
     { label: "Total Users", value: users.length, icon: UsersIcon, color: "text-primary", bg: "bg-primary-light" },

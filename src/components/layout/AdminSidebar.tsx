@@ -9,9 +9,7 @@ import {
   FileText,
   ShieldCheck,
   Users as UsersIcon,
-  Eye,
   Building2,
-  Wrench,
   BarChart3,
   FileBarChart,
   Settings,
@@ -98,7 +96,6 @@ export default function AdminSidebar() {
           items={[
             { href: "/responders", label: "Responders", icon: ShieldCheck },
             { href: "/users", label: "Users", icon: UsersIcon },
-            { href: "/witnesses", label: "Witnesses", icon: Eye },
           ]}
         />
 
@@ -106,7 +103,6 @@ export default function AdminSidebar() {
           label="Resources"
           items={[
             { href: "/evacuation-centers", label: "Evacuation Centers", icon: Building2 },
-            { href: "/resources", label: "Equipment / Resources", icon: Wrench },
           ]}
         />
 

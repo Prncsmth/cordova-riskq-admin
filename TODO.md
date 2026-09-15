@@ -2,6 +2,7 @@
 
 Running tracker of what's real (backend-wired) vs. still mock on the admin side.
 See `PROGRESS.md` for the one-time visual redesign summary this builds on.
+Note: the Witnesses and Equipment/Resources pages (and their sidebar entries) were removed outright rather than wired up — product decision, not a gap.
 
 ## Real (backend-wired)
 
@@ -29,8 +30,6 @@ See `PROGRESS.md` for the one-time visual redesign summary this builds on.
 - [ ] Reports
 - [ ] Audit Logs
 - [ ] Evacuation Centers
-- [ ] Resources
-- [ ] Witnesses
 - [ ] Settings
 - [ ] Notifications (admin-facing)
 
@@ -45,4 +44,4 @@ See `PROGRESS.md` for the one-time visual redesign summary this builds on.
 ## Next steps (pick one — each is independent)
 
 - Reports page — check whether it's a duplicate of Incident Reports or something distinct (e.g. generated/exportable reports); `GET /admin/history`'s filters (date range, category, barangay) may already cover it
-- Evacuation Centers / Resources / Witnesses have no backend models yet — would need schema design first
+- Evacuation Centers has no backend model yet — would need schema design first
