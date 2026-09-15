@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useSidebar } from "@/components/layout/SidebarContext";
+import { useLiveMapMarkers } from "@/hooks/useLiveMapMarkers";
 
 const LiveMap = dynamic(
   () => import("@/components/map/LiveMap"),
@@ -17,6 +18,7 @@ const LiveMap = dynamic(
 
 export default function LiveMapPage() {
   const { collapsed } = useSidebar();
+  const { markers } = useLiveMapMarkers();
 
   // When the sidebar is collapsed, render the map as a fixed full-viewport
   // layer so it fills the entire screen width; keep the sidebar toggle
@@ -24,7 +26,7 @@ export default function LiveMapPage() {
   if (collapsed) {
     return (
       <div className="fixed inset-0 z-0 bg-background">
-        <LiveMap />
+        <LiveMap markers={markers} />
       </div>
     );
   }
@@ -32,7 +34,7 @@ export default function LiveMapPage() {
   // Otherwise render the map to fill the available content area height.
   return (
     <div className="h-screen w-full">
-      <LiveMap />
+      <LiveMap markers={markers} />
     </div>
   );
 }

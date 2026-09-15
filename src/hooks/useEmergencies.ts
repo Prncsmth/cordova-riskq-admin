@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
-import { Emergency, EmergencyStatus, EmergencyType } from "@/types/emergency";
+import { categoryToEmergencyType } from "@/lib/incidentCategory";
+import { Emergency, EmergencyStatus } from "@/types/emergency";
 
 type RawIncident = {
   id: string;
@@ -19,15 +20,6 @@ type RawIncident = {
   updatedAt: string;
 };
 
-const CATEGORY_TO_TYPE: Record<string, EmergencyType> = {
-  medical: "Medical",
-  fire: "Fire",
-  "road-accident": "Accident",
-  flood: "Disaster",
-  sos: "Other",
-  other: "Other",
-};
-
 const STATUS_TO_EMERGENCY_STATUS: Record<string, EmergencyStatus> = {
   pending: "Active",
   lobby: "Responding",
@@ -40,7 +32,7 @@ const STATUS_TO_EMERGENCY_STATUS: Record<string, EmergencyStatus> = {
 function toEmergency(raw: RawIncident): Emergency {
   return {
     id: raw.id,
-    type: CATEGORY_TO_TYPE[raw.category] ?? "Other",
+    type: categoryToEmergencyType(raw.category),
     description: raw.details ?? undefined,
     latitude: raw.latitude ?? 0,
     longitude: raw.longitude ?? 0,

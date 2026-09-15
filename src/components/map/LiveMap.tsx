@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
+import Link from "next/link";
 import Map, { Marker, Popup } from "react-map-gl/mapbox";
 import type { MapRef } from "react-map-gl/mapbox";
 import {
@@ -25,7 +26,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 export type LiveMapMarkerType = "incident" | "responder" | "evacuation";
 
 import { useSidebar } from "@/components/layout/SidebarContext";
-import { CORDOVA_BARANGAYS, CORDOVA_CENTER, CORDOVA_MAP_BOUNDS, jitter } from "@/lib/cordovaBarangays";
+import { CORDOVA_CENTER, CORDOVA_MAP_BOUNDS } from "@/lib/cordovaBarangays";
 
 export type LiveMapMarker = {
   id: string;
@@ -40,16 +41,17 @@ export const markerConfig: Record<LiveMapMarkerType, { icon: LucideIcon; color: 
   evacuation: { icon: Building2, color: "#1e8e3e", label: "Evacuation Centers" },
 };
 
+// Evacuation centers have no admin detail page yet, so their markers get no link.
+function detailHref(marker: LiveMapMarker): string | null {
+  if (marker.type === "incident") return `/emergencies/${marker.id}`;
+  if (marker.type === "responder") return `/responders/${marker.id}`;
+  return null;
+}
+
 const center: [number, number] = [CORDOVA_CENTER.latitude, CORDOVA_CENTER.longitude];
 
 // Keeps the map locked to Cordova, Cebu — no panning/zooming out to other areas.
 const CORDOVA_BOUNDS = CORDOVA_MAP_BOUNDS;
-
-function barangay(id: string) {
-  const found = CORDOVA_BARANGAYS.find((b) => b.id === id);
-  if (!found) throw new Error(`Unknown Cordova barangay: ${id}`);
-  return found;
-}
 
 const mapStyles: Record<string, { url: string; icon: LucideIcon }> = {
   Road: { url: "mapbox://styles/mapbox/streets-v12", icon: MapIcon },
@@ -59,19 +61,6 @@ const mapStyles: Record<string, { url: string; icon: LucideIcon }> = {
 };
 
 type MapStyleName = keyof typeof mapStyles;
-
-// Mock markers for UI — replace with real API data once backend endpoints are available.
-// Positions are the real barangay coordinates (see lib/cordovaBarangays) with
-// a small deterministic jitter, so e.g. the Gabi Evacuation Center actually
-// plots inside Gabi rather than a arbitrary nearby point.
-export const defaultMarkers: LiveMapMarker[] = [
-  { id: "inc-1", position: jitter(barangay("poblacion"), 0), label: "Fire Incident — Poblacion", type: "incident" },
-  { id: "inc-2", position: jitter(barangay("san-miguel"), 1), label: "Road Accident — San Miguel", type: "incident" },
-  { id: "res-1", position: jitter(barangay("catarman"), 2), label: "Responder — Juan Dela Cruz", type: "responder" },
-  { id: "res-2", position: jitter(barangay("day-as"), 3), label: "Responder — Maria Garcia", type: "responder" },
-  { id: "evac-1", position: jitter(barangay("gabi"), 4), label: "Gabi Evacuation Center", type: "evacuation" },
-  { id: "evac-2", position: jitter(barangay("poblacion"), 5), label: "Poblacion Evacuation Center", type: "evacuation" },
-];
 
 type LiveMapProps = {
   markers?: LiveMapMarker[];
@@ -86,7 +75,7 @@ type LiveMapProps = {
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 export default function LiveMap({
-  markers = defaultMarkers,
+  markers = [],
   center: mapCenter = center,
   zoom = 14,
   controls = true,
@@ -329,20 +318,31 @@ export default function LiveMap({
             closeOnClick={false}
             onClose={() => setSelectedMarker(null)}
           >
-            <div className="flex items-center gap-2 py-0.5 pr-2">
-              <span
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
-                style={{ background: markerConfig[selectedMarker.type].color }}
-              >
-                {(() => {
-                  const Icon = markerConfig[selectedMarker.type].icon;
-                  return <Icon size={14} color="white" strokeWidth={2.5} />;
-                })()}
-              </span>
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-foreground">{selectedMarker.label}</p>
-                <p className="text-[11px] capitalize text-muted">{selectedMarker.type}</p>
+            <div className="min-w-[160px] py-0.5">
+              <div className="flex items-center gap-2 pr-2">
+                <span
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                  style={{ background: markerConfig[selectedMarker.type].color }}
+                >
+                  {(() => {
+                    const Icon = markerConfig[selectedMarker.type].icon;
+                    return <Icon size={14} color="white" strokeWidth={2.5} />;
+                  })()}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-foreground">{selectedMarker.label}</p>
+                  <p className="text-[11px] capitalize text-muted">{selectedMarker.type}</p>
+                </div>
               </div>
+
+              {detailHref(selectedMarker) && (
+                <Link
+                  href={detailHref(selectedMarker)!}
+                  className="mt-2 block rounded-lg bg-primary py-1.5 text-center text-xs font-medium text-white transition-colors hover:bg-primary-dark"
+                >
+                  View Details
+                </Link>
+              )}
             </div>
           </Popup>
         )}

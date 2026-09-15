@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { useLiveMapMarkers } from "@/hooks/useLiveMapMarkers";
 
 const LiveMap = dynamic(
   () => import("@/components/map/LiveMap"),
@@ -17,6 +18,8 @@ const LiveMap = dynamic(
 );
 
 export default function LiveMapPreview() {
+  const { markers } = useLiveMapMarkers();
+
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
       <div className="flex items-center justify-between border-b border-border/70 p-4">
@@ -35,7 +38,7 @@ export default function LiveMapPreview() {
       </div>
 
       <div className="h-80 w-full">
-        <LiveMap controls={false} />
+        <LiveMap controls={false} markers={markers} />
       </div>
 
       <div className="flex flex-wrap items-center gap-4 border-t border-border/70 px-4 py-3 text-xs text-text-tertiary">
