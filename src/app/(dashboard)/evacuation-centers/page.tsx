@@ -1,25 +1,32 @@
-import { Building2, Users, BedDouble, Gauge } from "lucide-react";
+"use client";
+
+import { Building2, CheckCircle2, XCircle } from "lucide-react";
 import Card from "@/components/ui/Card";
 import EvacuationCenterList from "@/components/evacuation-centers/EvacuationCenterList";
-
-const stats = [
-  { label: "Total Centers", value: "4", icon: Building2, color: "text-primary", bg: "bg-primary-light" },
-  { label: "Total Capacity", value: "530", icon: BedDouble, color: "text-info", bg: "bg-info-light" },
-  { label: "Currently Housed", value: "262", icon: Users, color: "text-success", bg: "bg-success-light" },
-  { label: "Overall Occupancy", value: "49%", icon: Gauge, color: "text-warning", bg: "bg-warning-light" },
-];
+import { useEvacuationCenters } from "@/hooks/useEvacuationCenters";
 
 export default function EvacuationCentersPage() {
+  const { centers, loading, error, actionError, updateCenter } = useEvacuationCenters();
+
+  const open = centers.filter((c) => c.status === "open").length;
+  const full = centers.length - open;
+
+  const stats = [
+    { label: "Total Centers", value: centers.length, icon: Building2, color: "text-primary", bg: "bg-primary-light" },
+    { label: "Open", value: open, icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
+    { label: "Full", value: full, icon: XCircle, color: "text-danger", bg: "bg-danger-light" },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Evacuation Centers</h1>
         <p className="text-sm text-muted">
-          Monitor occupancy and capacity across evacuation centers.
+          Monitor status and utilities across evacuation centers.
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-3">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -36,7 +43,13 @@ export default function EvacuationCentersPage() {
         })}
       </div>
 
-      <EvacuationCenterList />
+      <EvacuationCenterList
+        centers={centers}
+        loading={loading}
+        error={error}
+        actionError={actionError}
+        updateCenter={updateCenter}
+      />
     </div>
   );
 }
