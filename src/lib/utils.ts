@@ -26,12 +26,16 @@ export function timeAgo(date: string | Date) {
   return `${days} day${days === 1 ? "" : "s"} ago`;
 }
 
-export function isToday(date: string | Date) {
-  const d = new Date(date);
-  const now = new Date();
+export function isSameDay(a: string | Date, b: string | Date) {
+  const da = new Date(a);
+  const db = new Date(b);
   return (
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate()
+    da.getFullYear() === db.getFullYear() &&
+    da.getMonth() === db.getMonth() &&
+    da.getDate() === db.getDate()
   );
+}
+
+export function isToday(date: string | Date) {
+  return isSameDay(date, new Date());
 }
