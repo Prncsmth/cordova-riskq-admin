@@ -1,5 +1,6 @@
 "use client";
 
+import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
 import { useResponders } from "@/hooks/useResponders";
@@ -61,6 +62,18 @@ export default function ResponderDetails({
         <div>
           <p className="text-xs text-muted">Contact</p>
           <p>{responder.phone ?? "Not provided"}</p>
+        </div>
+
+        <div>
+          <p className="text-xs text-muted">Duty Status</p>
+          <Badge variant={responder.isOnDuty ? "success" : "default"}>
+            {responder.isOnDuty ? "On Duty" : "Off Duty"}
+          </Badge>
+        </div>
+
+        <div>
+          <p className="text-xs text-muted">Unit</p>
+          <p>{responder.unit ?? "Unclassified"}</p>
         </div>
 
         <div>

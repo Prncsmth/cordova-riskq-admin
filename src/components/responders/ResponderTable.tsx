@@ -3,9 +3,13 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
+import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
-import type { Responder } from "@/types/responder";
+import type { Responder, ResponderUnit } from "@/types/responder";
 import { formatDate } from "@/lib/utils";
+
+type DutyFilter = "all" | "on-duty" | "off-duty";
+type UnitFilter = "all" | ResponderUnit | "unclassified";
 
 function initials(name: string) {
   return name
@@ -26,18 +30,32 @@ export default function ResponderTable({
   error: string | null;
 }) {
   const [query, setQuery] = useState("");
+  const [dutyFilter, setDutyFilter] = useState<DutyFilter>("all");
+  const [unitFilter, setUnitFilter] = useState<UnitFilter>("all");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (q.length === 0) return responders;
 
-    return responders.filter(
-      (responder) =>
-        responder.name.toLowerCase().includes(q) ||
-        responder.email.toLowerCase().includes(q) ||
-        responder.id.toLowerCase().includes(q)
-    );
-  }, [responders, query]);
+    return responders.filter((responder) => {
+      if (q.length > 0) {
+        const matchesQuery =
+          responder.name.toLowerCase().includes(q) ||
+          responder.email.toLowerCase().includes(q) ||
+          responder.id.toLowerCase().includes(q);
+        if (!matchesQuery) return false;
+      }
+
+      if (dutyFilter === "on-duty" && !responder.isOnDuty) return false;
+      if (dutyFilter === "off-duty" && responder.isOnDuty) return false;
+
+      if (unitFilter === "unclassified" && responder.unit !== null) return false;
+      if (unitFilter === "BDRRMO" || unitFilter === "MDRRMO") {
+        if (responder.unit !== unitFilter) return false;
+      }
+
+      return true;
+    });
+  }, [responders, query, dutyFilter, unitFilter]);
 
   if (loading) {
     return (
@@ -76,6 +94,29 @@ export default function ResponderTable({
             className="w-full rounded-xl border border-border bg-background/60 py-2 pl-9 pr-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
           />
         </div>
+
+        <div className="flex gap-3">
+          <select
+            value={dutyFilter}
+            onChange={(e) => setDutyFilter(e.target.value as DutyFilter)}
+            className="rounded-xl border border-border bg-background/60 py-2 px-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+          >
+            <option value="all">All duty status</option>
+            <option value="on-duty">On Duty</option>
+            <option value="off-duty">Off Duty</option>
+          </select>
+
+          <select
+            value={unitFilter}
+            onChange={(e) => setUnitFilter(e.target.value as UnitFilter)}
+            className="rounded-xl border border-border bg-background/60 py-2 px-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+          >
+            <option value="all">All units</option>
+            <option value="BDRRMO">BDRRMO</option>
+            <option value="MDRRMO">MDRRMO</option>
+            <option value="unclassified">Unclassified</option>
+          </select>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
@@ -84,6 +125,8 @@ export default function ResponderTable({
             <tr>
               <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Responder</th>
               <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Phone</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Duty</th>
+              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Unit</th>
               <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Joined</th>
               <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Action</th>
             </tr>
@@ -103,6 +146,12 @@ export default function ResponderTable({
                   </div>
                 </td>
                 <td className="p-4 text-muted">{responder.phone ?? "Not provided"}</td>
+                <td className="p-4">
+                  <Badge variant={responder.isOnDuty ? "success" : "default"}>
+                    {responder.isOnDuty ? "On Duty" : "Off Duty"}
+                  </Badge>
+                </td>
+                <td className="p-4 text-muted">{responder.unit ?? "Unclassified"}</td>
                 <td className="p-4 text-muted">{formatDate(responder.createdAt)}</td>
                 <td className="p-4">
                   <Link
@@ -117,8 +166,8 @@ export default function ResponderTable({
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-10 text-center text-sm text-muted">
-                  No responders match your search.
+                <td colSpan={6} className="p-10 text-center text-sm text-muted">
+                  No responders match your search and filters.
                 </td>
               </tr>
             )}

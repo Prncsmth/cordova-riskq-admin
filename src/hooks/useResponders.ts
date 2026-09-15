@@ -11,6 +11,8 @@ type AdminUserRow = {
   email: string;
   mobile: string | null;
   role: string;
+  unit: string | null;
+  isOnDuty: boolean;
   createdAt: string;
 };
 
@@ -20,6 +22,8 @@ function toResponder(row: AdminUserRow): Responder {
     name: row.name ?? "",
     email: row.email,
     phone: row.mobile,
+    isOnDuty: row.isOnDuty,
+    unit: row.unit === "BDRRMO" || row.unit === "MDRRMO" ? row.unit : null,
     createdAt: row.createdAt,
   };
 }
