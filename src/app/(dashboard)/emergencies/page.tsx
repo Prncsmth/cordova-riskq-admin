@@ -3,10 +3,10 @@
 import { Siren, Radio, CheckCircle2, XCircle } from "lucide-react";
 import Card from "@/components/ui/Card";
 import EmergencyTable from "@/components/emergencies/EmergencyTable";
-import { useEmergencies } from "@/hooks/useEmergencies";
+import { useEmergenciesWithHistory } from "@/hooks/useEmergenciesWithHistory";
 
 export default function EmergenciesPage() {
-  const { emergencies, loading, error } = useEmergencies();
+  const { emergencies, loading, error } = useEmergenciesWithHistory();
 
   const stats = [
     {
