@@ -4,15 +4,15 @@ import { Users as UsersIcon, UserPlus } from "lucide-react";
 import Card from "@/components/ui/Card";
 import UserTable from "@/components/users/UserTable";
 import { useUsers } from "@/hooks/useUsers";
-import { isWithinLastWeek } from "@/lib/utils";
+import { usePaginationState } from "@/hooks/usePaginationState";
 
 export default function UsersPage() {
-  const { users, loading, error, actionError, changeRole } = useUsers();
-
-  const newThisWeek = users.filter((u) => isWithinLastWeek(u.createdAt)).length;
+  const pagination = usePaginationState();
+  const { users, total, newThisWeek, loading, error, actionError, changeRole } = useUsers(pagination);
+  const totalPages = Math.max(1, Math.ceil(total / pagination.pageSize));
 
   const stats = [
-    { label: "Total Users", value: users.length, icon: UsersIcon, color: "text-primary", bg: "bg-primary-light" },
+    { label: "Total Users", value: total, icon: UsersIcon, color: "text-primary", bg: "bg-primary-light" },
     { label: "New This Week", value: newThisWeek, icon: UserPlus, color: "text-info", bg: "bg-info-light" },
   ];
 
@@ -49,6 +49,13 @@ export default function UsersPage() {
         error={error}
         actionError={actionError}
         changeRole={changeRole}
+        searchInput={pagination.searchInput}
+        onSearchChange={pagination.setSearchInput}
+        page={pagination.page}
+        totalPages={totalPages}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
       />
     </div>
   );

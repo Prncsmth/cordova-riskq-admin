@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
+import Pagination from "@/components/ui/Pagination";
 import { User } from "@/types/user";
 import type { ResponderUnit } from "@/types/responder";
 
@@ -21,32 +22,33 @@ export default function UserTable({
   error,
   actionError,
   changeRole,
+  searchInput,
+  onSearchChange,
+  page,
+  totalPages,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
 }: {
   users: User[];
   loading: boolean;
   error: string | null;
   actionError: string | null;
   changeRole: (id: string, role: "citizen" | "responder", unit?: ResponderUnit) => Promise<void>;
+  searchInput: string;
+  onSearchChange: (value: string) => void;
+  page: number;
+  totalPages: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }) {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [unitSelections, setUnitSelections] = useState<Record<string, ResponderUnit>>({});
-  const [query, setQuery] = useState("");
 
   function getUnitSelection(userId: string): ResponderUnit {
     return unitSelections[userId] ?? "BDRRMO";
   }
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (q.length === 0) return users;
-
-    return users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(q) ||
-        user.email.toLowerCase().includes(q) ||
-        user.id.toLowerCase().includes(q)
-    );
-  }, [users, query]);
 
   async function handleToggleRole(user: User) {
     const nextRole = user.role === "citizen" ? "responder" : "citizen";
@@ -60,28 +62,11 @@ export default function UserTable({
     }
   }
 
-  if (loading) {
-    return (
-      <div className="rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted shadow-sm">
-        Loading users…
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700 shadow-sm">
         {error}
       </div>
-    );
-  }
-
-  if (users.length === 0) {
-    return (
-      <EmptyState
-        title="No users yet"
-        description="Registered citizens and responders will appear here."
-      />
     );
   }
 
@@ -98,79 +83,88 @@ export default function UserTable({
           <div className="relative w-full sm:max-w-xs">
             <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
             <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search name, email, ID..."
+              value={searchInput}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Search name, email..."
               className="w-full rounded-xl border border-border bg-background/60 py-2 pl-9 pr-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
             />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-background">
-              <tr>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">User</th>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Email</th>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Role</th>
-                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filtered.map((user) => (
-                <tr key={user.id} className="hover:bg-background">
-                  <td className="p-4 font-medium text-foreground">{user.name}</td>
-                  <td className="p-4 text-foreground">{user.email}</td>
-                  <td className="p-4">
-                    <Badge variant={ROLE_BADGE_VARIANT[user.role]}>{user.role}</Badge>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-4">
-                      <Link
-                        href={`/users/${user.id}`}
-                        className="font-medium text-primary hover:text-primary-dark"
-                      >
-                        View
-                      </Link>
-
-                      {user.role === "citizen" && (
-                        <select
-                          value={getUnitSelection(user.id)}
-                          onChange={(e) =>
-                            setUnitSelections((prev) => ({ ...prev, [user.id]: e.target.value as ResponderUnit }))
-                          }
-                          disabled={pendingId === user.id}
-                          className="rounded-lg border border-border bg-background/60 py-1.5 px-2 text-xs text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
-                        >
-                          <option value="BDRRMO">BDRRMO</option>
-                          <option value="MDRRMO">MDRRMO</option>
-                        </select>
-                      )}
-
-                      {user.role !== "admin" && (
-                        <Button
-                          variant="outline"
-                          disabled={pendingId === user.id}
-                          onClick={() => handleToggleRole(user)}
-                        >
-                          {user.role === "citizen" ? "Promote to Responder" : "Revert to Citizen"}
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-
-              {filtered.length === 0 && (
+        {loading ? (
+          <p className="p-10 text-center text-sm text-muted">Loading users…</p>
+        ) : users.length === 0 ? (
+          <EmptyState
+            title="No users found"
+            description="Try a different search, or check back once citizens register."
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-background">
                 <tr>
-                  <td colSpan={4} className="p-10 text-center text-sm text-muted">
-                    No users match your search.
-                  </td>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">User</th>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Email</th>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Role</th>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Action</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {users.map((user) => (
+                  <tr key={user.id} className="hover:bg-background">
+                    <td className="p-4 font-medium text-foreground">{user.name}</td>
+                    <td className="p-4 text-foreground">{user.email}</td>
+                    <td className="p-4">
+                      <Badge variant={ROLE_BADGE_VARIANT[user.role]}>{user.role}</Badge>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-4">
+                        <Link
+                          href={`/users/${user.id}`}
+                          className="font-medium text-primary hover:text-primary-dark"
+                        >
+                          View
+                        </Link>
+
+                        {user.role === "citizen" && (
+                          <select
+                            value={getUnitSelection(user.id)}
+                            onChange={(e) =>
+                              setUnitSelections((prev) => ({ ...prev, [user.id]: e.target.value as ResponderUnit }))
+                            }
+                            disabled={pendingId === user.id}
+                            className="rounded-lg border border-border bg-background/60 py-1.5 px-2 text-xs text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+                          >
+                            <option value="BDRRMO">BDRRMO</option>
+                            <option value="MDRRMO">MDRRMO</option>
+                          </select>
+                        )}
+
+                        {user.role !== "admin" && (
+                          <Button
+                            variant="outline"
+                            disabled={pendingId === user.id}
+                            onClick={() => handleToggleRole(user)}
+                          >
+                            {user.role === "citizen" ? "Promote to Responder" : "Revert to Citizen"}
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import type { usePaginationState } from "@/hooks/usePaginationState";
 import { User, UserRole } from "@/types/user";
 
 type AdminUserRow = {
@@ -23,9 +24,12 @@ function toUser(row: AdminUserRow): User {
   };
 }
 
-export function useUsers() {
+export function useUsers(pagination: ReturnType<typeof usePaginationState>) {
   const { token } = useAuth();
+  const { page, pageSize, search } = pagination;
   const [users, setUsers] = useState<User[]>([]);
+  const [total, setTotal] = useState(0);
+  const [newThisWeek, setNewThisWeek] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -37,12 +41,22 @@ export function useUsers() {
     }
 
     let cancelled = false;
-
+    setLoading(true);
     setError(null);
 
-    apiFetch<{ success: true; users: AdminUserRow[] }>("/admin/users", { token })
+    const params = new URLSearchParams({ page: String(page), limit: String(pageSize) });
+    if (search) params.set("search", search);
+
+    apiFetch<{ success: true; users: AdminUserRow[]; total: number; newThisWeek: number }>(
+      `/admin/users?${params.toString()}`,
+      { token },
+    )
       .then((response) => {
-        if (!cancelled) setUsers(response.users.map(toUser));
+        if (!cancelled) {
+          setUsers(response.users.map(toUser));
+          setTotal(response.total);
+          setNewThisWeek(response.newThisWeek);
+        }
       })
       .catch((err) => {
         if (!cancelled) {
@@ -56,7 +70,7 @@ export function useUsers() {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, page, pageSize, search]);
 
   const changeRole = useCallback(
     async (id: string, role: "citizen" | "responder", unit?: "BDRRMO" | "MDRRMO") => {
@@ -85,5 +99,5 @@ export function useUsers() {
     [token]
   );
 
-  return { users, loading, error, actionError, changeRole };
+  return { users, total, newThisWeek, loading, error, actionError, changeRole };
 }

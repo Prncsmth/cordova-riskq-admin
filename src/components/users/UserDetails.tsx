@@ -4,7 +4,7 @@ import { Mail, Phone, Calendar, Hash } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
-import { useUsers } from "@/hooks/useUsers";
+import { useUser } from "@/hooks/useUser";
 import { formatDate } from "@/lib/utils";
 import type { User } from "@/types/user";
 
@@ -24,8 +24,7 @@ function initials(name: string) {
 }
 
 export default function UserDetails({ id }: { id: string }) {
-  const { users, loading, error } = useUsers();
-  const user = users.find((u) => u.id === id);
+  const { user, loading, error } = useUser(id);
 
   if (loading) {
     return (
