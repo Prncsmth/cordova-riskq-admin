@@ -59,7 +59,7 @@ export function useUsers() {
   }, [token]);
 
   const changeRole = useCallback(
-    async (id: string, role: "citizen" | "responder") => {
+    async (id: string, role: "citizen" | "responder", unit?: "BDRRMO" | "MDRRMO") => {
       if (!token) return;
 
       setActionError(null);
@@ -69,7 +69,7 @@ export function useUsers() {
           `/admin/users/${id}/role`,
           {
             method: "PATCH",
-            body: JSON.stringify({ role }),
+            body: JSON.stringify(role === "responder" ? { role, unit } : { role }),
             token,
           }
         );

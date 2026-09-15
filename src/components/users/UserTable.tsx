@@ -6,6 +6,7 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
 import { User } from "@/types/user";
+import type { ResponderUnit } from "@/types/responder";
 
 const ROLE_BADGE_VARIANT: Record<User["role"], "info" | "success" | "default"> = {
   admin: "info",
@@ -24,15 +25,20 @@ export default function UserTable({
   loading: boolean;
   error: string | null;
   actionError: string | null;
-  changeRole: (id: string, role: "citizen" | "responder") => Promise<void>;
+  changeRole: (id: string, role: "citizen" | "responder", unit?: ResponderUnit) => Promise<void>;
 }) {
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [unitSelections, setUnitSelections] = useState<Record<string, ResponderUnit>>({});
+
+  function getUnitSelection(userId: string): ResponderUnit {
+    return unitSelections[userId] ?? "BDRRMO";
+  }
 
   async function handleToggleRole(user: User) {
     const nextRole = user.role === "citizen" ? "responder" : "citizen";
     setPendingId(user.id);
     try {
-      await changeRole(user.id, nextRole);
+      await changeRole(user.id, nextRole, nextRole === "responder" ? getUnitSelection(user.id) : undefined);
     } catch {
       // surfaced via useUsers' actionError state, rendered below
     } finally {
@@ -100,6 +106,20 @@ export default function UserTable({
                       >
                         View
                       </Link>
+
+                      {user.role === "citizen" && (
+                        <select
+                          value={getUnitSelection(user.id)}
+                          onChange={(e) =>
+                            setUnitSelections((prev) => ({ ...prev, [user.id]: e.target.value as ResponderUnit }))
+                          }
+                          disabled={pendingId === user.id}
+                          className="rounded-lg border border-border bg-background/60 py-1.5 px-2 text-xs text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+                        >
+                          <option value="BDRRMO">BDRRMO</option>
+                          <option value="MDRRMO">MDRRMO</option>
+                        </select>
+                      )}
 
                       {user.role !== "admin" && (
                         <Button
