@@ -7,7 +7,7 @@ import LiveMapPreview from "@/app/(dashboard)/dashboard/PreviewMap";
 import RecentIncidents from "@/components/dashboard/RecentIncidents";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import ResponderStatusDonut from "@/components/dashboard/ResponderStatusDonut";
-import EvacuationCenterCapacity from "@/components/dashboard/EvacuationCenterCapacity";
+import EvacuationCenterStatus from "@/components/dashboard/EvacuationCenterStatus";
 import QuickActions from "@/components/dashboard/QuickActions";
 import SystemSummary from "@/components/dashboard/SystemSummary";
 
@@ -30,7 +30,7 @@ export default function DashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <ResponderStatusDonut />
-        <EvacuationCenterCapacity />
+        <EvacuationCenterStatus />
         <QuickActions />
       </div>
 
