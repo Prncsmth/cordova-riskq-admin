@@ -128,12 +128,14 @@ parallel, return `{ success, <resource>, total, page, limit }`.
 
 ## Error handling
 
-Unchanged from the existing per-hook pattern: fetch failures set `error`, rendered
-by each table's existing error state (`RecentIncidents.tsx`-style
-loading/error/empty branches, already present on every affected table). A failed
-page-change attempt leaves the previously-loaded page visible with the error message
-shown below it, rather than clearing the table — avoids a jarring blank state from a
-transient network blip.
+Unchanged from the existing per-hook pattern: fetch failures set `error`, and each
+table replaces its content with the error message, exactly as `UserTable`,
+`ResponderTable`, `SosAlertTable`, and `AnnouncementTable` already do today for a
+failed initial load. A failed page-change or search request behaves the same way —
+the table (not just the row list) is replaced by the error text until the next
+successful fetch. This is a known tradeoff (a transient blip on page 3 loses your
+place rather than showing page 2's stale rows with a banner), accepted to avoid
+adding new stale-data-retention state that no table in this codebase has today.
 
 ## Testing
 
