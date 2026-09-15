@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { Search } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
@@ -29,10 +30,23 @@ export default function UserTable({
 }) {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [unitSelections, setUnitSelections] = useState<Record<string, ResponderUnit>>({});
+  const [query, setQuery] = useState("");
 
   function getUnitSelection(userId: string): ResponderUnit {
     return unitSelections[userId] ?? "BDRRMO";
   }
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (q.length === 0) return users;
+
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(q) ||
+        user.email.toLowerCase().includes(q) ||
+        user.id.toLowerCase().includes(q)
+    );
+  }, [users, query]);
 
   async function handleToggleRole(user: User) {
     const nextRole = user.role === "citizen" ? "responder" : "citizen";
@@ -80,6 +94,18 @@ export default function UserTable({
       )}
 
       <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+        <div className="border-b border-border p-4">
+          <div className="relative w-full sm:max-w-xs">
+            <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search name, email, ID..."
+              className="w-full rounded-xl border border-border bg-background/60 py-2 pl-9 pr-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+            />
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-background">
@@ -91,7 +117,7 @@ export default function UserTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {users.map((user) => (
+              {filtered.map((user) => (
                 <tr key={user.id} className="hover:bg-background">
                   <td className="p-4 font-medium text-foreground">{user.name}</td>
                   <td className="p-4 text-foreground">{user.email}</td>
@@ -134,6 +160,14 @@ export default function UserTable({
                   </td>
                 </tr>
               ))}
+
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="p-10 text-center text-sm text-muted">
+                    No users match your search.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
