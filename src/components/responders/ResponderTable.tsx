@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
+import Pagination from "@/components/ui/Pagination";
 import type { Responder, ResponderUnit } from "@/types/responder";
 import { formatDate } from "@/lib/utils";
 
@@ -24,61 +24,38 @@ export default function ResponderTable({
   responders,
   loading,
   error,
+  searchInput,
+  onSearchChange,
+  dutyFilter,
+  onDutyFilterChange,
+  unitFilter,
+  onUnitFilterChange,
+  page,
+  totalPages,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
 }: {
   responders: Responder[];
   loading: boolean;
   error: string | null;
+  searchInput: string;
+  onSearchChange: (value: string) => void;
+  dutyFilter: DutyFilter;
+  onDutyFilterChange: (value: DutyFilter) => void;
+  unitFilter: UnitFilter;
+  onUnitFilterChange: (value: UnitFilter) => void;
+  page: number;
+  totalPages: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }) {
-  const [query, setQuery] = useState("");
-  const [dutyFilter, setDutyFilter] = useState<DutyFilter>("all");
-  const [unitFilter, setUnitFilter] = useState<UnitFilter>("all");
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-
-    return responders.filter((responder) => {
-      if (q.length > 0) {
-        const matchesQuery =
-          responder.name.toLowerCase().includes(q) ||
-          responder.email.toLowerCase().includes(q) ||
-          responder.id.toLowerCase().includes(q);
-        if (!matchesQuery) return false;
-      }
-
-      if (dutyFilter === "on-duty" && !responder.isOnDuty) return false;
-      if (dutyFilter === "off-duty" && responder.isOnDuty) return false;
-
-      if (unitFilter === "unclassified" && responder.unit !== null) return false;
-      if (unitFilter === "BDRRMO" || unitFilter === "MDRRMO") {
-        if (responder.unit !== unitFilter) return false;
-      }
-
-      return true;
-    });
-  }, [responders, query, dutyFilter, unitFilter]);
-
-  if (loading) {
-    return (
-      <div className="rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted shadow-sm">
-        Loading responders…
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700 shadow-sm">
         {error}
       </div>
-    );
-  }
-
-  if (responders.length === 0) {
-    return (
-      <EmptyState
-        title="No responders yet"
-        description="Citizens promoted to responder will appear here."
-      />
     );
   }
 
@@ -88,9 +65,9 @@ export default function ResponderTable({
         <div className="relative w-full sm:max-w-xs">
           <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
           <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search name, email, ID..."
+            value={searchInput}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search name, email..."
             className="w-full rounded-xl border border-border bg-background/60 py-2 pl-9 pr-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
           />
         </div>
@@ -98,7 +75,7 @@ export default function ResponderTable({
         <div className="flex gap-3">
           <select
             value={dutyFilter}
-            onChange={(e) => setDutyFilter(e.target.value as DutyFilter)}
+            onChange={(e) => onDutyFilterChange(e.target.value as DutyFilter)}
             className="rounded-xl border border-border bg-background/60 py-2 px-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
           >
             <option value="all">All duty status</option>
@@ -108,7 +85,7 @@ export default function ResponderTable({
 
           <select
             value={unitFilter}
-            onChange={(e) => setUnitFilter(e.target.value as UnitFilter)}
+            onChange={(e) => onUnitFilterChange(e.target.value as UnitFilter)}
             className="rounded-xl border border-border bg-background/60 py-2 px-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
           >
             <option value="all">All units</option>
@@ -119,61 +96,70 @@ export default function ResponderTable({
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-background/60">
-            <tr>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Responder</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Phone</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Duty</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Unit</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Joined</th>
-              <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/70">
-            {filtered.map((responder) => (
-              <tr key={responder.id} className="transition-colors hover:bg-background/70">
-                <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white shadow-xs">
-                      {initials(responder.name)}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="font-medium text-foreground">{responder.name}</p>
-                      <p className="text-xs text-muted">{responder.email}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4 text-muted">{responder.phone ?? "Not provided"}</td>
-                <td className="p-4">
-                  <Badge variant={responder.isOnDuty ? "success" : "default"}>
-                    {responder.isOnDuty ? "On Duty" : "Off Duty"}
-                  </Badge>
-                </td>
-                <td className="p-4 text-muted">{responder.unit ?? "Unclassified"}</td>
-                <td className="p-4 text-muted">{formatDate(responder.createdAt)}</td>
-                <td className="p-4">
-                  <Link
-                    href={`/responders/${responder.id}`}
-                    className="font-medium text-primary hover:text-primary-dark"
-                  >
-                    View
-                  </Link>
-                </td>
-              </tr>
-            ))}
-
-            {filtered.length === 0 && (
+      {loading ? (
+        <p className="p-10 text-center text-sm text-muted">Loading responders…</p>
+      ) : responders.length === 0 ? (
+        <EmptyState
+          title="No responders found"
+          description="Try a different search or filter combination."
+        />
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-background/60">
               <tr>
-                <td colSpan={6} className="p-10 text-center text-sm text-muted">
-                  No responders match your search and filters.
-                </td>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Responder</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Phone</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Duty</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Unit</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Joined</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Action</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-border/70">
+              {responders.map((responder) => (
+                <tr key={responder.id} className="transition-colors hover:bg-background/70">
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white shadow-xs">
+                        {initials(responder.name)}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground">{responder.name}</p>
+                        <p className="text-xs text-muted">{responder.email}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-muted">{responder.phone ?? "Not provided"}</td>
+                  <td className="p-4">
+                    <Badge variant={responder.isOnDuty ? "success" : "default"}>
+                      {responder.isOnDuty ? "On Duty" : "Off Duty"}
+                    </Badge>
+                  </td>
+                  <td className="p-4 text-muted">{responder.unit ?? "Unclassified"}</td>
+                  <td className="p-4 text-muted">{formatDate(responder.createdAt)}</td>
+                  <td className="p-4">
+                    <Link
+                      href={`/responders/${responder.id}`}
+                      className="font-medium text-primary hover:text-primary-dark"
+                    >
+                      View
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 }

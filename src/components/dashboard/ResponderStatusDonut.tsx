@@ -4,23 +4,24 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { useResponders } from "@/hooks/useResponders";
+import { useResponderSummary } from "@/hooks/useResponders";
 
 // Colors reference the theme's CSS vars directly (not Tailwind classes,
 // since Recharts needs a real color value for SVG `fill`) so they switch
 // with dark mode instead of staying pinned to their light-mode hex.
 export default function ResponderStatusDonut() {
-  const { responders, loading, error } = useResponders();
+  const { summary, loading, error } = useResponderSummary();
 
   const data = useMemo(() => {
-    const onDuty = responders.filter((r) => r.isOnDuty).length;
+    const onDuty = summary?.onDuty ?? 0;
+    const offDuty = summary?.offDuty ?? 0;
     return [
       { name: "On Duty", value: onDuty, color: "var(--success)" },
-      { name: "Off Duty", value: responders.length - onDuty, color: "var(--muted)" },
+      { name: "Off Duty", value: offDuty, color: "var(--muted)" },
     ];
-  }, [responders]);
+  }, [summary]);
 
-  const total = responders.length;
+  const total = summary?.total ?? 0;
 
   if (loading) {
     return (

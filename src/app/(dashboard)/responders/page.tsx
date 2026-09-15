@@ -1,27 +1,42 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState } from "react";
 import { ShieldCheck, ShieldHalf, ShieldOff } from "lucide-react";
 import Card from "@/components/ui/Card";
 import ResponderTable from "@/components/responders/ResponderTable";
-import { useResponders } from "@/hooks/useResponders";
+import { useResponders, useResponderSummary } from "@/hooks/useResponders";
+import { usePaginationState } from "@/hooks/usePaginationState";
+import type { ResponderUnit } from "@/types/responder";
+
+type DutyFilter = "all" | "on-duty" | "off-duty";
+type UnitFilter = "all" | ResponderUnit | "unclassified";
 
 export default function RespondersPage() {
-  const { responders, loading, error } = useResponders();
+  const pagination = usePaginationState();
+  const [dutyFilter, setDutyFilter] = useState<DutyFilter>("all");
+  const [unitFilter, setUnitFilter] = useState<UnitFilter>("all");
 
-  const stats = useMemo(() => {
-    const onDuty = responders.filter((r) => r.isOnDuty).length;
-    return {
-      total: responders.length,
-      onDuty,
-      offDuty: responders.length - onDuty,
-    };
-  }, [responders]);
+  const { responders, total, loading, error } = useResponders(pagination, {
+    duty: dutyFilter,
+    unit: unitFilter,
+  });
+  const { summary } = useResponderSummary();
+  const totalPages = Math.max(1, Math.ceil(total / pagination.pageSize));
+
+  function handleDutyFilterChange(value: DutyFilter) {
+    setDutyFilter(value);
+    pagination.resetPage();
+  }
+
+  function handleUnitFilterChange(value: UnitFilter) {
+    setUnitFilter(value);
+    pagination.resetPage();
+  }
 
   const statCards = [
-    { label: "Total Responders", value: stats.total, icon: ShieldCheck, color: "text-primary", bg: "bg-primary-light" },
-    { label: "On Duty", value: stats.onDuty, icon: ShieldHalf, color: "text-success", bg: "bg-success-light" },
-    { label: "Off Duty", value: stats.offDuty, icon: ShieldOff, color: "text-muted", bg: "bg-background" },
+    { label: "Total Responders", value: summary?.total ?? 0, icon: ShieldCheck, color: "text-primary", bg: "bg-primary-light" },
+    { label: "On Duty", value: summary?.onDuty ?? 0, icon: ShieldHalf, color: "text-success", bg: "bg-success-light" },
+    { label: "Off Duty", value: summary?.offDuty ?? 0, icon: ShieldOff, color: "text-muted", bg: "bg-background" },
   ];
 
   return (
@@ -51,7 +66,22 @@ export default function RespondersPage() {
         })}
       </div>
 
-      <ResponderTable responders={responders} loading={loading} error={error} />
+      <ResponderTable
+        responders={responders}
+        loading={loading}
+        error={error}
+        searchInput={pagination.searchInput}
+        onSearchChange={pagination.setSearchInput}
+        dutyFilter={dutyFilter}
+        onDutyFilterChange={handleDutyFilterChange}
+        unitFilter={unitFilter}
+        onUnitFilterChange={handleUnitFilterChange}
+        page={pagination.page}
+        totalPages={totalPages}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
     </div>
   );
 }

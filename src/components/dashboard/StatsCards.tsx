@@ -4,12 +4,12 @@ import CountUp from "react-countup";
 import { motion } from "framer-motion";
 import { AlertTriangle, BellRing, ShieldCheck, HeartHandshake } from "lucide-react";
 import { useEmergenciesWithHistory } from "@/hooks/useEmergenciesWithHistory";
-import { useResponders } from "@/hooks/useResponders";
+import { useResponderSummary } from "@/hooks/useResponders";
 import { isToday } from "@/lib/utils";
 
 export default function StatsCards() {
   const { emergencies } = useEmergenciesWithHistory();
-  const { responders } = useResponders();
+  const { summary } = useResponderSummary();
 
   const activeIncidents = emergencies.filter((e) => e.status === "Active").length;
   const sosAlertsToday = emergencies.filter((e) => e.source === "sos" && isToday(e.createdAt)).length;
@@ -31,7 +31,7 @@ export default function StatsCards() {
     },
     {
       title: "Total Responders",
-      value: responders.length,
+      value: summary?.total ?? 0,
       color: "text-success",
       bg: "bg-success-light",
       icon: ShieldCheck,

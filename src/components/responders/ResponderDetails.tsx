@@ -3,7 +3,7 @@
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
-import { useResponders } from "@/hooks/useResponders";
+import { useResponder } from "@/hooks/useResponders";
 import { formatDate } from "@/lib/utils";
 
 export default function ResponderDetails({
@@ -11,8 +11,7 @@ export default function ResponderDetails({
 }: {
   id: string;
 }) {
-  const { responders, loading, error } = useResponders();
-  const responder = responders.find((r) => r.id === id);
+  const { responder, loading, error } = useResponder(id);
 
   if (loading) {
     return (
