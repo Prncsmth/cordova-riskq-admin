@@ -9,7 +9,7 @@ import RecentActivity from "@/components/dashboard/RecentActivity";
 import ResponderStatusDonut from "@/components/dashboard/ResponderStatusDonut";
 import EvacuationCenterStatus from "@/components/dashboard/EvacuationCenterStatus";
 import QuickActions from "@/components/dashboard/QuickActions";
-import SystemSummary from "@/components/dashboard/SystemSummary";
+import DashboardFooter from "@/components/dashboard/DashboardFooter";
 
 export default function DashboardPage() {
   return (
@@ -34,7 +34,7 @@ export default function DashboardPage() {
         <QuickActions />
       </div>
 
-      <SystemSummary />
+      <DashboardFooter />
     </div>
   );
 }
