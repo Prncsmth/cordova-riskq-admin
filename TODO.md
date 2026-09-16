@@ -2,6 +2,7 @@
 
 Running tracker of what's real (backend-wired) vs. still mock on the admin side.
 See `PROGRESS.md` for the one-time visual redesign summary this builds on.
+Note: the Witnesses and Equipment/Resources pages (and their sidebar entries) were removed outright rather than wired up — product decision, not a gap.
 
 ## Real (backend-wired)
 
@@ -18,11 +19,18 @@ See `PROGRESS.md` for the one-time visual redesign summary this builds on.
 - [x] Dashboard: Incident Overview trend chart — real, 14-day daily bucket of `useEmergenciesWithHistory()` split into "Incidents" and "SOS Alerts" series (`isSameDay()` helper). Note: history is capped at the most recent 100 terminal incidents (ordered by `updatedAt`, not `createdAt`) — fine at current volume, could under-count older days once the city has more than ~100 resolved/cancelled incidents total.
 - [x] Dashboard: Quick Actions — no data, just navigation links; nothing to wire
 - [x] Dashboard: System Summary — static status banner + a live client-side clock; nothing to wire
+- [x] Dashboard: Recent Activity widget — real via new `GET /admin/activity` (derives a feed from `SosAlert`/`IncidentResponder`/`Incident`/`EvacuationCenter`/`User`, no dedicated audit-log model) for the initial load, plus live `admin:activity` socket events pushed from the 5 write sites that produce each activity type. "View All" still links to Audit Logs, which stays mock.
+- [x] SOS Alerts — real via the already-existing `GET /admin/sos-alerts` (backend route/controller/service were already built, just unused by the frontend). `SosAlert.status` itself never changes after creation, so the New/Acknowledged/Resolved badge is derived from the linked Incident's status instead (`pending` -> New, `lobby`/`on_the_way`/`arrived` -> Acknowledged, `completed`/`cancelled` -> Resolved), same pattern as `useEmergencies.ts`. Stat cards on the page are now real counts.
+- [x] Announcements — already fully real (`useAnnouncements.ts`: list/create/delete against `GET`/`POST`/`DELETE /admin/announcements`, including the "All Users" audience triggering real citizen notifications via `notificationService.createForAllCitizens`). This tracker had it miscategorized as Mock; no code changes were needed, just correcting the tracker.
+- [x] Users/Responders/SOS Alerts/Announcements pagination — all four pages now fetch one page at a time with server-side search/filtering (`GET /admin/users`, `/admin/sos-alerts`, `/admin/announcements` all gained `page`/`limit`/`search` + resource-specific filters), replacing the earlier fetch-everything-and-filter-client-side pattern. Shared `<Pagination>` component + `usePaginationState` hook. Emergencies/Incident Reports and Evacuation Centers were deliberately excluded (see `docs/superpowers/specs/2026-09-16-admin-pagination-design.md`).
 
 ## Mock (static UI only, no backend wiring)
+
+- [ ] Dashboard: Evacuation Center Capacity — blocked on the same missing `EvacuationCenter` backend model as the full Evacuation Centers page (see Next steps)
 - [ ] Analytics
 - [ ] Reports
 - [ ] Audit Logs
+- [ ] Evacuation Centers
 - [ ] Settings
 - [ ] Notifications (admin-facing)
 
@@ -37,6 +45,4 @@ See `PROGRESS.md` for the one-time visual redesign summary this builds on.
 ## Next steps (pick one — each is independent)
 
 - Reports page — check whether it's a duplicate of Incident Reports or something distinct (e.g. generated/exportable reports); `GET /admin/history`'s filters (date range, category, barangay) may already cover it
-- Wire SOS Alerts to the real `SosAlert` backend model
-- Wire Announcements to the real `Announcement` model (already used by the mobile citizen notification pipeline)
-- Evacuation Centers / Resources / Witnesses have no backend models yet — would need schema design first
+- Evacuation Centers has no backend model yet — would need schema design first
