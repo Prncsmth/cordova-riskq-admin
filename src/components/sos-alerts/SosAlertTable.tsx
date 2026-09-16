@@ -1,15 +1,24 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import Badge from "@/components/ui/Badge";
-import type { SosAlert } from "@/types/sos-alert";
+import Pagination from "@/components/ui/Pagination";
+import type { SosAlert, SosAlertStatus } from "@/types/sos-alert";
 import { timeAgo } from "@/lib/utils";
 
 type SosAlertTableProps = {
   alerts: SosAlert[];
   loading: boolean;
   error: string | null;
+  searchInput: string;
+  onSearchChange: (value: string) => void;
+  statusFilter: "All" | SosAlertStatus;
+  onStatusFilterChange: (value: "All" | SosAlertStatus) => void;
+  page: number;
+  totalPages: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 };
 
 const statusVariant = {
@@ -29,34 +38,29 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export default function SosAlertTable({ alerts, loading, error }: SosAlertTableProps) {
-  const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("All");
-
-  const filtered = useMemo(() => {
-    return alerts.filter((alert) => {
-      const matchesStatus = statusFilter === "All" || alert.status === statusFilter;
-
-      const q = query.trim().toLowerCase();
-      const matchesQuery =
-        q.length === 0 ||
-        alert.userName.toLowerCase().includes(q) ||
-        alert.id.toLowerCase().includes(q) ||
-        alert.locationName.toLowerCase().includes(q);
-
-      return matchesStatus && matchesQuery;
-    });
-  }, [alerts, query, statusFilter]);
-
+export default function SosAlertTable({
+  alerts,
+  loading,
+  error,
+  searchInput,
+  onSearchChange,
+  statusFilter,
+  onStatusFilterChange,
+  page,
+  totalPages,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+}: SosAlertTableProps) {
   return (
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
       <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:max-w-xs">
           <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
           <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search user, ID, location..."
+            value={searchInput}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search user, location..."
             className="w-full rounded-xl border border-border bg-background/60 py-2 pl-9 pr-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
           />
         </div>
@@ -66,7 +70,7 @@ export default function SosAlertTable({ alerts, loading, error }: SosAlertTableP
             <button
               key={status}
               type="button"
-              onClick={() => setStatusFilter(status)}
+              onClick={() => onStatusFilterChange(status)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
                 statusFilter === status
                   ? "bg-primary text-white shadow-xs"
@@ -95,7 +99,7 @@ export default function SosAlertTable({ alerts, loading, error }: SosAlertTableP
               </tr>
             </thead>
             <tbody className="divide-y divide-border/70">
-              {filtered.map((alert) => (
+              {alerts.map((alert) => (
                 <tr
                   key={alert.id}
                   className={`transition-colors hover:bg-background/70 ${alert.status === "New" ? "bg-danger-light/20" : ""}`}
@@ -126,10 +130,10 @@ export default function SosAlertTable({ alerts, loading, error }: SosAlertTableP
                 </tr>
               ))}
 
-              {filtered.length === 0 && (
+              {alerts.length === 0 && (
                 <tr>
                   <td colSpan={4} className="p-10 text-center text-sm text-muted">
-                    {alerts.length === 0 ? "No SOS alerts yet." : "No SOS alerts match your filters."}
+                    No SOS alerts match your search and filters.
                   </td>
                 </tr>
               )}
@@ -137,6 +141,14 @@ export default function SosAlertTable({ alerts, loading, error }: SosAlertTableP
           </table>
         </div>
       )}
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 }

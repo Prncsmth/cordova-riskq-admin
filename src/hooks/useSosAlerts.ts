@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import type { usePaginationState } from "@/hooks/usePaginationState";
 import type { SosAlert, SosAlertStatus } from "@/types/sos-alert";
 
 type RawSosAlert = {
@@ -41,9 +42,11 @@ function toSosAlert(raw: RawSosAlert): SosAlert {
   };
 }
 
-export function useSosAlerts() {
+export function useSosAlerts(pagination: ReturnType<typeof usePaginationState>, alertStatus: "All" | SosAlertStatus) {
   const { token } = useAuth();
+  const { page, pageSize, search } = pagination;
   const [alerts, setAlerts] = useState<SosAlert[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,11 +57,22 @@ export function useSosAlerts() {
     }
 
     let cancelled = false;
+    setLoading(true);
     setError(null);
 
-    apiFetch<{ success: true; alerts: RawSosAlert[] }>("/admin/sos-alerts?limit=100", { token })
+    const params = new URLSearchParams({ page: String(page), limit: String(pageSize) });
+    if (search) params.set("search", search);
+    if (alertStatus !== "All") params.set("alertStatus", alertStatus);
+
+    apiFetch<{ success: true; alerts: RawSosAlert[]; total: number }>(
+      `/admin/sos-alerts?${params.toString()}`,
+      { token },
+    )
       .then((response) => {
-        if (!cancelled) setAlerts(response.alerts.map(toSosAlert));
+        if (!cancelled) {
+          setAlerts(response.alerts.map(toSosAlert));
+          setTotal(response.total);
+        }
       })
       .catch((err) => {
         if (!cancelled) {
@@ -72,7 +86,48 @@ export function useSosAlerts() {
     return () => {
       cancelled = true;
     };
+  }, [token, page, pageSize, search, alertStatus]);
+
+  return { alerts, total, loading, error };
+}
+
+export function useSosAlertSummary() {
+  const { token } = useAuth();
+  const [summary, setSummary] = useState<{
+    total: number;
+    New: number;
+    Acknowledged: number;
+    Resolved: number;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setError(null);
+
+    apiFetch<{ success: true; summary: typeof summary }>("/admin/sos-alerts/summary", { token })
+      .then((response) => {
+        if (!cancelled) setSummary(response.summary);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load SOS alert summary.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [token]);
 
-  return { alerts, loading, error };
+  return { summary, loading, error };
 }

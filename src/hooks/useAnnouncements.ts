@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import type { usePaginationState } from "@/hooks/usePaginationState";
 import type { Announcement, AnnouncementAudience, AnnouncementPriority } from "@/types/announcement";
 
 type CreateAnnouncementInput = {
@@ -13,12 +14,18 @@ type CreateAnnouncementInput = {
   barangayName?: string;
 };
 
-export function useAnnouncements() {
+export function useAnnouncements(
+  pagination: ReturnType<typeof usePaginationState>,
+  priority: "All" | AnnouncementPriority,
+) {
   const { token } = useAuth();
+  const { page, pageSize, search } = pagination;
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [refetchToken, setRefetchToken] = useState(0);
 
   useEffect(() => {
     if (!token) {
@@ -27,11 +34,22 @@ export function useAnnouncements() {
     }
 
     let cancelled = false;
+    setLoading(true);
     setError(null);
 
-    apiFetch<{ success: true; announcements: Announcement[] }>("/admin/announcements", { token })
+    const params = new URLSearchParams({ page: String(page), limit: String(pageSize) });
+    if (search) params.set("search", search);
+    if (priority !== "All") params.set("priority", priority);
+
+    apiFetch<{ success: true; announcements: Announcement[]; total: number }>(
+      `/admin/announcements?${params.toString()}`,
+      { token },
+    )
       .then((response) => {
-        if (!cancelled) setAnnouncements(response.announcements);
+        if (!cancelled) {
+          setAnnouncements(response.announcements);
+          setTotal(response.total);
+        }
       })
       .catch((err) => {
         if (!cancelled) {
@@ -45,7 +63,7 @@ export function useAnnouncements() {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, page, pageSize, search, priority, refetchToken]);
 
   const create = useCallback(
     async (input: CreateAnnouncementInput) => {
@@ -54,22 +72,18 @@ export function useAnnouncements() {
       setActionError(null);
 
       try {
-        const response = await apiFetch<{ success: true; announcement: Announcement }>(
-          "/admin/announcements",
-          {
-            method: "POST",
-            body: JSON.stringify(input),
-            token,
-          }
-        );
-
-        setAnnouncements((prev) => [response.announcement, ...prev]);
+        await apiFetch<{ success: true; announcement: Announcement }>("/admin/announcements", {
+          method: "POST",
+          body: JSON.stringify(input),
+          token,
+        });
+        setRefetchToken((t) => t + 1);
       } catch (err) {
         setActionError(err instanceof Error ? err.message : "Failed to publish announcement.");
         throw err;
       }
     },
-    [token]
+    [token],
   );
 
   const remove = useCallback(
@@ -83,15 +97,14 @@ export function useAnnouncements() {
           method: "DELETE",
           token,
         });
-
-        setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+        setRefetchToken((t) => t + 1);
       } catch (err) {
         setActionError(err instanceof Error ? err.message : "Failed to delete announcement.");
         throw err;
       }
     },
-    [token]
+    [token],
   );
 
-  return { announcements, loading, error, actionError, create, remove };
+  return { announcements, total, loading, error, actionError, create, remove };
 }

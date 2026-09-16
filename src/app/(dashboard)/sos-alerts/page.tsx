@@ -1,24 +1,37 @@
 "use client";
 
+import { useState } from "react";
 import { BellRing, CheckCheck, ShieldCheck, Siren } from "lucide-react";
 import Card from "@/components/ui/Card";
 import SosAlertTable from "@/components/sos-alerts/SosAlertTable";
-import { useSosAlerts } from "@/hooks/useSosAlerts";
+import { useSosAlerts, useSosAlertSummary } from "@/hooks/useSosAlerts";
+import { usePaginationState } from "@/hooks/usePaginationState";
+import type { SosAlertStatus } from "@/types/sos-alert";
 
 export default function SosAlertsPage() {
-  const { alerts, loading, error } = useSosAlerts();
+  const pagination = usePaginationState();
+  const [statusFilter, setStatusFilter] = useState<"All" | SosAlertStatus>("All");
+
+  const { alerts, total, loading, error } = useSosAlerts(pagination, statusFilter);
+  const { summary } = useSosAlertSummary();
+  const totalPages = Math.max(1, Math.ceil(total / pagination.pageSize));
+
+  function handleStatusFilterChange(value: "All" | SosAlertStatus) {
+    setStatusFilter(value);
+    pagination.resetPage();
+  }
 
   const stats = [
     {
       label: "Total Alerts",
-      value: String(alerts.length),
+      value: String(summary?.total ?? 0),
       icon: Siren,
       color: "text-primary",
       bg: "bg-primary-light",
     },
     {
       label: "New",
-      value: String(alerts.filter((a) => a.status === "New").length),
+      value: String(summary?.New ?? 0),
       icon: BellRing,
       color: "text-danger",
       bg: "bg-danger-light",
@@ -26,14 +39,14 @@ export default function SosAlertsPage() {
     },
     {
       label: "Acknowledged",
-      value: String(alerts.filter((a) => a.status === "Acknowledged").length),
+      value: String(summary?.Acknowledged ?? 0),
       icon: CheckCheck,
       color: "text-warning",
       bg: "bg-warning-light",
     },
     {
       label: "Resolved",
-      value: String(alerts.filter((a) => a.status === "Resolved").length),
+      value: String(summary?.Resolved ?? 0),
       icon: ShieldCheck,
       color: "text-success",
       bg: "bg-success-light",
@@ -71,7 +84,20 @@ export default function SosAlertsPage() {
         })}
       </div>
 
-      <SosAlertTable alerts={alerts} loading={loading} error={error} />
+      <SosAlertTable
+        alerts={alerts}
+        loading={loading}
+        error={error}
+        searchInput={pagination.searchInput}
+        onSearchChange={pagination.setSearchInput}
+        statusFilter={statusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
+        page={pagination.page}
+        totalPages={totalPages}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
     </div>
   );
 }

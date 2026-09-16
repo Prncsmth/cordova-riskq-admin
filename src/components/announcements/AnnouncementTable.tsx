@@ -1,10 +1,11 @@
 // src/components/announcements/AnnouncementTable.tsx
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Search, Megaphone, Trash2 } from "lucide-react";
 import Badge from "@/components/ui/Badge";
-import type { Announcement } from "@/types/announcement";
+import Pagination from "@/components/ui/Pagination";
+import type { Announcement, AnnouncementPriority } from "@/types/announcement";
 
 const priorityFilters = ["All", "Normal", "Urgent"] as const;
 
@@ -14,25 +15,32 @@ export default function AnnouncementTable({
   error,
   actionError,
   onDelete,
+  searchInput,
+  onSearchChange,
+  priorityFilter,
+  onPriorityFilterChange,
+  page,
+  totalPages,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
 }: {
   announcements: Announcement[];
   loading: boolean;
   error: string | null;
   actionError: string | null;
   onDelete: (id: string) => Promise<void>;
+  searchInput: string;
+  onSearchChange: (value: string) => void;
+  priorityFilter: "All" | AnnouncementPriority;
+  onPriorityFilterChange: (value: "All" | AnnouncementPriority) => void;
+  page: number;
+  totalPages: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }) {
-  const [query, setQuery] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState<(typeof priorityFilters)[number]>("All");
   const [pendingId, setPendingId] = useState<string | null>(null);
-
-  const filtered = useMemo(() => {
-    return announcements.filter((a) => {
-      const matchesPriority = priorityFilter === "All" || a.priority === priorityFilter;
-      const q = query.trim().toLowerCase();
-      const matchesQuery = q.length === 0 || a.title.toLowerCase().includes(q) || a.content.toLowerCase().includes(q);
-      return matchesPriority && matchesQuery;
-    });
-  }, [query, priorityFilter, announcements]);
 
   async function handleDelete(id: string) {
     setPendingId(id);
@@ -74,8 +82,8 @@ export default function AnnouncementTable({
           <div className="relative w-full sm:max-w-xs">
             <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
             <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Search announcements..."
               className="w-full rounded-xl border border-border bg-background/60 py-2 pl-9 pr-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
             />
@@ -86,7 +94,7 @@ export default function AnnouncementTable({
               <button
                 key={p}
                 type="button"
-                onClick={() => setPriorityFilter(p)}
+                onClick={() => onPriorityFilterChange(p)}
                 className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
                   priorityFilter === p
                     ? "bg-primary text-white shadow-xs"
@@ -100,7 +108,7 @@ export default function AnnouncementTable({
         </div>
 
         <div className="divide-y divide-border/70">
-          {filtered.map((a) => (
+          {announcements.map((a) => (
             <div key={a.id} className="flex items-start gap-3 p-4 transition-colors hover:bg-background/50">
               <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${a.priority === "Urgent" ? "bg-danger-light text-danger" : "bg-primary-light text-primary"}`}>
                 <Megaphone size={16} />
@@ -132,10 +140,18 @@ export default function AnnouncementTable({
             </div>
           ))}
 
-          {filtered.length === 0 && (
-            <p className="p-10 text-center text-sm text-muted">No announcements match your filters.</p>
+          {announcements.length === 0 && (
+            <p className="p-10 text-center text-sm text-muted">No announcements match your search and filters.</p>
           )}
         </div>
+
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
       </div>
     </div>
   );

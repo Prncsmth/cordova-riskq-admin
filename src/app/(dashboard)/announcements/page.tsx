@@ -6,15 +6,29 @@ import AnnouncementForm from "@/components/announcements/AnnouncementForm";
 import AnnouncementPreview from "@/components/announcements/AnnouncementPreview";
 import AnnouncementTable from "@/components/announcements/AnnouncementTable";
 import { useAnnouncements } from "@/hooks/useAnnouncements";
+import { usePaginationState } from "@/hooks/usePaginationState";
 import type { AnnouncementAudience, AnnouncementPriority } from "@/types/announcement";
 
 export default function AnnouncementsPage() {
-  const { announcements, loading, error, actionError, create, remove } = useAnnouncements();
+  const pagination = usePaginationState();
+  const [priorityFilter, setPriorityFilter] = useState<"All" | AnnouncementPriority>("All");
+
+  const { announcements, total, loading, error, actionError, create, remove } = useAnnouncements(
+    pagination,
+    priorityFilter,
+  );
+  const totalPages = Math.max(1, Math.ceil(total / pagination.pageSize));
+
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [priority, setPriority] = useState<AnnouncementPriority>("Normal");
   const [audience, setAudience] = useState<AnnouncementAudience>("All Users");
   const [barangay, setBarangay] = useState("");
+
+  function handlePriorityFilterChange(value: "All" | AnnouncementPriority) {
+    setPriorityFilter(value);
+    pagination.resetPage();
+  }
 
   async function handlePublish() {
     try {
@@ -71,6 +85,15 @@ export default function AnnouncementsPage() {
           error={error}
           actionError={actionError}
           onDelete={remove}
+          searchInput={pagination.searchInput}
+          onSearchChange={pagination.setSearchInput}
+          priorityFilter={priorityFilter}
+          onPriorityFilterChange={handlePriorityFilterChange}
+          page={pagination.page}
+          totalPages={totalPages}
+          pageSize={pagination.pageSize}
+          onPageChange={pagination.setPage}
+          onPageSizeChange={pagination.setPageSize}
         />
       </div>
     </div>
