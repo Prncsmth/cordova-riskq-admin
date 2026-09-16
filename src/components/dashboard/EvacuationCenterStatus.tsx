@@ -1,12 +1,27 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { Building2 } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import { useEvacuationCenters } from "@/hooks/useEvacuationCenters";
 
+// Dashboard preview only — keeps this card's height in line with its row
+// siblings (Responder Status, Quick Actions) instead of growing with the
+// full center count. "Full" centers surface first since they're the ones
+// actively handling an evacuation; see the full list at /evacuation-centers.
+const PREVIEW_COUNT = 5;
+
 export default function EvacuationCenterStatus() {
   const { centers, loading, error } = useEvacuationCenters();
+
+  const previewCenters = useMemo(
+    () =>
+      [...centers]
+        .sort((a, b) => Number(b.status === "full") - Number(a.status === "full"))
+        .slice(0, PREVIEW_COUNT),
+    [centers]
+  );
 
   if (loading) {
     return (
@@ -39,10 +54,10 @@ export default function EvacuationCenterStatus() {
       </div>
 
       <div className="mt-5 space-y-1">
-        {centers.length === 0 ? (
+        {previewCenters.length === 0 ? (
           <p className="p-4 text-center text-sm text-muted">No evacuation centers yet.</p>
         ) : (
-          centers.map((center) => (
+          previewCenters.map((center) => (
             <div
               key={center.id}
               className="flex items-center justify-between rounded-xl p-2.5 text-sm transition-colors hover:bg-background/60"

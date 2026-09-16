@@ -57,7 +57,7 @@ export default function LoginPage() {
           <div className="relative z-10 flex h-full flex-col p-12 text-white">
             <div className="inline-flex w-fit items-center gap-3 rounded-2xl border border-white/15 bg-black/35 px-4 py-3 shadow-lg backdrop-blur-xl">
               <div className="relative h-11 w-11 shrink-0">
-                <Image src="/images/logo.png" alt="" fill sizes="44px" className="object-contain" />
+                <Image src="/images/logo.png" alt="" fill sizes="44px" className="object-contain" priority />
               </div>
               <div>
                 <p className="text-base font-bold leading-tight tracking-wide">CORDOVA RISKQ</p>
@@ -94,7 +94,7 @@ export default function LoginPage() {
           <div className="w-full max-w-md rounded-3xl border border-border/70 bg-surface p-8 shadow-lg sm:p-10">
             <div className="flex flex-col items-center text-center">
               <div className="relative h-14 w-14">
-                <Image src="/images/logo.png" alt="Cordova RISKQ" fill sizes="56px" className="object-contain" />
+                <Image src="/images/logo.png" alt="Cordova RISKQ" fill sizes="56px" className="object-contain" priority />
               </div>
 
               <h1 className="mt-4 text-2xl font-bold text-foreground">Administrator Login</h1>
