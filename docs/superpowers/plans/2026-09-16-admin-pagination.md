@@ -1658,7 +1658,7 @@ git commit -m "feat(admin): paginate and server-search the Responders page"
 - Consumes: `usePaginationState` (Task 5), `<Pagination>` (Task 6), the extended `GET /admin/sos-alerts` (search + alertStatus, Task 2), new `GET /admin/sos-alerts/summary` (Task 2).
 - Produces: `useSosAlerts(pagination, alertStatus: "All" | AlertStatus)` returning `{ alerts, total, loading, error }`. New `useSosAlertSummary()` returning `{ summary: { total, New, Acknowledged, Resolved } | null, loading, error }`.
 
-- [ ] **Step 1: Rewrite `useSosAlerts.ts`**
+- [x] **Step 1: Rewrite `useSosAlerts.ts`**
 
 ```typescript
 "use client";
@@ -1793,7 +1793,7 @@ export function useSosAlertSummary() {
 }
 ```
 
-- [ ] **Step 2: Update `SosAlertTable.tsx`** — drop client-side filtering, take search/status-filter/pagination as props
+- [x] **Step 2: Update `SosAlertTable.tsx`** — drop client-side filtering, take search/status-filter/pagination as props
 
 ```typescript
 "use client";
@@ -1952,7 +1952,7 @@ export default function SosAlertTable({
 }
 ```
 
-- [ ] **Step 3: Update `sos-alerts/page.tsx`**
+- [x] **Step 3: Update `sos-alerts/page.tsx`**
 
 ```typescript
 "use client";
@@ -2060,12 +2060,12 @@ export default function SosAlertsPage() {
 }
 ```
 
-- [ ] **Step 4: Build and lint**
+- [x] **Step 4: Build and lint**
 
 Run: `cd cordova-riskq-admin && npm run build && npm run lint`
 Expected: Build succeeds; lint error count unchanged.
 
-- [ ] **Step 5: Manual verification**
+- [x] **Step 5: Manual verification**
 
 Run: `cd cordova-riskq-admin && npm run dev`, open `/sos-alerts`, confirm: pagination works, clicking a status pill resets to page 1 and filters server-side, search narrows by user/location, and the four stat cards reflect true totals from `/admin/sos-alerts/summary` (not just the loaded page).
 
@@ -2090,7 +2090,7 @@ git commit -m "feat(admin): paginate and server-search the SOS Alerts page"
 - Consumes: `usePaginationState` (Task 5), `<Pagination>` (Task 6), the extended `GET /admin/announcements` (Task 4).
 - Produces: `useAnnouncements(pagination, priority: "All" | AnnouncementPriority)` returning `{ announcements, total, loading, error, actionError, create, remove }` — `create`/`remove` keep their existing signatures, just re-fetch the current page afterward instead of doing an optimistic local splice (simpler and correct now that the local list is only one page, not the full set).
 
-- [ ] **Step 1: Rewrite `useAnnouncements.ts`**
+- [x] **Step 1: Rewrite `useAnnouncements.ts`**
 
 ```typescript
 "use client";
@@ -2205,7 +2205,7 @@ export function useAnnouncements(
 }
 ```
 
-- [ ] **Step 2: Update `AnnouncementTable.tsx`** — drop client-side filtering, take search/priority-filter/pagination as props
+- [x] **Step 2: Update `AnnouncementTable.tsx`** — drop client-side filtering, take search/priority-filter/pagination as props
 
 ```typescript
 // src/components/announcements/AnnouncementTable.tsx
@@ -2368,7 +2368,7 @@ export default function AnnouncementTable({
 }
 ```
 
-- [ ] **Step 3: Update `announcements/page.tsx`**
+- [x] **Step 3: Update `announcements/page.tsx`**
 
 ```typescript
 // src/app/(dashboard)/announcements/page.tsx
@@ -2474,12 +2474,12 @@ export default function AnnouncementsPage() {
 }
 ```
 
-- [ ] **Step 4: Build and lint**
+- [x] **Step 4: Build and lint**
 
 Run: `cd cordova-riskq-admin && npm run build && npm run lint`
 Expected: Build succeeds; lint error count unchanged.
 
-- [ ] **Step 5: Manual verification**
+- [x] **Step 5: Manual verification**
 
 Run: `cd cordova-riskq-admin && npm run dev`, open `/announcements`, confirm: publishing a new announcement makes it appear (it refetches the current page), deleting one works, pagination and search/priority filters work against the full dataset rather than just the loaded page.
 
@@ -2497,21 +2497,21 @@ git commit -m "feat(admin): paginate and server-search the Announcements page"
 
 **Files:** None (verification only).
 
-- [ ] **Step 1: Full backend verification**
+- [x] **Step 1: Full backend verification**
 
 Run: `cd CordovaRiskQ-Bacnkend && npx tsc --noEmit && npm test`
 Expected: No type errors; every test passes (Task 1's 5 new tests plus every pre-existing test, ~41 total based on the 36 passing before this plan started).
 
-- [ ] **Step 2: Full frontend verification**
+- [x] **Step 2: Full frontend verification**
 
 Run: `cd cordova-riskq-admin && npm run build && npm run lint`
 Expected: Build succeeds with all routes listed (no `/witnesses` or `/resources` — those were removed in a prior change and should stay gone). Lint error count matches the pre-plan baseline of 13 (all pre-existing `react-hooks/set-state-in-effect` errors on other hooks) — this plan's new/modified hooks (`useUsers`, `useResponders`, `useSosAlerts`, `useAnnouncements`, `usePaginationState`) follow the same early-return-then-setState pattern already established throughout this codebase, so the count should not have grown.
 
-- [ ] **Step 3: Manual smoke test across all four pages**
+- [x] **Step 3: Manual smoke test across all four pages**
 
 Run: `cd cordova-riskq-admin && npm run dev`. For each of `/users`, `/responders`, `/sos-alerts`, `/announcements`: change the page-size selector (10/25/50) and confirm the row count and page count both update; click through to the last page and confirm Next disables; type a search term that matches nothing and confirm the empty state renders (not a blank table); clear the search and confirm the full result set returns.
 
-- [ ] **Step 4: Update `TODO.md`**
+- [x] **Step 4: Update `TODO.md`**
 
 Add a line to the "Real (backend-wired)" section of `cordova-riskq-admin/TODO.md`:
 
