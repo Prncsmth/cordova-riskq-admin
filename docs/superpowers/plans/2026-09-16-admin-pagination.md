@@ -28,7 +28,7 @@
 **Interfaces:**
 - Produces: `AlertStatus` type (`"New" | "Acknowledged" | "Resolved"`), `incidentStatusToAlertStatus(incidentStatus: string | undefined): AlertStatus`, `filterAlertIdsByStatus(allAlertIds: string[], incidentStatusByAlertId: Map<string, string>, alertStatus: AlertStatus): string[]`, `countAlertsByStatus(allAlertIds: string[], incidentStatusByAlertId: Map<string, string>): { New: number; Acknowledged: number; Resolved: number; total: number }` — Task 2 imports all four.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```typescript
 // src/services/sosAlertStatus.test.ts
@@ -91,12 +91,12 @@ test("countAlertsByStatus buckets every id and reports the total", () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `cd CordovaRiskQ-Bacnkend && npx tsx --test src/services/sosAlertStatus.test.ts`
 Expected: FAIL with `Cannot find module '@/services/sosAlertStatus'` (file doesn't exist yet).
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```typescript
 // src/services/sosAlertStatus.ts
@@ -145,12 +145,12 @@ export function countAlertsByStatus(
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `cd CordovaRiskQ-Bacnkend && npm test`
 Expected: All tests pass, including the new `sosAlertStatus.test.ts` file (check the summary line for `pass` count increasing by 5 and `fail: 0`).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd CordovaRiskQ-Bacnkend
@@ -171,7 +171,7 @@ git commit -m "feat(admin): add pure SOS alert-status bucket helper"
 - Consumes: `incidentStatusToAlertStatus`, `filterAlertIdsByStatus`, `countAlertsByStatus`, `AlertStatus` from `@/services/sosAlertStatus` (Task 1).
 - Produces: `sosService.listForAdmin` gains `search?: string` and `alertStatus?: AlertStatus` on its filters param (no return-shape change — still `{ alerts, total, page, limit }`). New `sosService.getAdminSummary(): Promise<{ total: number; New: number; Acknowledged: number; Resolved: number }>`. New route `GET /admin/sos-alerts/summary` → `{ success: true, summary }`.
 
-- [ ] **Step 1: Add search + alertStatus filtering to `listForAdmin`**
+- [x] **Step 1: Add search + alertStatus filtering to `listForAdmin`**
 
 In `src/services/sos.service.ts`, add the import and extend `SosAlertAdminFilters` and `listForAdmin`:
 
@@ -327,7 +327,7 @@ Replace the body of `listForAdmin` (keep `trigger` untouched) with:
 };
 ```
 
-- [ ] **Step 2: Add the controller action**
+- [x] **Step 2: Add the controller action**
 
 In `src/controllers/sos.controller.ts`, update `listForAdmin` to read the two new query params and add `getAdminSummary`:
 
@@ -373,7 +373,7 @@ export const sosController = {
 };
 ```
 
-- [ ] **Step 3: Add the route**
+- [x] **Step 3: Add the route**
 
 In `src/routes/sos.routes.ts`, add above the existing `listForAdmin` route:
 
@@ -383,12 +383,12 @@ router.get("/admin/sos-alerts/summary", authenticate, requireAdmin, sosControlle
 
 (Keep it above `router.get("/admin/sos-alerts", ...)` — Express matches routes in registration order, and `/admin/sos-alerts/summary` must not be captured by anything treating the rest of the path as an `:id`-style param. There is no such param route here, but keeping the more specific path first is the safer convention.)
 
-- [ ] **Step 4: Type-check and run the full backend test suite**
+- [x] **Step 4: Type-check and run the full backend test suite**
 
 Run: `cd CordovaRiskQ-Bacnkend && npx tsc --noEmit && npm test`
 Expected: `tsc` reports no errors; all tests pass (same count as Task 1's end state — this task added no new test files, only service/controller/route code).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd CordovaRiskQ-Bacnkend
@@ -408,7 +408,7 @@ git commit -m "feat(admin): add search, alertStatus filter, and summary endpoint
 **Interfaces:**
 - Produces: `adminService.listUsers(filters: { search?: string; role?: string; duty?: boolean; unit?: string; page?: number; limit?: number }): Promise<{ users: AdminUserRow[]; total: number; newThisWeek: number; page: number; limit: number }>` where `AdminUserRow` keeps its existing shape (`id, name, email, mobile, role, unit, isOnDuty, createdAt`). Task 7 (Users frontend) and Task 8 (Responders frontend) both call `GET /admin/users` with this new contract.
 
-- [ ] **Step 1: Rewrite `listUsers` in `admin.service.ts`**
+- [x] **Step 1: Rewrite `listUsers` in `admin.service.ts`**
 
 ```typescript
 import { prisma } from "@/lib/prisma";
@@ -480,7 +480,7 @@ export const adminService = {
 
 (Keep everything from `updateUserRole` onward — `getResponderSummary` and `getRecentActivity` — completely unchanged.)
 
-- [ ] **Step 2: Update the controller**
+- [x] **Step 2: Update the controller**
 
 In `src/controllers/admin.controller.ts`, replace `listUsers`:
 
@@ -514,7 +514,7 @@ export const adminController = {
 
 (Leave `updateUserRole`, `getResponderSummary`, and `getRecentActivity` untouched.)
 
-- [ ] **Step 3: No route changes needed**
+- [x] **Step 3: No route changes needed**
 
 `GET /admin/users` in `src/routes/admin.routes.ts` already points at `adminController.listUsers` with no param-shape declaration to update — Express routes don't declare query param names. Confirm by reading the file that the line is unchanged:
 
@@ -522,12 +522,12 @@ export const adminController = {
 router.get("/admin/users", authenticate, requireAdmin, adminController.listUsers);
 ```
 
-- [ ] **Step 4: Type-check and run the full backend test suite**
+- [x] **Step 4: Type-check and run the full backend test suite**
 
 Run: `cd CordovaRiskQ-Bacnkend && npx tsc --noEmit && npm test`
 Expected: No type errors; all tests still pass (this task adds no test files — Prisma-touching CRUD listing isn't unit-tested elsewhere in this codebase either, matching existing convention).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd CordovaRiskQ-Bacnkend
@@ -546,7 +546,7 @@ git commit -m "feat(admin): add search/role/duty/unit filters and pagination to 
 **Interfaces:**
 - Produces: `announcementService.listForAdmin(filters: { search?: string; priority?: string; page?: number; limit?: number }): Promise<{ announcements: Announcement[]; total: number; page: number; limit: number }>`. Task 10 (Announcements frontend) calls `GET /admin/announcements` with this new contract.
 
-- [ ] **Step 1: Rewrite `listForAdmin`**
+- [x] **Step 1: Rewrite `listForAdmin`**
 
 In `src/services/announcement.service.ts`, replace the `listForAdmin` method (leave `getActive`, `create`, `remove` untouched):
 
@@ -587,7 +587,7 @@ In `src/services/announcement.service.ts`, replace the `listForAdmin` method (le
     },
 ```
 
-- [ ] **Step 2: Update the controller**
+- [x] **Step 2: Update the controller**
 
 In `src/controllers/announcement.controller.ts`:
 
@@ -618,12 +618,12 @@ export const announcementController = {
 
 (Leave `create` and `remove` untouched.)
 
-- [ ] **Step 3: Type-check and run the full backend test suite**
+- [x] **Step 3: Type-check and run the full backend test suite**
 
 Run: `cd CordovaRiskQ-Bacnkend && npx tsc --noEmit && npm test`
 Expected: No type errors; all tests pass.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd CordovaRiskQ-Bacnkend
@@ -641,7 +641,7 @@ git commit -m "feat(admin): add search/priority filters and pagination to GET /a
 **Interfaces:**
 - Produces: `usePaginationState(initialPageSize?: number): { page: number; setPage: (page: number) => void; pageSize: number; setPageSize: (size: number) => void; searchInput: string; setSearchInput: (value: string) => void; search: string; resetPage: () => void }`. Tasks 7-10 use this in every affected hook.
 
-- [ ] **Step 1: Write the hook**
+- [x] **Step 1: Write the hook**
 
 ```typescript
 // src/hooks/usePaginationState.ts
@@ -683,12 +683,12 @@ export function usePaginationState(initialPageSize = 10) {
 }
 ```
 
-- [ ] **Step 2: Build to verify it compiles**
+- [x] **Step 2: Build to verify it compiles**
 
 Run: `cd cordova-riskq-admin && npm run build`
 Expected: Build succeeds (this file isn't imported anywhere yet, so it just needs to type-check standalone — Next.js's build still type-checks every file in `src/`).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd cordova-riskq-admin
@@ -706,7 +706,7 @@ git commit -m "feat(admin): add shared usePaginationState hook"
 **Interfaces:**
 - Produces: `<Pagination page={number} totalPages={number} pageSize={number} onPageChange={(page: number) => void} onPageSizeChange={(size: number) => void} />` default-exported. Tasks 7-10 render it at the bottom of each table.
 
-- [ ] **Step 1: Write the component**
+- [x] **Step 1: Write the component**
 
 ```typescript
 // src/components/ui/Pagination.tsx
@@ -814,12 +814,12 @@ export default function Pagination({ page, totalPages, pageSize, onPageChange, o
 }
 ```
 
-- [ ] **Step 2: Build to verify it compiles**
+- [x] **Step 2: Build to verify it compiles**
 
 Run: `cd cordova-riskq-admin && npm run build`
 Expected: Build succeeds.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd cordova-riskq-admin
@@ -840,7 +840,7 @@ git commit -m "feat(admin): add shared Pagination UI component"
 - Consumes: `usePaginationState` (Task 5), `<Pagination>` (Task 6), the new `GET /admin/users` contract (Task 3: `{ users, total, newThisWeek, page, limit }`).
 - Produces: `useUsers(pagination: ReturnType<typeof usePaginationState>)` — now takes the shared pagination state as a parameter instead of managing nothing itself — returning `{ users, total, newThisWeek, loading, error, actionError, changeRole }`.
 
-- [ ] **Step 1: Rewrite `useUsers.ts`**
+- [x] **Step 1: Rewrite `useUsers.ts`**
 
 ```typescript
 "use client";
@@ -948,7 +948,7 @@ export function useUsers(pagination: ReturnType<typeof usePaginationState>) {
 }
 ```
 
-- [ ] **Step 2: Update `UserTable.tsx`** — drop client-side filtering, take `search`/`onSearchChange` and pagination props instead of owning its own `query` state
+- [x] **Step 2: Update `UserTable.tsx`** — drop client-side filtering, take `search`/`onSearchChange` and pagination props instead of owning its own `query` state
 
 ```typescript
 "use client";
@@ -1124,7 +1124,7 @@ export default function UserTable({
 }
 ```
 
-- [ ] **Step 3: Update `users/page.tsx`** to own the `usePaginationState()` instance and wire it through
+- [x] **Step 3: Update `users/page.tsx`** to own the `usePaginationState()` instance and wire it through
 
 ```typescript
 "use client";
@@ -1191,16 +1191,16 @@ export default function UsersPage() {
 }
 ```
 
-- [ ] **Step 4: Build and lint**
+- [x] **Step 4: Build and lint**
 
 Run: `cd cordova-riskq-admin && npm run build && npm run lint`
 Expected: Build succeeds. Lint error count is unchanged or lower than before this task (baseline going into this plan: 13 pre-existing `react-hooks/set-state-in-effect` errors — this task doesn't touch that pattern in a new way, so the count should stay the same).
 
-- [ ] **Step 5: Manual verification**
+- [x] **Step 5: Manual verification**
 
 Run: `cd cordova-riskq-admin && npm run dev`, open `/users`, confirm: the table shows at most 10 rows with working Previous/Next and a page-size selector; typing in the search box (wait ~300ms) narrows results without a full page reload; "Total Users" and "New This Week" stat cards show real counts (not just the current page's row count).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd cordova-riskq-admin
@@ -1221,7 +1221,7 @@ git commit -m "feat(admin): paginate and server-search the Users page"
 - Consumes: `usePaginationState` (Task 5), `<Pagination>` (Task 6), `GET /admin/users` with `role`/`duty`/`unit`/`search`/`page`/`limit` (Task 3), the pre-existing `GET /admin/responders/summary` (already built — confirmed present in `admin.routes.ts`/`admin.controller.ts`, unused by the frontend until now).
 - Produces: `useResponders(pagination, filters: { duty: "all" | "on-duty" | "off-duty"; unit: "all" | "BDRRMO" | "MDRRMO" | "unclassified" })` returning `{ responders, total, loading, error }`. New `useResponderSummary()` hook returning `{ summary: { total, onDuty, offDuty, bdrrmo, mdrrmo, unclassified } | null, loading, error }`.
 
-- [ ] **Step 1: Rewrite `useResponders.ts`** — add pagination/search/duty/unit params, and a separate summary hook
+- [x] **Step 1: Rewrite `useResponders.ts`** — add pagination/search/duty/unit params, and a separate summary hook
 
 ```typescript
 "use client";
@@ -1366,7 +1366,7 @@ export function useResponderSummary() {
 }
 ```
 
-- [ ] **Step 2: Update `ResponderTable.tsx`** — drop client-side filtering/search, take filter state and pagination props from the parent
+- [x] **Step 2: Update `ResponderTable.tsx`** — drop client-side filtering/search, take filter state and pagination props from the parent
 
 ```typescript
 "use client";
@@ -1536,7 +1536,7 @@ export default function ResponderTable({
 }
 ```
 
-- [ ] **Step 3: Update `responders/page.tsx`**
+- [x] **Step 3: Update `responders/page.tsx`**
 
 ```typescript
 "use client";
@@ -1628,16 +1628,16 @@ export default function RespondersPage() {
 }
 ```
 
-- [ ] **Step 4: Build and lint**
+- [x] **Step 4: Build and lint**
 
 Run: `cd cordova-riskq-admin && npm run build && npm run lint`
 Expected: Build succeeds; lint error count unchanged from before this task.
 
-- [ ] **Step 5: Manual verification**
+- [x] **Step 5: Manual verification**
 
 Run: `cd cordova-riskq-admin && npm run dev`, open `/responders`, confirm: pagination controls work, duty/unit filter changes reset to page 1, "Unclassified" unit filter still works (client-side exception, documented in the hook), and the three stat cards show real aggregate counts from `/admin/responders/summary` (not just the current page).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd cordova-riskq-admin
