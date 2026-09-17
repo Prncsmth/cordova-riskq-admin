@@ -3,14 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Bell } from "lucide-react";
-import { MOCK_NOTIFICATIONS } from "@/lib/mockNotifications";
+import { useAdminNotifications } from "@/hooks/useAdminNotifications";
+import { ACTIVITY_TYPE_STYLE, ACTIVITY_TYPE_HREF } from "@/lib/adminActivity";
+import { timeAgo } from "@/lib/utils";
 
 export default function NotificationsMenu() {
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS.slice(0, 5));
+  const { items, unreadCount, markRead, markAllRead } = useAdminNotifications(5);
   const ref = useRef<HTMLDivElement>(null);
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -21,14 +21,6 @@ export default function NotificationsMenu() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  function markAllRead() {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  }
-
-  function markRead(id: string) {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-  }
 
   return (
     <div ref={ref} className="relative">
@@ -60,36 +52,37 @@ export default function NotificationsMenu() {
           </div>
 
           <div className="max-h-96 overflow-y-auto">
-            {notifications.map((n) => {
-              const Icon = n.icon;
+            {items.map(({ activity, key, read }) => {
+              const style = ACTIVITY_TYPE_STYLE[activity.type];
+              const Icon = style.icon;
               return (
                 <Link
-                  key={n.id}
-                  href={n.href}
+                  key={key}
+                  href={ACTIVITY_TYPE_HREF[activity.type]}
                   onClick={() => {
-                    markRead(n.id);
+                    markRead(activity);
                     setOpen(false);
                   }}
                   className={`flex items-start gap-3 border-b border-(--glass-border) px-4 py-3 transition-colors last:border-b-0 hover:bg-primary-light/20 ${
-                    n.read ? "" : "bg-primary-light/10"
+                    read ? "" : "bg-primary-light/10"
                   }`}
                 >
-                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${n.bg}`}>
-                    <Icon size={16} className={n.color} />
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${style.bg}`}>
+                    <Icon size={16} className={style.color} />
                   </span>
 
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-foreground">{n.title}</p>
-                    <p className="truncate text-xs text-muted">{n.detail}</p>
-                    <p className="mt-0.5 text-xs text-muted">{n.time}</p>
+                    <p className="truncate text-sm font-medium text-foreground">{activity.title}</p>
+                    <p className="truncate text-xs text-muted">{activity.detail}</p>
+                    <p className="mt-0.5 text-xs text-muted">{timeAgo(activity.occurredAt)}</p>
                   </div>
 
-                  {!n.read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
+                  {!read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
                 </Link>
               );
             })}
 
-            {notifications.length === 0 && (
+            {items.length === 0 && (
               <p className="px-4 py-8 text-center text-sm text-muted">You&apos;re all caught up.</p>
             )}
           </div>

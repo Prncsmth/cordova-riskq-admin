@@ -19,12 +19,11 @@ export type AdminActivity = {
   occurredAt: string;
 };
 
-const MAX_ITEMS = 10;
-
 // Fetches the initial feed via REST, then prepends live "admin:activity"
 // socket events (see the backend's realtime/emit.ts emitAdminActivity) as
-// they arrive -- no polling.
-export function useRecentActivity() {
+// they arrive -- no polling. `limit` defaults to 10 for the dashboard's
+// compact widget; the Audit Logs page asks for a larger feed.
+export function useRecentActivity(limit = 10) {
   const { token } = useAuth();
   const socket = useSocket();
   const [activities, setActivities] = useState<AdminActivity[]>([]);
@@ -38,9 +37,10 @@ export function useRecentActivity() {
     }
 
     let cancelled = false;
+    setLoading(true);
     setError(null);
 
-    apiFetch<{ success: true; activities: AdminActivity[] }>("/admin/activity", { token })
+    apiFetch<{ success: true; activities: AdminActivity[] }>(`/admin/activity?limit=${limit}`, { token })
       .then((response) => {
         if (!cancelled) setActivities(response.activities);
       })
@@ -56,18 +56,18 @@ export function useRecentActivity() {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, limit]);
 
   useEffect(() => {
     function handleActivity(activity: AdminActivity) {
-      setActivities((prev) => [activity, ...prev].slice(0, MAX_ITEMS));
+      setActivities((prev) => [activity, ...prev].slice(0, limit));
     }
 
     socket.on("admin:activity", handleActivity);
     return () => {
       socket.off("admin:activity", handleActivity);
     };
-  }, [socket]);
+  }, [socket, limit]);
 
   return { activities, loading, error };
 }

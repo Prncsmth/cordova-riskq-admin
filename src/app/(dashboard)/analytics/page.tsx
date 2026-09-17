@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import { Siren, BellRing, Timer, CheckCircle2 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import AnalyticsFilters from "@/components/analytics/AnalyticsFilters";
@@ -6,15 +9,45 @@ import IncidentTypeChart from "@/components/analytics/IncidentTypeChart";
 import SosAlertTrendChart from "@/components/analytics/SosAlertTrendChart";
 import ResponseTimeByTypeChart from "@/components/analytics/ResponseTimeByTypeChart";
 import IncidentsByHourChart from "@/components/analytics/IncidentsByHourChart";
-
-const stats = [
-  { label: "Total Incidents", value: "411", icon: Siren, color: "text-danger", bg: "bg-danger-light" },
-  { label: "Total SOS Alerts", value: "711", icon: BellRing, color: "text-warning", bg: "bg-warning-light" },
-  { label: "Avg. Response Time", value: "8.4 min", icon: Timer, color: "text-info", bg: "bg-info-light" },
-  { label: "Resolution Rate", value: "94%", icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
-];
+import { useEmergenciesWithHistory } from "@/hooks/useEmergenciesWithHistory";
+import { useIncidentHistory } from "@/hooks/useIncidentHistory";
+import { getRangeBounds, type DateRangePreset } from "@/lib/dateRanges";
+import { computeAvgResponseTime, computeResolutionRate } from "@/lib/incidentStats";
 
 export default function AnalyticsPage() {
+  const [range, setRange] = useState<DateRangePreset>("This Month");
+  const { startDate, endDate } = useMemo(() => getRangeBounds(range), [range]);
+
+  const { emergencies } = useEmergenciesWithHistory();
+  const { records: historyRecords } = useIncidentHistory();
+
+  const filteredEmergencies = useMemo(() => {
+    const startTime = startDate.getTime();
+    const endTime = endDate.getTime();
+    return emergencies.filter((e) => {
+      const createdAt = new Date(e.createdAt).getTime();
+      return createdAt >= startTime && createdAt <= endTime;
+    });
+  }, [emergencies, startDate, endDate]);
+
+  const filteredHistoryRecords = useMemo(() => {
+    const startTime = startDate.getTime();
+    const endTime = endDate.getTime();
+    return historyRecords.filter((r) => {
+      const createdAt = new Date(r.createdAt).getTime();
+      return createdAt >= startTime && createdAt <= endTime;
+    });
+  }, [historyRecords, startDate, endDate]);
+
+  const totalSosAlerts = filteredEmergencies.filter((e) => e.source === "sos").length;
+
+  const stats = [
+    { label: "Total Incidents", value: filteredEmergencies.length, icon: Siren, color: "text-danger", bg: "bg-danger-light" },
+    { label: "Total SOS Alerts", value: totalSosAlerts, icon: BellRing, color: "text-warning", bg: "bg-warning-light" },
+    { label: "Avg. Response Time", value: computeAvgResponseTime(filteredHistoryRecords), icon: Timer, color: "text-info", bg: "bg-info-light" },
+    { label: "Resolution Rate", value: computeResolutionRate(filteredHistoryRecords), icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -25,7 +58,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
 
-        <AnalyticsFilters />
+        <AnalyticsFilters range={range} onRangeChange={setRange} />
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
@@ -46,16 +79,16 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <IncidentTrendChart />
-        <SosAlertTrendChart />
+        <IncidentTrendChart emergencies={filteredEmergencies} startDate={startDate} endDate={endDate} />
+        <SosAlertTrendChart emergencies={filteredEmergencies} startDate={startDate} endDate={endDate} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <IncidentTypeChart />
-        <ResponseTimeByTypeChart />
+        <IncidentTypeChart emergencies={filteredEmergencies} />
+        <ResponseTimeByTypeChart records={filteredHistoryRecords} />
       </div>
 
-      <IncidentsByHourChart />
+      <IncidentsByHourChart emergencies={filteredEmergencies} />
     </div>
   );
 }

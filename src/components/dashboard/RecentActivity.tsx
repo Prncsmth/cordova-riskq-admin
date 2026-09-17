@@ -1,16 +1,8 @@
 import Link from "next/link";
-import { BellRing, ShieldCheck, CheckCircle2, Building2, UserPlus, History } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { useRecentActivity, type AdminActivityType } from "@/hooks/useRecentActivity";
+import { History } from "lucide-react";
+import { useRecentActivity } from "@/hooks/useRecentActivity";
+import { ACTIVITY_TYPE_STYLE } from "@/lib/adminActivity";
 import { timeAgo } from "@/lib/utils";
-
-const ICON_BY_TYPE: Record<AdminActivityType, { icon: LucideIcon; color: string; bg: string }> = {
-  sos_alert: { icon: BellRing, color: "text-danger", bg: "bg-danger-light" },
-  responder_joined: { icon: ShieldCheck, color: "text-info", bg: "bg-info-light" },
-  incident_resolved: { icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
-  evacuation_center_updated: { icon: Building2, color: "text-warning", bg: "bg-warning-light" },
-  user_registered: { icon: UserPlus, color: "text-primary", bg: "bg-primary-light" },
-};
 
 export default function RecentActivity() {
   const { activities, loading, error } = useRecentActivity();
@@ -38,7 +30,7 @@ export default function RecentActivity() {
       ) : (
         <div className="max-h-[420px] divide-y divide-border/70 overflow-y-auto">
           {activities.map((activity, index) => {
-            const { icon: Icon, color, bg } = ICON_BY_TYPE[activity.type];
+            const { icon: Icon, color, bg } = ACTIVITY_TYPE_STYLE[activity.type];
             return (
               <div key={index} className="flex items-start gap-3 p-4 transition-colors hover:bg-background/50">
                 <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${bg}`}>

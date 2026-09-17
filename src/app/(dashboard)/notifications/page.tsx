@@ -4,33 +4,31 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, Bell, MailOpen } from "lucide-react";
 import Card from "@/components/ui/Card";
-import { MOCK_NOTIFICATIONS, notificationTypeLabels, type NotificationType } from "@/lib/mockNotifications";
+import EmptyState from "@/components/ui/EmptyState";
+import { useAdminNotifications } from "@/hooks/useAdminNotifications";
+import { ACTIVITY_TYPE_STYLE, ACTIVITY_TYPE_HREF } from "@/lib/adminActivity";
+import { timeAgo } from "@/lib/utils";
+import type { AdminActivityType } from "@/hooks/useRecentActivity";
 
-const typeFilters: (NotificationType | "All")[] = ["All", ...(Object.keys(notificationTypeLabels) as NotificationType[])];
+const FEED_LIMIT = 50;
+const typeFilters = ["All", ...Object.keys(ACTIVITY_TYPE_STYLE)] as (AdminActivityType | "All")[];
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  const { items, loading, error, unreadCount, markRead, markAllRead } = useAdminNotifications(FEED_LIMIT);
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<(typeof typeFilters)[number]>("All");
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
   const filtered = useMemo(() => {
-    return notifications.filter((n) => {
-      const matchesType = typeFilter === "All" || n.type === typeFilter;
+    return items.filter(({ activity }) => {
+      const matchesType = typeFilter === "All" || activity.type === typeFilter;
       const q = query.trim().toLowerCase();
-      const matchesQuery = q.length === 0 || n.title.toLowerCase().includes(q) || n.detail.toLowerCase().includes(q);
+      const matchesQuery =
+        q.length === 0 ||
+        activity.title.toLowerCase().includes(q) ||
+        activity.detail.toLowerCase().includes(q);
       return matchesType && matchesQuery;
     });
-  }, [notifications, query, typeFilter]);
-
-  function markAllRead() {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  }
-
-  function markRead(id: string) {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-  }
+  }, [items, query, typeFilter]);
 
   return (
     <div className="space-y-6">
@@ -59,7 +57,7 @@ export default function NotificationsPage() {
           </span>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Total</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{notifications.length}</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{items.length}</p>
           </div>
         </Card>
 
@@ -84,7 +82,7 @@ export default function NotificationsPage() {
           </span>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Read</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{notifications.length - unreadCount}</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{items.length - unreadCount}</p>
           </div>
         </Card>
       </div>
@@ -113,41 +111,50 @@ export default function NotificationsPage() {
                     : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
                 }`}
               >
-                {type === "All" ? "All" : notificationTypeLabels[type]}
+                {type === "All" ? "All" : ACTIVITY_TYPE_STYLE[type].label}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="divide-y divide-border/70">
-          {filtered.map((n) => {
-            const Icon = n.icon;
-            return (
-              <Link
-                key={n.id}
-                href={n.href}
-                onClick={() => markRead(n.id)}
-                className={`flex items-start gap-3 p-4 transition-colors hover:bg-background/50 ${n.read ? "" : "bg-primary-light/10"}`}
-              >
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${n.bg}`}>
-                  <Icon size={16} className={n.color} />
-                </span>
+        {loading ? (
+          <p className="p-10 text-center text-sm text-muted">Loading notifications…</p>
+        ) : error ? (
+          <p className="p-10 text-center text-sm text-red-700">{error}</p>
+        ) : items.length === 0 ? (
+          <EmptyState title="You're all caught up" description="New activity will show up here." />
+        ) : (
+          <div className="divide-y divide-border/70">
+            {filtered.map(({ activity, key, read }) => {
+              const style = ACTIVITY_TYPE_STYLE[activity.type];
+              const Icon = style.icon;
+              return (
+                <Link
+                  key={key}
+                  href={ACTIVITY_TYPE_HREF[activity.type]}
+                  onClick={() => markRead(activity)}
+                  className={`flex items-start gap-3 p-4 transition-colors hover:bg-background/50 ${read ? "" : "bg-primary-light/10"}`}
+                >
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${style.bg}`}>
+                    <Icon size={16} className={style.color} />
+                  </span>
 
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-foreground">{n.title}</p>
-                  <p className="text-sm text-muted">{n.detail}</p>
-                  <p className="mt-1 text-xs text-text-tertiary">{n.time}</p>
-                </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-foreground">{activity.title}</p>
+                    <p className="text-sm text-muted">{activity.detail}</p>
+                    <p className="mt-1 text-xs text-text-tertiary">{timeAgo(activity.occurredAt)}</p>
+                  </div>
 
-                {!n.read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
-              </Link>
-            );
-          })}
+                  {!read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
+                </Link>
+              );
+            })}
 
-          {filtered.length === 0 && (
-            <p className="p-10 text-center text-sm text-muted">No notifications match your filters.</p>
-          )}
-        </div>
+            {filtered.length === 0 && (
+              <p className="p-10 text-center text-sm text-muted">No notifications match your filters.</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

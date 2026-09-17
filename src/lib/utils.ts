@@ -45,3 +45,23 @@ const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 export function isWithinLastWeek(date: string | Date) {
   return Date.now() - new Date(date).getTime() < ONE_WEEK_MS;
 }
+
+const dayLabelFormatter = new Intl.DateTimeFormat("en-PH", { month: "short", day: "numeric" });
+
+// One bucket per calendar day from startDate to endDate (inclusive), each
+// labeled for a chart x-axis. Shared by every trend chart so date-range
+// filtering behaves identically across them.
+export function buildDailyBuckets(startDate: Date, endDate: Date): { label: string; date: Date }[] {
+  const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+
+  const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000)) + 1);
+
+  return Array.from({ length: days }, (_, i) => {
+    const date = new Date(start);
+    date.setDate(date.getDate() + i);
+    return { label: dayLabelFormatter.format(date), date };
+  });
+}

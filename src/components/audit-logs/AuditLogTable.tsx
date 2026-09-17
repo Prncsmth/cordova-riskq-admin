@@ -1,57 +1,64 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, Siren, ShieldCheck, Megaphone, Users as UsersIcon, ScrollText } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import Badge from "@/components/ui/Badge";
-import type { AuditLog } from "@/types/audit-log";
-import type { BadgeVariant } from "@/components/ui/Badge";
+import { Search } from "lucide-react";
+import EmptyState from "@/components/ui/EmptyState";
+import { ACTIVITY_TYPE_STYLE } from "@/lib/adminActivity";
+import { formatDate } from "@/lib/utils";
+import type { AdminActivity, AdminActivityType } from "@/hooks/useRecentActivity";
 
-// Mock data for UI — replace with real API data once backend endpoints are available.
-const logs: AuditLog[] = [
-  { id: "LOG-901", adminId: "Admin User", action: "Updated incident status", entityType: "Emergency", entityId: "INC-2026-0091", createdAt: "10 min ago" },
-  { id: "LOG-900", adminId: "Admin User", action: "Verified responder", entityType: "Responder", entityId: "RES-001", createdAt: "1 hr ago" },
-  { id: "LOG-899", adminId: "Admin User", action: "Published announcement", entityType: "Announcement", entityId: "ANN-014", createdAt: "3 hr ago" },
-  { id: "LOG-898", adminId: "Admin User", action: "Suspended user account", entityType: "User", entityId: "USR-233", createdAt: "5 hr ago" },
-];
+const typeFilters = ["All", ...Object.keys(ACTIVITY_TYPE_STYLE)] as (AdminActivityType | "All")[];
 
-const entityStyles: Record<string, { icon: LucideIcon; variant: BadgeVariant; tile: string }> = {
-  Emergency: { icon: Siren, variant: "danger", tile: "bg-danger-light text-danger" },
-  Responder: { icon: ShieldCheck, variant: "info", tile: "bg-info-light text-info" },
-  Announcement: { icon: Megaphone, variant: "warning", tile: "bg-warning-light text-warning" },
-  User: { icon: UsersIcon, variant: "success", tile: "bg-success-light text-success" },
-};
-
-const defaultEntityStyle = { icon: ScrollText, variant: "default" as BadgeVariant, tile: "bg-background text-muted" };
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-const entityFilters = ["All", ...Array.from(new Set(logs.map((log) => log.entityType)))];
-
-export default function AuditLogTable() {
+export default function AuditLogTable({
+  activities,
+  loading,
+  error,
+}: {
+  activities: AdminActivity[];
+  loading: boolean;
+  error: string | null;
+}) {
   const [query, setQuery] = useState("");
-  const [entityFilter, setEntityFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState<(typeof typeFilters)[number]>("All");
 
   const filtered = useMemo(() => {
-    return logs.filter((log) => {
-      const matchesEntity = entityFilter === "All" || log.entityType === entityFilter;
+    return activities.filter((activity) => {
+      const matchesType = typeFilter === "All" || activity.type === typeFilter;
+
       const q = query.trim().toLowerCase();
       const matchesQuery =
         q.length === 0 ||
-        log.action.toLowerCase().includes(q) ||
-        log.adminId.toLowerCase().includes(q) ||
-        log.id.toLowerCase().includes(q) ||
-        (log.entityId ?? "").toLowerCase().includes(q);
-      return matchesEntity && matchesQuery;
+        activity.title.toLowerCase().includes(q) ||
+        activity.detail.toLowerCase().includes(q);
+
+      return matchesType && matchesQuery;
     });
-  }, [query, entityFilter]);
+  }, [activities, query, typeFilter]);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted shadow-sm">
+        Loading activity…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700 shadow-sm">
+        {error}
+      </div>
+    );
+  }
+
+  if (activities.length === 0) {
+    return (
+      <EmptyState
+        title="No activity yet"
+        description="SOS alerts, responder joins, incident resolutions, evacuation center updates, and new registrations will appear here."
+      />
+    );
+  }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
@@ -61,24 +68,24 @@ export default function AuditLogTable() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search actions, admins, IDs..."
+            placeholder="Search activity..."
             className="w-full rounded-xl border border-border bg-background/60 py-2 pl-9 pr-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
-          {entityFilters.map((entity) => (
+          {typeFilters.map((type) => (
             <button
-              key={entity}
+              key={type}
               type="button"
-              onClick={() => setEntityFilter(entity)}
+              onClick={() => setTypeFilter(type)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
-                entityFilter === entity
+                typeFilter === type
                   ? "bg-primary text-white shadow-xs"
                   : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
               }`}
             >
-              {entity}
+              {type === "All" ? "All" : ACTIVITY_TYPE_STYLE[type].label}
             </button>
           ))}
         </div>
@@ -88,55 +95,35 @@ export default function AuditLogTable() {
         <table className="w-full text-left text-sm">
           <thead className="bg-background/60">
             <tr>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Action</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Admin</th>
-              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Entity</th>
+              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Event</th>
+              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Detail</th>
               <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">When</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/70">
-            {filtered.map((log) => {
-              const style = entityStyles[log.entityType] ?? defaultEntityStyle;
+            {filtered.map((activity, index) => {
+              const style = ACTIVITY_TYPE_STYLE[activity.type];
               const Icon = style.icon;
 
               return (
-                <tr key={log.id} className="transition-colors hover:bg-background/70">
+                <tr key={index} className="transition-colors hover:bg-background/70">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${style.tile}`}>
-                        <Icon size={16} />
+                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${style.bg}`}>
+                        <Icon size={16} className={style.color} />
                       </span>
-                      <div className="min-w-0">
-                        <p className="font-medium text-foreground">{log.action}</p>
-                        <p className="text-xs text-muted">{log.id}</p>
-                      </div>
+                      <p className="font-medium text-foreground">{activity.title}</p>
                     </div>
                   </td>
-
-                  <td className="p-4">
-                    <div className="flex items-center gap-2.5">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
-                        {initials(log.adminId)}
-                      </span>
-                      <span className="text-foreground">{log.adminId}</span>
-                    </div>
-                  </td>
-
-                  <td className="p-4">
-                    <Badge variant={style.variant}>
-                      {log.entityType}
-                      {log.entityId ? ` · ${log.entityId}` : ""}
-                    </Badge>
-                  </td>
-
-                  <td className="p-4 text-muted">{log.createdAt}</td>
+                  <td className="p-4 text-muted">{activity.detail}</td>
+                  <td className="p-4 text-muted">{formatDate(activity.occurredAt)}</td>
                 </tr>
               );
             })}
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-10 text-center text-sm text-muted">
+                <td colSpan={3} className="p-10 text-center text-sm text-muted">
                   No matching activity found.
                 </td>
               </tr>

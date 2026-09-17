@@ -1,19 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { DATE_RANGES, type DateRangePreset } from "@/lib/dateRanges";
 
-const ranges = ["Today", "This Week", "This Month", "This Year"] as const;
-
-export default function AnalyticsFilters() {
-  const [range, setRange] = useState<(typeof ranges)[number]>("This Month");
-
+export default function AnalyticsFilters({
+  range,
+  onRangeChange,
+}: {
+  range: DateRangePreset;
+  onRangeChange: (range: DateRangePreset) => void;
+}) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      {ranges.map((r) => (
+      {DATE_RANGES.map((r) => (
         <button
           key={r}
           type="button"
-          onClick={() => setRange(r)}
+          onClick={() => onRangeChange(r)}
           className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
             range === r
               ? "bg-primary text-white shadow-sm hover:bg-primary-dark"
