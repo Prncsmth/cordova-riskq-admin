@@ -3,14 +3,17 @@
 import { useMemo } from "react";
 import { useEmergencies } from "@/hooks/useEmergencies";
 import { useEvacuationCenters } from "@/hooks/useEvacuationCenters";
+import { useResponderLocations } from "@/hooks/useResponderLocations";
 import type { LiveMapMarker } from "@/components/map/LiveMap";
 
-// Responder markers would need live location tracking (User has no lat/lng
-// field at all — mobile only uses on-device GPS transiently) — stays empty
-// rather than fabricated.
+// Responder markers only cover responders currently en route to a
+// non-terminal incident -- that's the only time the backend has a fresh
+// location for them (see useResponderLocations). Idle on-duty responders
+// intentionally have no marker.
 export function useLiveMapMarkers() {
   const { emergencies, loading: emergenciesLoading, error: emergenciesError } = useEmergencies();
   const { centers, loading: centersLoading, error: centersError } = useEvacuationCenters();
+  const { responders, loading: respondersLoading, error: respondersError } = useResponderLocations();
 
   const markers = useMemo<LiveMapMarker[]>(() => {
     const incidentMarkers: LiveMapMarker[] = emergencies
@@ -29,12 +32,19 @@ export function useLiveMapMarkers() {
       type: "evacuation",
     }));
 
-    return [...incidentMarkers, ...evacuationMarkers];
-  }, [emergencies, centers]);
+    const responderMarkers: LiveMapMarker[] = responders.map((r) => ({
+      id: r.responderId,
+      position: [r.latitude, r.longitude],
+      label: `${r.responderName} — En Route`,
+      type: "responder",
+    }));
+
+    return [...incidentMarkers, ...evacuationMarkers, ...responderMarkers];
+  }, [emergencies, centers, responders]);
 
   return {
     markers,
-    loading: emergenciesLoading || centersLoading,
-    error: emergenciesError ?? centersError,
+    loading: emergenciesLoading || centersLoading || respondersLoading,
+    error: emergenciesError ?? centersError ?? respondersError,
   };
 }
