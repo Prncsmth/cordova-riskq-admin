@@ -24,6 +24,7 @@ export type IncidentHistoryFilters = {
   endDate?: Date;
   category?: string;
   barangay?: string;
+  responderId?: string;
 };
 
 function buildQuery(filters: IncidentHistoryFilters): string {
@@ -32,6 +33,7 @@ function buildQuery(filters: IncidentHistoryFilters): string {
   if (filters.endDate) params.set("endDate", filters.endDate.toISOString());
   if (filters.category) params.set("category", filters.category);
   if (filters.barangay) params.set("barangay", filters.barangay);
+  if (filters.responderId) params.set("responderId", filters.responderId);
   return params.toString();
 }
 
@@ -44,7 +46,7 @@ export function useIncidentHistory(filters: IncidentHistoryFilters = {}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { startDate, endDate, category, barangay } = filters;
+  const { startDate, endDate, category, barangay, responderId } = filters;
   const startTime = startDate?.getTime();
   const endTime = endDate?.getTime();
 
@@ -63,6 +65,7 @@ export function useIncidentHistory(filters: IncidentHistoryFilters = {}) {
       endDate: endTime ? new Date(endTime) : undefined,
       category,
       barangay,
+      responderId,
     });
 
     apiFetch<{ success: true; records: HistoryRecord[] }>(`/admin/history?${query}`, { token })
@@ -81,7 +84,7 @@ export function useIncidentHistory(filters: IncidentHistoryFilters = {}) {
     return () => {
       cancelled = true;
     };
-  }, [token, startTime, endTime, category, barangay]);
+  }, [token, startTime, endTime, category, barangay, responderId]);
 
   return { records, loading, error };
 }
