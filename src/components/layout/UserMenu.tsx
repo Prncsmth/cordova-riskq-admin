@@ -4,10 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, LogOut, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { initials } from "@/lib/utils";
 
 export default function UserMenu() {
   const router = useRouter();
-  const { logout: clearSession } = useAuth();
+  const { user, logout: clearSession } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -26,6 +27,8 @@ export default function UserMenu() {
     router.push("/login");
   }
 
+  const displayName = user?.name || user?.email || "Admin";
+
   return (
     <div ref={ref} className="relative">
       <button
@@ -33,12 +36,12 @@ export default function UserMenu() {
         className="flex items-center gap-3 rounded-xl px-2 py-1.5 text-left transition-all duration-150 hover:bg-primary-light/40 active:scale-[0.98]"
       >
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white shadow-xs">
-          AU
+          {initials(displayName)}
         </span>
 
         <span className="hidden sm:block">
-          <span className="block text-sm font-semibold text-foreground">Admin User</span>
-          <span className="block text-xs text-text-tertiary">Super Admin</span>
+          <span className="block text-sm font-semibold text-foreground">{displayName}</span>
+          <span className="block text-xs text-text-tertiary">Administrator</span>
         </span>
 
         <ChevronDown size={16} className="hidden text-text-tertiary sm:block" />
@@ -47,8 +50,8 @@ export default function UserMenu() {
       {open && (
         <div className="glass-strong absolute right-0 z-50 mt-2 w-52 origin-top-right rounded-2xl border border-(--glass-border) p-1.5 shadow-lg">
           <div className="border-b border-(--glass-border) px-3 py-2 sm:hidden">
-            <p className="text-sm font-semibold text-foreground">Admin User</p>
-            <p className="text-xs text-text-tertiary">Super Admin</p>
+            <p className="text-sm font-semibold text-foreground">{displayName}</p>
+            <p className="text-xs text-text-tertiary">Administrator</p>
           </div>
 
           <button

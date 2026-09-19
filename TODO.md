@@ -23,6 +23,9 @@ Note: the Witnesses and Equipment/Resources pages (and their sidebar entries) we
 - [x] SOS Alerts — real via the already-existing `GET /admin/sos-alerts` (backend route/controller/service were already built, just unused by the frontend). `SosAlert.status` itself never changes after creation, so the New/Acknowledged/Resolved badge is derived from the linked Incident's status instead (`pending` -> New, `lobby`/`on_the_way`/`arrived` -> Acknowledged, `completed`/`cancelled` -> Resolved), same pattern as `useEmergencies.ts`. Stat cards on the page are now real counts.
 - [x] Announcements — already fully real (`useAnnouncements.ts`: list/create/delete against `GET`/`POST`/`DELETE /admin/announcements`, including the "All Users" audience triggering real citizen notifications via `notificationService.createForAllCitizens`). This tracker had it miscategorized as Mock; no code changes were needed, just correcting the tracker.
 - [x] Users/Responders/SOS Alerts/Announcements pagination — all four pages now fetch one page at a time with server-side search/filtering (`GET /admin/users`, `/admin/sos-alerts`, `/admin/announcements` all gained `page`/`limit`/`search` + resource-specific filters), replacing the earlier fetch-everything-and-filter-client-side pattern. Shared `<Pagination>` component + `usePaginationState` hook. Emergencies/Incident Reports and Evacuation Centers were deliberately excluded (see `docs/superpowers/specs/2026-09-16-admin-pagination-design.md`).
+- [x] `UserMenu` display name — real, shows the logged-in admin's name/initials (`useAuth().user`) instead of hardcoded "Admin User" / "Super Admin"
+- [x] Settings: Admin Profile — real, inline name edit via `PUT /users/me`
+- [x] Settings: Security — real change-password flow via `POST /users/change-password`; logout now goes through `useAuth().logout()` instead of a raw localStorage key
 
 ## Mock (static UI only, no backend wiring)
 
@@ -31,15 +34,13 @@ Note: the Witnesses and Equipment/Resources pages (and their sidebar entries) we
 - [ ] Reports
 - [ ] Audit Logs
 - [ ] Evacuation Centers
-- [ ] Settings
-- [ ] Notifications (admin-facing)
+- [ ] Settings: Notification/Emergency toggles ("Browser Push Notifications", "Emergency Notifications") — local component state only, no backend preference model exists yet. Other toggles with no plausible backend concept (Email, SMS, Responder Alerts, Live Location Tracking) were removed rather than left as fake switches.
 
 ## Known gaps
 
 - [ ] Live Map's responder layer has no data source at all — `User` has no lat/lng field (mobile only uses on-device GPS transiently, nothing persisted); would need real backend location tracking, not just a new endpoint
 - [ ] Live Map's evacuation-center layer has no data source — no backend model exists for evacuation centers yet
 - [ ] Responder detail page has no assignment/incident history — deliberately deferred (see `docs/superpowers/specs/2026-08-23-admin-role-management-design.md`); needs a new backend endpoint over `IncidentResponder`
-- [ ] `UserMenu`'s "Admin User" / "Super Admin" display name isn't wired to the real logged-in admin
 - [ ] The admin-facing `GET /incidents/:id` response (`buildResponderFacingIncident`) doesn't include `source` or `reporterId` at all — `useEmergency(id)` (the detail hook) silently gets `source: "report"` (defaulted) and `userId: undefined` for every incident viewed via detail. Only affects the single-incident detail view; the list endpoint (`GET /incidents`, used everywhere else) has both fields.
 
 ## Next steps (pick one — each is independent)

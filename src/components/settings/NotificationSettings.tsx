@@ -1,4 +1,4 @@
-import { Mail, MessageSquare, MonitorSmartphone } from "lucide-react";
+import { MonitorSmartphone } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Switch from "@/components/ui/Switch";
 import SettingRow from "@/components/settings/SettingRow";
@@ -11,22 +11,6 @@ export default function NotificationSettings() {
       </h2>
 
       <Card className="divide-y divide-border/70">
-        <SettingRow
-          icon={Mail}
-          label="Email Notifications"
-          description="Daily summaries and critical system alerts"
-        >
-          <Switch defaultChecked label="Email Notifications" />
-        </SettingRow>
-
-        <SettingRow
-          icon={MessageSquare}
-          label="SMS Alerts"
-          description="Text message alerts for high-priority SOS activity"
-        >
-          <Switch label="SMS Alerts" />
-        </SettingRow>
-
         <SettingRow
           icon={MonitorSmartphone}
           label="Browser Push Notifications"

@@ -71,5 +71,14 @@ export function useAuth() {
     setUser(null);
   }, []);
 
-  return { authenticated, isHydrated, token, user, login, logout };
+  const updateUser = useCallback((patch: Partial<Pick<User, "name" | "email">>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...patch };
+      localStorage.setItem(USER_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  return { authenticated, isHydrated, token, user, login, logout, updateUser };
 }
