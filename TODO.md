@@ -26,24 +26,23 @@ Note: the Witnesses and Equipment/Resources pages (and their sidebar entries) we
 - [x] `UserMenu` display name — real, shows the logged-in admin's name/initials (`useAuth().user`) instead of hardcoded "Admin User" / "Super Admin"
 - [x] Settings: Admin Profile — real, inline name edit via `PUT /users/me`
 - [x] Settings: Security — real change-password flow via `POST /users/change-password`; logout now goes through `useAuth().logout()` instead of a raw localStorage key
+- [x] Reports — already fully real (`useIncidentHistory()` -> `GET /admin/history` with `startDate`/`endDate`/`category`/`barangay`, all backed by `historyService.list`), plus computed stats (Total Incidents, Avg Response Time, Resolution Rate) and CSV export. Not a duplicate of Incident Reports: this is a date-ranged analytics/export view over terminal history, Incident Reports is the operational list of individual incident reports. This tracker had it miscategorized as Mock (same situation as Announcements above); no code changes were needed, just correcting the tracker.
+- [x] Evacuation Centers — already fully real on both page and dashboard widget. Backend has a real `EvacuationCenter` Prisma model (migration `20260915165423_add_evacuation_center`, seeded via `prisma/seed.ts`) with `GET /evacuation-centers` (list) and `PATCH /admin/evacuation-centers/:id` (update status/facilities, also pushes to the admin activity feed). Frontend's `useEvacuationCenters()` hook backs both the `/evacuation-centers` page (with update controls) and the Dashboard's `EvacuationCenterStatus` widget (what this tracker meant by "Evacuation Center Capacity" — there's no numeric capacity field, just open/full status). This tracker had it entirely miscategorized as Mock/no-backend-model; no code changes were needed, just correcting the tracker. The one real gap is the Live Map not plotting evacuation markers — see Known gaps.
 
 ## Mock (static UI only, no backend wiring)
 
-- [ ] Dashboard: Evacuation Center Capacity — blocked on the same missing `EvacuationCenter` backend model as the full Evacuation Centers page (see Next steps)
 - [ ] Analytics
-- [ ] Reports
 - [ ] Audit Logs
-- [ ] Evacuation Centers
 - [ ] Settings: Notification/Emergency toggles ("Browser Push Notifications", "Emergency Notifications") — local component state only, no backend preference model exists yet. Other toggles with no plausible backend concept (Email, SMS, Responder Alerts, Live Location Tracking) were removed rather than left as fake switches.
 
 ## Known gaps
 
 - [ ] Live Map's responder layer has no data source at all — `User` has no lat/lng field (mobile only uses on-device GPS transiently, nothing persisted); would need real backend location tracking, not just a new endpoint
-- [ ] Live Map's evacuation-center layer has no data source — no backend model exists for evacuation centers yet
+- [ ] Live Map's evacuation-center layer renders empty — `useLiveMapMarkers()` only reads from `useEmergencies()`; a real `EvacuationCenter` backend model and `useEvacuationCenters()` hook already exist (see Real, above) but aren't merged in yet. Small wiring fix, not a missing-model problem.
 - [ ] Responder detail page has no assignment/incident history — deliberately deferred (see `docs/superpowers/specs/2026-08-23-admin-role-management-design.md`); needs a new backend endpoint over `IncidentResponder`
 - [ ] The admin-facing `GET /incidents/:id` response (`buildResponderFacingIncident`) doesn't include `source` or `reporterId` at all — `useEmergency(id)` (the detail hook) silently gets `source: "report"` (defaulted) and `userId: undefined` for every incident viewed via detail. Only affects the single-incident detail view; the list endpoint (`GET /incidents`, used everywhere else) has both fields.
 
 ## Next steps (pick one — each is independent)
 
-- Reports page — check whether it's a duplicate of Incident Reports or something distinct (e.g. generated/exportable reports); `GET /admin/history`'s filters (date range, category, barangay) may already cover it
-- Evacuation Centers has no backend model yet — would need schema design first
+- Wire evacuation centers into the Live Map (`useLiveMapMarkers()` merge — see Known gaps)
+- Analytics / Audit Logs — scope what each should actually show before wiring anything
