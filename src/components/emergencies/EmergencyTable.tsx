@@ -147,7 +147,7 @@ export default function EmergencyTable({
                     </div>
                   </td>
                   <td className="p-4 text-foreground">{emergency.locationName}</td>
-                  <td className="p-4 text-muted">{emergency.responderId ?? "Unassigned"}</td>
+                  <td className="p-4 text-muted">{emergency.responderName ?? "Unassigned"}</td>
                   <td className="p-4">
                     <Badge variant={status.variant} solid={status.solid}>
                       {emergency.status}

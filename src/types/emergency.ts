@@ -23,6 +23,7 @@ export interface Emergency {
   source: "report" | "sos";
   userId: string;
   responderId?: string;
+  responderName?: string;
   createdAt: string;
   updatedAt: string;
 }

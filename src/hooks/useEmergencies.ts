@@ -20,6 +20,11 @@ type RawIncident = {
   status: string;
   reporterId: string;
   acceptedByResponderId?: string | null;
+  // The full active roster, each with a real name -- acceptedByResponderId
+  // is just an ID (a holdover from before the multi-responder roster
+  // replaced the old single-acceptor model); this is what actually lets a
+  // name be shown instead of that raw ID.
+  responders?: { id: string; name: string; status: string }[];
   createdAt: string;
   updatedAt: string;
 };
@@ -34,6 +39,8 @@ const STATUS_TO_EMERGENCY_STATUS: Record<string, EmergencyStatus> = {
 };
 
 function toEmergency(raw: RawIncident): Emergency {
+  const acceptedResponder = raw.responders?.find((r) => r.id === raw.acceptedByResponderId);
+
   return {
     id: raw.id,
     type: categoryToEmergencyType(raw.category),
@@ -45,6 +52,7 @@ function toEmergency(raw: RawIncident): Emergency {
     source: raw.source === "sos" ? "sos" : "report",
     userId: raw.reporterId,
     responderId: raw.acceptedByResponderId ?? undefined,
+    responderName: acceptedResponder?.name,
     createdAt: raw.createdAt,
     updatedAt: raw.updatedAt,
   };

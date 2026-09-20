@@ -76,7 +76,7 @@ export default function EmergencyDetails({
 
         <div className="mt-5">
           {emergency.responderId ? (
-            <p className="font-medium">{emergency.responderId}</p>
+            <p className="font-medium">{emergency.responderName ?? "Responder"}</p>
           ) : (
             <p className="text-sm text-muted">No responder assigned yet.</p>
           )}

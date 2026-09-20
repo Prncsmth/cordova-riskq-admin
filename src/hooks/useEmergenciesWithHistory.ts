@@ -19,6 +19,7 @@ function toEmergency(record: HistoryRecord): Emergency {
     source: record.source === "sos" ? "sos" : "report",
     userId: record.reporter.id,
     responderId: respondedBy?.id,
+    responderName: respondedBy?.name,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
