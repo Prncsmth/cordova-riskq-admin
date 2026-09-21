@@ -52,9 +52,7 @@ export default function NotificationsPage() {
 
       <div className="grid gap-6 sm:grid-cols-3">
         <Card className="flex items-center gap-4">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
-            <Bell size={19} />
-          </span>
+          <Bell size={22} className="shrink-0 text-primary" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Total</p>
             <p className="mt-1 text-2xl font-bold text-foreground">{items.length}</p>
@@ -62,14 +60,7 @@ export default function NotificationsPage() {
         </Card>
 
         <Card className="flex items-center gap-4">
-          <span className="relative flex h-11 w-11 shrink-0 items-center justify-center">
-            {unreadCount > 0 && (
-              <span className="absolute inline-flex h-11 w-11 animate-ping rounded-full bg-danger-light opacity-60" />
-            )}
-            <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-danger-light text-danger">
-              <Bell size={19} />
-            </span>
-          </span>
+          <Bell size={22} className="shrink-0 text-danger" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Unread</p>
             <p className="mt-1 text-2xl font-bold text-foreground">{unreadCount}</p>
@@ -77,9 +68,7 @@ export default function NotificationsPage() {
         </Card>
 
         <Card className="flex items-center gap-4">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-success-light text-success">
-            <MailOpen size={19} />
-          </span>
+          <MailOpen size={22} className="shrink-0 text-success" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Read</p>
             <p className="mt-1 text-2xl font-bold text-foreground">{items.length - unreadCount}</p>
@@ -135,9 +124,7 @@ export default function NotificationsPage() {
                   onClick={() => markRead(activity)}
                   className={`flex items-start gap-3 p-4 transition-colors hover:bg-background/50 ${read ? "" : "bg-primary-light/10"}`}
                 >
-                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${style.bg}`}>
-                    <Icon size={16} className={style.color} />
-                  </span>
+                  <Icon size={20} className={`mt-0.5 shrink-0 ${style.color}`} />
 
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-foreground">{activity.title}</p>

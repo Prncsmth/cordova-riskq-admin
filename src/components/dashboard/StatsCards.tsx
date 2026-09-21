@@ -19,28 +19,24 @@ export default function StatsCards() {
       title: "Active Incidents",
       value: activeIncidents,
       color: "text-danger",
-      bg: "bg-danger-light",
       icon: AlertTriangle,
     },
     {
       title: "SOS Alerts Today",
       value: sosAlertsToday,
       color: "text-warning",
-      bg: "bg-warning-light",
       icon: BellRing,
     },
     {
       title: "Total Responders",
       value: summary?.total ?? 0,
       color: "text-success",
-      bg: "bg-success-light",
       icon: ShieldCheck,
     },
     {
       title: "People Assisted",
       value: null,
       color: "text-info",
-      bg: "bg-info-light",
       icon: HeartHandshake,
     },
   ];
@@ -75,9 +71,7 @@ export default function StatsCards() {
                 </p>
               </div>
 
-              <div className={`rounded-full p-3 ring-1 ring-black/3 ${card.bg}`}>
-                <Icon size={22} className={card.color} />
-              </div>
+              <Icon size={26} className={`shrink-0 ${card.color}`} />
             </div>
           </motion.div>
         );

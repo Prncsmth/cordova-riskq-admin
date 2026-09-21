@@ -106,13 +106,8 @@ export default function SosAlertTable({
                 >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center">
-                        {alert.status === "New" && (
-                          <span className="absolute inline-flex h-9 w-9 animate-ping rounded-full bg-danger opacity-30" />
-                        )}
-                        <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white shadow-xs">
-                          {initials(alert.userName)}
-                        </span>
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white shadow-xs">
+                        {initials(alert.userName)}
                       </span>
                       <div className="min-w-0">
                         <p className="font-medium text-foreground">{alert.userName}</p>

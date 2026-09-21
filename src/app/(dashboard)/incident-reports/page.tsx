@@ -9,10 +9,10 @@ export default function IncidentReportsPage() {
   const { reports, loading, error } = useIncidentReports();
 
   const stats = [
-    { label: "Total Reports", value: reports.length, icon: FileText, color: "text-primary", bg: "bg-primary-light" },
-    { label: "Active", value: reports.filter((r) => r.status === "Active").length, icon: Clock, color: "text-danger", bg: "bg-danger-light" },
-    { label: "Responding", value: reports.filter((r) => r.status === "Responding").length, icon: Radio, color: "text-warning", bg: "bg-warning-light" },
-    { label: "Resolved", value: reports.filter((r) => r.status === "Resolved").length, icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
+    { label: "Total Reports", value: reports.length, icon: FileText, color: "text-primary" },
+    { label: "Active", value: reports.filter((r) => r.status === "Active").length, icon: Clock, color: "text-danger" },
+    { label: "Responding", value: reports.filter((r) => r.status === "Responding").length, icon: Radio, color: "text-warning" },
+    { label: "Resolved", value: reports.filter((r) => r.status === "Resolved").length, icon: CheckCircle2, color: "text-success" },
   ];
 
   return (
@@ -29,9 +29,7 @@ export default function IncidentReportsPage() {
           const Icon = stat.icon;
           return (
             <Card key={stat.label} className="flex items-center gap-4">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${stat.bg} ${stat.color}`}>
-                <Icon size={19} />
-              </span>
+              <Icon size={22} className={`shrink-0 ${stat.color}`} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{stat.label}</p>
                 <p className="mt-1 text-2xl font-bold text-foreground">{stat.value}</p>

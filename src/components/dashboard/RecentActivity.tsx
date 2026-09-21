@@ -11,9 +11,7 @@ export default function RecentActivity() {
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
       <div className="flex items-center justify-between border-b border-border/70 p-5">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
-            <History size={15} />
-          </span>
+          <History size={18} className="shrink-0 text-primary" />
           <h2 className="text-lg font-semibold text-foreground">Recent Activity</h2>
         </div>
         <Link href="/audit-logs" className="text-sm font-medium text-primary hover:text-primary-dark">
@@ -30,12 +28,10 @@ export default function RecentActivity() {
       ) : (
         <div className="max-h-[420px] divide-y divide-border/70 overflow-y-auto">
           {activities.map((activity, index) => {
-            const { icon: Icon, color, bg } = ACTIVITY_TYPE_STYLE[activity.type];
+            const { icon: Icon, color } = ACTIVITY_TYPE_STYLE[activity.type];
             return (
               <div key={index} className="flex items-start gap-3 p-4 transition-colors hover:bg-background/50">
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${bg}`}>
-                  <Icon size={16} className={color} />
-                </span>
+                <Icon size={20} className={`mt-0.5 shrink-0 ${color}`} />
 
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-foreground">{activity.title}</p>

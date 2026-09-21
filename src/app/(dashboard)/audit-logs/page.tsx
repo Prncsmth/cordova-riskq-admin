@@ -16,9 +16,9 @@ export default function AuditLogsPage() {
   const lastEvent = activities.length > 0 ? timeAgo(activities[0].occurredAt) : "—";
 
   const stats = [
-    { label: "Events Today", value: eventsToday, icon: ScrollText, color: "text-primary", bg: "bg-primary-light" },
-    { label: "SOS Alerts Today", value: sosAlertsToday, icon: BellRing, color: "text-danger", bg: "bg-danger-light" },
-    { label: "Last Event", value: lastEvent, icon: Clock, color: "text-success", bg: "bg-success-light" },
+    { label: "Events Today", value: eventsToday, icon: ScrollText, color: "text-primary" },
+    { label: "SOS Alerts Today", value: sosAlertsToday, icon: BellRing, color: "text-danger" },
+    { label: "Last Event", value: lastEvent, icon: Clock, color: "text-success" },
   ];
 
   return (
@@ -35,9 +35,7 @@ export default function AuditLogsPage() {
           const Icon = stat.icon;
           return (
             <Card key={stat.label} className="flex items-center gap-4">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${stat.bg} ${stat.color}`}>
-                <Icon size={19} />
-              </span>
+              <Icon size={22} className={`shrink-0 ${stat.color}`} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{stat.label}</p>
                 <p className="mt-1 text-2xl font-bold text-foreground">{stat.value}</p>

@@ -5,13 +5,28 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import { useUser } from "@/hooks/useUser";
-import { formatDate } from "@/lib/utils";
+import { formatDate, timeAgo } from "@/lib/utils";
 import type { User } from "@/types/user";
 
 const ROLE_BADGE_VARIANT: Record<User["role"], "info" | "success" | "default"> = {
   admin: "info",
   responder: "success",
   citizen: "default",
+};
+
+// Solid-fill counterparts to ROLE_BADGE_VARIANT's soft badge tints, for the
+// avatar circle -- mirrors Badge's own solidStyles color choices so the two
+// stay visually paired.
+const ROLE_AVATAR_STYLE: Record<User["role"], string> = {
+  admin: "bg-info",
+  responder: "bg-success",
+  citizen: "bg-muted",
+};
+
+const ROLE_LABEL: Record<User["role"], string> = {
+  admin: "Admin",
+  responder: "Responder",
+  citizen: "Citizen",
 };
 
 function initials(name: string) {
@@ -55,53 +70,47 @@ export default function UserDetails({ id }: { id: string }) {
     <div className="grid gap-6">
       <Card>
         <div className="flex flex-wrap items-center gap-5">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-xl font-bold text-white shadow-xs ring-1 ring-primary/10">
+          <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-bold text-white shadow-xs ${ROLE_AVATAR_STYLE[user.role]}`}>
             {initials(user.name)}
           </div>
 
           <div className="min-w-0 flex-1">
             <h2 className="text-lg font-semibold text-foreground">{user.name}</h2>
-            <p className="text-sm text-muted">{user.id}</p>
+            <p className="text-sm text-muted">
+              {ROLE_LABEL[user.role]} &middot; Joined {timeAgo(user.createdAt)}
+            </p>
           </div>
 
           <Badge variant={ROLE_BADGE_VARIANT[user.role]}>{user.role}</Badge>
         </div>
 
-        <div className="mt-8 grid gap-5 sm:grid-cols-2">
-          <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-info-light text-info">
-              <Mail size={15} />
-            </span>
+        <div className="mt-8 grid gap-5 border-t border-border/70 pt-6 sm:grid-cols-2">
+          <div className="flex items-start gap-2.5">
+            <Mail size={16} className="mt-0.5 shrink-0 text-muted" />
             <div>
               <p className="text-xs text-muted">Email</p>
               <p className="text-sm font-medium text-foreground">{user.email}</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-success-light text-success">
-              <Phone size={15} />
-            </span>
+          <div className="flex items-start gap-2.5">
+            <Phone size={16} className="mt-0.5 shrink-0 text-muted" />
             <div>
               <p className="text-xs text-muted">Phone</p>
               <p className="text-sm font-medium text-foreground">{user.phone ?? "Not provided"}</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-warning-light text-warning">
-              <Calendar size={15} />
-            </span>
+          <div className="flex items-start gap-2.5">
+            <Calendar size={16} className="mt-0.5 shrink-0 text-muted" />
             <div>
               <p className="text-xs text-muted">Joined</p>
               <p className="text-sm font-medium text-foreground">{formatDate(user.createdAt)}</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
-              <Hash size={15} />
-            </span>
+          <div className="flex items-start gap-2.5">
+            <Hash size={16} className="mt-0.5 shrink-0 text-muted" />
             <div>
               <p className="text-xs text-muted">User ID</p>
               <p className="text-sm font-medium text-foreground">{user.id}</p>

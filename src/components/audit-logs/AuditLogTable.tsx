@@ -109,9 +109,7 @@ export default function AuditLogTable({
                 <tr key={index} className="transition-colors hover:bg-background/70">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${style.bg}`}>
-                        <Icon size={16} className={style.color} />
-                      </span>
+                      <Icon size={20} className={`shrink-0 ${style.color}`} />
                       <p className="font-medium text-foreground">{activity.title}</p>
                     </div>
                   </td>

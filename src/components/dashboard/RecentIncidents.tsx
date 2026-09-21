@@ -21,9 +21,7 @@ export default function RecentIncidents() {
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
       <div className="flex items-center justify-between border-b border-border/70 p-5">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-danger-light text-danger">
-            <Siren size={15} />
-          </span>
+          <Siren size={18} className="shrink-0 text-danger" />
           <h2 className="text-lg font-semibold text-foreground">Recent Incidents</h2>
         </div>
         <Link href="/emergencies" className="text-sm font-medium text-primary hover:text-primary-dark">

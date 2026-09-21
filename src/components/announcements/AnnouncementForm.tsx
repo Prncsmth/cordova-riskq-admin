@@ -36,9 +36,7 @@ export default function AnnouncementForm({
   return (
     <Card>
       <div className="flex items-center gap-2.5">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
-          <Megaphone size={15} />
-        </span>
+        <Megaphone size={18} className="shrink-0 text-primary" />
         <h2 className="font-semibold text-foreground">Create Announcement</h2>
       </div>
 

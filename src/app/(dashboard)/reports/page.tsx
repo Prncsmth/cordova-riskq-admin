@@ -27,9 +27,9 @@ export default function ReportsPage() {
   });
 
   const stats = [
-    { label: "Total Incidents", value: records.length, icon: Siren, color: "text-danger", bg: "bg-danger-light" },
-    { label: "Avg. Response Time", value: computeAvgResponseTime(records), icon: Timer, color: "text-info", bg: "bg-info-light" },
-    { label: "Resolution Rate", value: computeResolutionRate(records), icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
+    { label: "Total Incidents", value: records.length, icon: Siren, color: "text-danger" },
+    { label: "Avg. Response Time", value: computeAvgResponseTime(records), icon: Timer, color: "text-info" },
+    { label: "Resolution Rate", value: computeResolutionRate(records), icon: CheckCircle2, color: "text-success" },
   ];
 
   function handleExport() {
@@ -74,9 +74,7 @@ export default function ReportsPage() {
           const Icon = stat.icon;
           return (
             <Card key={stat.label} className="flex items-center gap-4">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${stat.bg} ${stat.color}`}>
-                <Icon size={19} />
-              </span>
+              <Icon size={22} className={`shrink-0 ${stat.color}`} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{stat.label}</p>
                 <p className="mt-1 text-2xl font-bold text-foreground">{stat.value}</p>

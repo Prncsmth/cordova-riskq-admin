@@ -12,8 +12,8 @@ export default function UsersPage() {
   const totalPages = Math.max(1, Math.ceil(total / pagination.pageSize));
 
   const stats = [
-    { label: "Total Users", value: total, icon: UsersIcon, color: "text-primary", bg: "bg-primary-light" },
-    { label: "New This Week", value: newThisWeek, icon: UserPlus, color: "text-info", bg: "bg-info-light" },
+    { label: "Total Users", value: total, icon: UsersIcon, color: "text-primary" },
+    { label: "New This Week", value: newThisWeek, icon: UserPlus, color: "text-info" },
   ];
 
   return (
@@ -31,9 +31,7 @@ export default function UsersPage() {
           const Icon = stat.icon;
           return (
             <Card key={stat.label} className="flex items-center gap-4">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${stat.bg} ${stat.color}`}>
-                <Icon size={19} />
-              </span>
+              <Icon size={22} className={`shrink-0 ${stat.color}`} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{stat.label}</p>
                 <p className="mt-1 text-2xl font-bold text-foreground">{stat.value}</p>

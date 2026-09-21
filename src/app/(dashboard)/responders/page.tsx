@@ -34,9 +34,9 @@ export default function RespondersPage() {
   }
 
   const statCards = [
-    { label: "Total Responders", value: summary?.total ?? 0, icon: ShieldCheck, color: "text-primary", bg: "bg-primary-light" },
-    { label: "On Duty", value: summary?.onDuty ?? 0, icon: ShieldHalf, color: "text-success", bg: "bg-success-light" },
-    { label: "Off Duty", value: summary?.offDuty ?? 0, icon: ShieldOff, color: "text-muted", bg: "bg-background" },
+    { label: "Total Responders", value: summary?.total ?? 0, icon: ShieldCheck, color: "text-primary" },
+    { label: "On Duty", value: summary?.onDuty ?? 0, icon: ShieldHalf, color: "text-success" },
+    { label: "Off Duty", value: summary?.offDuty ?? 0, icon: ShieldOff, color: "text-muted" },
   ];
 
   return (
@@ -54,9 +54,7 @@ export default function RespondersPage() {
           const Icon = card.icon;
           return (
             <Card key={card.label} className="flex items-center gap-4">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${card.bg} ${card.color}`}>
-                <Icon size={19} />
-              </span>
+              <Icon size={22} className={`shrink-0 ${card.color}`} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{card.label}</p>
                 <p className="mt-1 text-2xl font-bold text-foreground">{card.value}</p>
