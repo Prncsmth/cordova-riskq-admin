@@ -16,14 +16,14 @@ const statusVariant = {
   Cancelled: "default",
 } as const;
 
-const typeStyles: Record<string, { icon: LucideIcon; tile: string }> = {
-  Fire: { icon: Flame, tile: "bg-danger-light text-danger" },
-  Disaster: { icon: CloudRain, tile: "bg-info-light text-info" },
-  Accident: { icon: Car, tile: "bg-warning-light text-warning" },
-  Medical: { icon: HeartPulse, tile: "bg-success-light text-success" },
+const typeStyles: Record<string, { icon: LucideIcon; color: string }> = {
+  Fire: { icon: Flame, color: "text-danger" },
+  Disaster: { icon: CloudRain, color: "text-info" },
+  Accident: { icon: Car, color: "text-warning" },
+  Medical: { icon: HeartPulse, color: "text-success" },
 };
 
-const defaultTypeStyle = { icon: FileText, tile: "bg-background text-muted" };
+const defaultTypeStyle = { icon: FileText, color: "text-muted" };
 
 const statusFilters = ["All", "Active", "Responding", "Resolved", "Cancelled"] as const;
 
@@ -130,9 +130,7 @@ export default function IncidentReportTable({
                 <tr key={report.id} className="transition-colors hover:bg-background/70">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${style.tile}`}>
-                        <Icon size={16} />
-                      </span>
+                      <Icon size={20} className={`shrink-0 ${style.color}`} />
                       <div className="min-w-0">
                         <p className="font-medium text-foreground">{report.type}</p>
                         <Link

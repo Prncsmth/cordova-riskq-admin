@@ -2,29 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, HeartPulse, Flame, Car, ShieldAlert, CloudRain, FileQuestion } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Search } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import type { Emergency } from "@/types/emergency";
 import { timeAgo } from "@/lib/utils";
-
-const statusStyle = {
-  Active: { variant: "danger" as const, solid: true },
-  Responding: { variant: "warning" as const, solid: false },
-  Resolved: { variant: "success" as const, solid: false },
-  Cancelled: { variant: "default" as const, solid: false },
-};
-
-const typeStyles: Record<string, { icon: LucideIcon; tile: string }> = {
-  Medical: { icon: HeartPulse, tile: "bg-success-light text-success" },
-  Fire: { icon: Flame, tile: "bg-danger-light text-danger" },
-  Accident: { icon: Car, tile: "bg-warning-light text-warning" },
-  Crime: { icon: ShieldAlert, tile: "bg-primary-light text-primary" },
-  Disaster: { icon: CloudRain, tile: "bg-info-light text-info" },
-};
-
-const defaultTypeStyle = { icon: FileQuestion, tile: "bg-background text-muted" };
+import { emergencyTypeStyles, defaultEmergencyTypeStyle, emergencyStatusStyle } from "@/lib/emergencyStyles";
 
 const statusFilters = ["All", "Active", "Responding", "Resolved", "Cancelled"] as const;
 
@@ -124,22 +107,15 @@ export default function EmergencyTable({
           </thead>
           <tbody className="divide-y divide-border/70">
             {filtered.map((emergency) => {
-              const style = typeStyles[emergency.type] ?? defaultTypeStyle;
+              const style = emergencyTypeStyles[emergency.type] ?? defaultEmergencyTypeStyle;
               const Icon = style.icon;
-              const status = statusStyle[emergency.status];
+              const status = emergencyStatusStyle[emergency.status];
 
               return (
                 <tr key={emergency.id} className="transition-colors hover:bg-background/70">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center">
-                        {emergency.status === "Active" && (
-                          <span className="absolute inline-flex h-9 w-9 animate-ping rounded-full bg-danger opacity-25" />
-                        )}
-                        <span className={`relative flex h-9 w-9 items-center justify-center rounded-full ${style.tile}`}>
-                          <Icon size={16} />
-                        </span>
-                      </span>
+                      <Icon size={20} className={`shrink-0 ${style.color}`} />
                       <div className="min-w-0">
                         <p className="font-medium text-foreground">{emergency.type}</p>
                         <p className="text-xs text-muted">{emergency.id} &middot; {timeAgo(emergency.createdAt)}</p>

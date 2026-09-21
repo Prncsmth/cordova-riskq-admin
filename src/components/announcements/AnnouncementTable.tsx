@@ -110,9 +110,7 @@ export default function AnnouncementTable({
         <div className="divide-y divide-border/70">
           {announcements.map((a) => (
             <div key={a.id} className="flex items-start gap-3 p-4 transition-colors hover:bg-background/50">
-              <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${a.priority === "Urgent" ? "bg-danger-light text-danger" : "bg-primary-light text-primary"}`}>
-                <Megaphone size={16} />
-              </span>
+              <Megaphone size={20} className={`shrink-0 ${a.priority === "Urgent" ? "text-danger" : "text-primary"}`} />
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">

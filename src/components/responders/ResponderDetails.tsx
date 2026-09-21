@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Mail, Phone, Building2, Calendar, Siren, History } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
@@ -9,7 +10,16 @@ import { useEmergencies } from "@/hooks/useEmergencies";
 import { useIncidentHistory } from "@/hooks/useIncidentHistory";
 import { categoryToEmergencyType } from "@/lib/incidentCategory";
 import { formatMinutes } from "@/lib/incidentStats";
-import { formatDate } from "@/lib/utils";
+import { formatDate, timeAgo } from "@/lib/utils";
+
+function initials(name: string) {
+  return name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 export default function ResponderDetails({
   id,
@@ -50,50 +60,67 @@ export default function ResponderDetails({
   return (
     <div className="space-y-6">
       <Card>
-        <h2 className="font-semibold">Responder Information</h2>
-
-        <div className="mt-5 space-y-4">
-          <div>
-            <p className="text-xs text-muted">Responder ID</p>
-            <p>{responder.id}</p>
+        <div className="flex flex-wrap items-center gap-5">
+          <div
+            className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-bold text-white shadow-xs ${
+              responder.isOnDuty ? "bg-success" : "bg-muted"
+            }`}
+          >
+            {initials(responder.name)}
           </div>
 
-          <div>
-            <p className="text-xs text-muted">Name</p>
-            <p>{responder.name}</p>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-lg font-semibold text-foreground">{responder.name}</h2>
+            <p className="text-sm text-muted">
+              {responder.unit ?? "Unclassified"} &middot; Joined {timeAgo(responder.createdAt)}
+            </p>
           </div>
 
-          <div>
-            <p className="text-xs text-muted">Email</p>
-            <p>{responder.email}</p>
+          <Badge variant={responder.isOnDuty ? "success" : "default"}>
+            {responder.isOnDuty ? "On Duty" : "Off Duty"}
+          </Badge>
+        </div>
+
+        <div className="mt-8 grid gap-5 border-t border-border/70 pt-6 sm:grid-cols-2">
+          <div className="flex items-start gap-2.5">
+            <Mail size={16} className="mt-0.5 shrink-0 text-muted" />
+            <div>
+              <p className="text-xs text-muted">Email</p>
+              <p className="text-sm font-medium text-foreground">{responder.email}</p>
+            </div>
           </div>
 
-          <div>
-            <p className="text-xs text-muted">Contact</p>
-            <p>{responder.phone ?? "Not provided"}</p>
+          <div className="flex items-start gap-2.5">
+            <Phone size={16} className="mt-0.5 shrink-0 text-muted" />
+            <div>
+              <p className="text-xs text-muted">Contact</p>
+              <p className="text-sm font-medium text-foreground">{responder.phone ?? "Not provided"}</p>
+            </div>
           </div>
 
-          <div>
-            <p className="text-xs text-muted">Duty Status</p>
-            <Badge variant={responder.isOnDuty ? "success" : "default"}>
-              {responder.isOnDuty ? "On Duty" : "Off Duty"}
-            </Badge>
+          <div className="flex items-start gap-2.5">
+            <Building2 size={16} className="mt-0.5 shrink-0 text-muted" />
+            <div>
+              <p className="text-xs text-muted">Unit</p>
+              <p className="text-sm font-medium text-foreground">{responder.unit ?? "Unclassified"}</p>
+            </div>
           </div>
 
-          <div>
-            <p className="text-xs text-muted">Unit</p>
-            <p>{responder.unit ?? "Unclassified"}</p>
-          </div>
-
-          <div>
-            <p className="text-xs text-muted">Joined</p>
-            <p>{formatDate(responder.createdAt)}</p>
+          <div className="flex items-start gap-2.5">
+            <Calendar size={16} className="mt-0.5 shrink-0 text-muted" />
+            <div>
+              <p className="text-xs text-muted">Joined</p>
+              <p className="text-sm font-medium text-foreground">{formatDate(responder.createdAt)}</p>
+            </div>
           </div>
         </div>
       </Card>
 
       <Card>
-        <h2 className="font-semibold">Current Assignment</h2>
+        <div className="flex items-center gap-2.5">
+          <Siren size={18} className="shrink-0 text-danger" />
+          <h2 className="font-semibold text-foreground">Current Assignment</h2>
+        </div>
 
         <div className="mt-5">
           {emergenciesLoading ? (
@@ -123,7 +150,10 @@ export default function ResponderDetails({
       </Card>
 
       <Card>
-        <h2 className="font-semibold">Past Incidents</h2>
+        <div className="flex items-center gap-2.5">
+          <History size={18} className="shrink-0 text-primary" />
+          <h2 className="font-semibold text-foreground">Past Incidents</h2>
+        </div>
 
         <div className="mt-5">
           {historyLoading ? (

@@ -67,9 +67,7 @@ export default function NotificationsMenu() {
                     read ? "" : "bg-primary-light/10"
                   }`}
                 >
-                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${style.bg}`}>
-                    <Icon size={16} className={style.color} />
-                  </span>
+                  <Icon size={20} className={`mt-0.5 shrink-0 ${style.color}`} />
 
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-foreground">{activity.title}</p>

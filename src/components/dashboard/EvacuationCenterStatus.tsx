@@ -43,9 +43,7 @@ export default function EvacuationCenterStatus() {
     <div className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-info-light text-info">
-            <Building2 size={15} />
-          </span>
+          <Building2 size={18} className="shrink-0 text-info" />
           <h2 className="text-lg font-semibold text-foreground">Evacuation Center Status</h2>
         </div>
         <Link href="/evacuation-centers" className="text-sm font-medium text-primary hover:text-primary-dark">

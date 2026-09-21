@@ -34,9 +34,9 @@ const tide = {
 };
 
 const tideStyles = {
-  Normal: { bg: "bg-success-light", ring: "bg-success", text: "text-success" },
-  Watch: { bg: "bg-warning-light", ring: "bg-warning", text: "text-warning" },
-  Warning: { bg: "bg-danger-light", ring: "bg-danger", text: "text-danger" },
+  Normal: { bg: "bg-success-light", text: "text-success" },
+  Watch: { bg: "bg-warning-light", text: "text-warning" },
+  Warning: { bg: "bg-danger-light", text: "text-danger" },
 };
 
 export default function DashboardHeader() {
@@ -84,12 +84,7 @@ export default function DashboardHeader() {
       </div>
 
       <div className={`relative mt-5 flex items-center gap-3 rounded-2xl border border-(--glass-border) p-3.5 ${tideStyle.bg}`}>
-        <span className="relative flex h-9 w-9 shrink-0 items-center justify-center">
-          <span className={`absolute inline-flex h-9 w-9 animate-ping rounded-full opacity-30 ${tideStyle.ring}`} />
-          <span className={`relative flex h-9 w-9 items-center justify-center rounded-full ${tideStyle.ring}`}>
-            <Waves size={16} className="text-white" strokeWidth={2.5} />
-          </span>
-        </span>
+        <Waves size={20} className={`shrink-0 ${tideStyle.text}`} strokeWidth={2.25} />
 
         <div className="min-w-0">
           <p className={`text-sm font-semibold ${tideStyle.text}`}>Tide Level: {tide.level}</p>

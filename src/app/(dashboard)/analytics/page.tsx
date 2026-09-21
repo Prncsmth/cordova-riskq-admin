@@ -42,10 +42,10 @@ export default function AnalyticsPage() {
   const totalSosAlerts = filteredEmergencies.filter((e) => e.source === "sos").length;
 
   const stats = [
-    { label: "Total Incidents", value: filteredEmergencies.length, icon: Siren, color: "text-danger", bg: "bg-danger-light" },
-    { label: "Total SOS Alerts", value: totalSosAlerts, icon: BellRing, color: "text-warning", bg: "bg-warning-light" },
-    { label: "Avg. Response Time", value: computeAvgResponseTime(filteredHistoryRecords), icon: Timer, color: "text-info", bg: "bg-info-light" },
-    { label: "Resolution Rate", value: computeResolutionRate(filteredHistoryRecords), icon: CheckCircle2, color: "text-success", bg: "bg-success-light" },
+    { label: "Total Incidents", value: filteredEmergencies.length, icon: Siren, color: "text-danger" },
+    { label: "Total SOS Alerts", value: totalSosAlerts, icon: BellRing, color: "text-warning" },
+    { label: "Avg. Response Time", value: computeAvgResponseTime(filteredHistoryRecords), icon: Timer, color: "text-info" },
+    { label: "Resolution Rate", value: computeResolutionRate(filteredHistoryRecords), icon: CheckCircle2, color: "text-success" },
   ];
 
   return (
@@ -66,9 +66,7 @@ export default function AnalyticsPage() {
           const Icon = stat.icon;
           return (
             <Card key={stat.label} className="flex items-center gap-4">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${stat.bg} ${stat.color}`}>
-                <Icon size={19} />
-              </span>
+              <Icon size={22} className={`shrink-0 ${stat.color}`} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{stat.label}</p>
                 <p className="mt-1 text-2xl font-bold text-foreground">{stat.value}</p>

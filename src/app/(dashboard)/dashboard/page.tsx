@@ -19,8 +19,8 @@ export default function DashboardPage() {
       <StatsCards />
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <IncidentOverviewChart />
         <LiveMapPreview />
+        <IncidentOverviewChart />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">

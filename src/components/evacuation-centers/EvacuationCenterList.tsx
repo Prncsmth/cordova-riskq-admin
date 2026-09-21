@@ -214,42 +214,40 @@ export default function EvacuationCenterList({
           <p className="mt-1 text-sm text-muted">Try a different search term or status.</p>
         </div>
       ) : (
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="space-y-3">
           {filtered.map((center) => (
             <div
               key={center.id}
-              className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs"
+              className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-surface p-4 shadow-xs sm:flex-row sm:items-center"
             >
-              <div className="h-40 w-full">
+              <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl">
                 <MiniMap latitude={center.latitude} longitude={center.longitude} label={center.name} />
               </div>
 
-              <div className="p-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-semibold text-foreground">{center.name}</p>
-                    <p className="text-sm text-muted">{center.address}</p>
-                  </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-semibold text-foreground">{center.name}</p>
                   <Badge variant={center.status === "full" ? "danger" : "success"} solid={center.status === "full"}>
                     {center.status === "full" ? "Full" : "Open"}
                   </Badge>
                 </div>
+                <p className="text-sm text-muted">{center.address}</p>
 
                 <EditableFacilities
                   center={center}
                   pending={pendingId === center.id}
                   onSave={(facilities) => handleSaveFacilities(center, facilities)}
                 />
-
-                <Button
-                  variant="outline"
-                  disabled={pendingId === center.id}
-                  onClick={() => handleToggleStatus(center)}
-                  className="mt-4 w-full"
-                >
-                  {center.status === "open" ? "Mark as Full" : "Mark as Open"}
-                </Button>
               </div>
+
+              <Button
+                variant="outline"
+                disabled={pendingId === center.id}
+                onClick={() => handleToggleStatus(center)}
+                className="w-full sm:w-auto sm:shrink-0"
+              >
+                {center.status === "open" ? "Mark as Full" : "Mark as Open"}
+              </Button>
             </div>
           ))}
         </div>

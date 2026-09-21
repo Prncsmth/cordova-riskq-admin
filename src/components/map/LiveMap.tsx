@@ -280,7 +280,7 @@ export default function LiveMap({
                 key={marker.id}
                 longitude={marker.position[1]}
                 latitude={marker.position[0]}
-                anchor="center"
+                anchor="bottom"
                 onClick={(event) => {
                   event.originalEvent.stopPropagation();
                   setSelectedMarker(marker);
@@ -289,20 +289,40 @@ export default function LiveMap({
                 <button
                   type="button"
                   aria-label={marker.label}
-                  className="group relative flex h-8 w-8 items-center justify-center"
+                  className="group relative block"
+                  style={{ width: 32, height: 32 }}
                 >
                   {marker.type === "incident" && (
                     <span
-                      className="absolute inline-flex h-8 w-8 animate-ping rounded-full opacity-30"
+                      className="absolute bottom-0 left-1/2 h-3 w-3 -translate-x-1/2 animate-ping rounded-full opacity-50"
                       style={{ background: config.color }}
                     />
                   )}
-                  <span
-                    className="relative flex h-8 w-8 items-center justify-center rounded-full shadow-md transition-transform duration-150 group-hover:scale-110"
-                    style={{ background: config.color }}
+                  {/* Teardrop pin -- category color fill with a thin white
+                      outline for definition against the map, white icon.
+                      Single closed path so the outline traces one clean
+                      outer silhouette with no seam. anchor="bottom" on the
+                      Marker means the tip (bottom of the path) is the exact
+                      coordinate. */}
+                  <svg
+                    width={32}
+                    height={32}
+                    viewBox="0 0 24 24"
+                    className="absolute inset-0 origin-bottom drop-shadow-md transition-transform duration-150 group-hover:scale-110"
                   >
-                    <Icon size={18} color="white" strokeWidth={2.5} />
-                  </span>
+                    <path
+                      d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+                      fill={config.color}
+                      stroke="white"
+                      strokeWidth={1.5}
+                    />
+                  </svg>
+                  <div
+                    className="pointer-events-none absolute left-0 top-0 flex items-center justify-center"
+                    style={{ width: 32, height: 22 }}
+                  >
+                    <Icon size={14} color="white" strokeWidth={2.25} />
+                  </div>
                 </button>
               </Marker>
             );
@@ -313,7 +333,7 @@ export default function LiveMap({
             longitude={selectedMarker.position[1]}
             latitude={selectedMarker.position[0]}
             anchor="bottom"
-            offset={20}
+            offset={36}
             closeButton
             closeOnClick={false}
             onClose={() => setSelectedMarker(null)}

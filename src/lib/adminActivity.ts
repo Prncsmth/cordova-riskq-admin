@@ -4,13 +4,13 @@ import type { AdminActivity, AdminActivityType } from "@/hooks/useRecentActivity
 
 export const ACTIVITY_TYPE_STYLE: Record<
   AdminActivityType,
-  { icon: LucideIcon; label: string; color: string; bg: string }
+  { icon: LucideIcon; label: string; color: string }
 > = {
-  sos_alert: { icon: BellRing, label: "SOS Alert", color: "text-danger", bg: "bg-danger-light" },
-  responder_joined: { icon: ShieldCheck, label: "Responder Joined", color: "text-info", bg: "bg-info-light" },
-  incident_resolved: { icon: CheckCircle2, label: "Incident Resolved", color: "text-success", bg: "bg-success-light" },
-  evacuation_center_updated: { icon: Building2, label: "Evacuation Center", color: "text-warning", bg: "bg-warning-light" },
-  user_registered: { icon: UserPlus, label: "New User", color: "text-primary", bg: "bg-primary-light" },
+  sos_alert: { icon: BellRing, label: "SOS Alert", color: "text-danger" },
+  responder_joined: { icon: ShieldCheck, label: "Responder Joined", color: "text-info" },
+  incident_resolved: { icon: CheckCircle2, label: "Incident Resolved", color: "text-success" },
+  evacuation_center_updated: { icon: Building2, label: "Evacuation Center", color: "text-warning" },
+  user_registered: { icon: UserPlus, label: "New User", color: "text-primary" },
 };
 
 // Where "View" on a notification/audit row should send the admin -- the feed

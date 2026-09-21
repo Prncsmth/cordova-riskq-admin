@@ -33,9 +33,7 @@ export default function IncidentOverviewChart() {
   return (
     <div className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
       <div className="flex items-center gap-2.5">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
-          <Activity size={15} />
-        </span>
+        <Activity size={18} className="shrink-0 text-primary" />
         <div>
           <h2 className="text-lg font-semibold text-foreground">Incident Overview</h2>
           <p className="text-sm text-muted">Incidents and SOS alerts — last 14 days</p>
