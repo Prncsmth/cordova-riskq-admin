@@ -18,6 +18,7 @@ type AnnouncementFormProps = {
   onAudienceChange: (value: AnnouncementAudience) => void;
   onBarangayChange: (value: string) => void;
   onPublish: () => void;
+  isPublishing: boolean;
 };
 
 export default function AnnouncementForm({
@@ -32,6 +33,7 @@ export default function AnnouncementForm({
   onAudienceChange,
   onBarangayChange,
   onPublish,
+  isPublishing,
 }: AnnouncementFormProps) {
   return (
     <Card>
@@ -130,9 +132,10 @@ export default function AnnouncementForm({
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-primary px-5 py-3 font-semibold text-white shadow-xs transition-all duration-150 hover:bg-primary-dark active:scale-[0.98] sm:w-auto"
+          disabled={isPublishing}
+          className="w-full rounded-xl bg-primary px-5 py-3 font-semibold text-white shadow-xs transition-all duration-150 hover:bg-primary-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
-          Publish Announcement
+          {isPublishing ? "Publishing…" : "Publish Announcement"}
         </button>
       </form>
     </Card>

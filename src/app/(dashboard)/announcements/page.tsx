@@ -24,6 +24,7 @@ export default function AnnouncementsPage() {
   const [priority, setPriority] = useState<AnnouncementPriority>("Normal");
   const [audience, setAudience] = useState<AnnouncementAudience>("All Users");
   const [barangay, setBarangay] = useState("");
+  const [isPublishing, setIsPublishing] = useState(false);
 
   function handlePriorityFilterChange(value: "All" | AnnouncementPriority) {
     setPriorityFilter(value);
@@ -31,6 +32,10 @@ export default function AnnouncementsPage() {
   }
 
   async function handlePublish() {
+    // "All Users" fans out to a real citizen notification per recipient --
+    // a double-click/double-submit here would send it twice.
+    if (isPublishing) return;
+    setIsPublishing(true);
     try {
       await create({
         title,
@@ -46,6 +51,8 @@ export default function AnnouncementsPage() {
       setBarangay("");
     } catch {
       // surfaced via useAnnouncements' actionError state, rendered in the table
+    } finally {
+      setIsPublishing(false);
     }
   }
 
@@ -72,6 +79,7 @@ export default function AnnouncementsPage() {
           onAudienceChange={setAudience}
           onBarangayChange={setBarangay}
           onPublish={handlePublish}
+          isPublishing={isPublishing}
         />
 
         <AnnouncementPreview title={title} body={body} priority={priority} audience={audience} />

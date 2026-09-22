@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { History } from "lucide-react";
 import { useRecentActivity } from "@/hooks/useRecentActivity";
-import { ACTIVITY_TYPE_STYLE } from "@/lib/adminActivity";
+import { getActivityStyle } from "@/lib/adminActivity";
 import { timeAgo } from "@/lib/utils";
 
 export default function RecentActivity() {
@@ -28,7 +28,7 @@ export default function RecentActivity() {
       ) : (
         <div className="max-h-[420px] divide-y divide-border/70 overflow-y-auto">
           {activities.map((activity, index) => {
-            const { icon: Icon, color } = ACTIVITY_TYPE_STYLE[activity.type];
+            const { icon: Icon, color } = getActivityStyle(activity.type);
             return (
               <div key={index} className="flex items-start gap-3 p-4 transition-colors hover:bg-background/50">
                 <Icon size={20} className={`mt-0.5 shrink-0 ${color}`} />

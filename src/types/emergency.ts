@@ -24,6 +24,12 @@ export interface Emergency {
   userId: string;
   responderId?: string;
   responderName?: string;
+  // Every responder currently active on this incident's roster (joined
+  // through arrived, per the backend's multi-responder model) -- responderId
+  // above is only ever the single legacy "accepted" responder, so a page
+  // like ResponderDetails that needs to know "is this responder working this
+  // incident" must check this list, not just responderId.
+  responderIds?: string[];
   createdAt: string;
   updatedAt: string;
 }

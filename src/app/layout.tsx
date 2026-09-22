@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import GlobalErrorGuards from "@/components/GlobalErrorGuards";
 import "./globals.css";
+import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 
 const geistSans = Geist({
@@ -31,7 +32,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <GlobalErrorGuards />
-        <ThemeProvider>{children}</ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

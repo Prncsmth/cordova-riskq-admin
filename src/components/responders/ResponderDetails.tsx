@@ -30,7 +30,10 @@ export default function ResponderDetails({
   const { emergencies, loading: emergenciesLoading, error: emergenciesError } = useEmergencies();
   const { records: history, loading: historyLoading, error: historyError } = useIncidentHistory({ responderId: id });
 
-  const currentAssignments = emergencies.filter((e) => e.responderId === id);
+  // e.responderId is only the single legacy "accepted" responder -- check
+  // the full active roster (responderIds) so a non-primary responder who
+  // joined via the multi-responder model still sees their own assignment.
+  const currentAssignments = emergencies.filter((e) => e.responderIds?.includes(id));
 
   if (loading) {
     return (

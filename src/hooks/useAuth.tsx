@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { User } from "@/types/user";
 
@@ -14,6 +14,18 @@ type LoginResponse = {
   token: string;
 };
 
+type AuthContextValue = {
+  authenticated: boolean;
+  isHydrated: boolean;
+  token: string | null;
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  updateUser: (patch: Partial<Pick<User, "name" | "email">>) => void;
+};
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
 function readStoredUser(): User | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(USER_KEY);
@@ -25,7 +37,12 @@ function readStoredUser(): User | null {
   }
 }
 
-export function useAuth() {
+// Single shared auth state via Context, same pattern as ThemeProvider --
+// previously a plain hook with independent useState per call site, so
+// editing the admin's name in Settings (updateUser) updated only that
+// component's own hook instance, leaving UserMenu/DashboardHeader's
+// already-mounted copies of `user` stale until a full page reload.
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -80,5 +97,17 @@ export function useAuth() {
     });
   }, []);
 
-  return { authenticated, isHydrated, token, user, login, logout, updateUser };
+  return (
+    <AuthContext.Provider value={{ authenticated, isHydrated, token, user, login, logout, updateUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return context;
 }

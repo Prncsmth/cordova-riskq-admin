@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import { useSocket } from "@/hooks/useSocket";
 import { categoryToEmergencyType } from "@/lib/incidentCategory";
 import { Emergency, EmergencyStatus } from "@/types/emergency";
 
@@ -53,6 +54,7 @@ function toEmergency(raw: RawIncident): Emergency {
     userId: raw.reporterId,
     responderId: raw.acceptedByResponderId ?? undefined,
     responderName: acceptedResponder?.name,
+    responderIds: raw.responders?.map((r) => r.id) ?? [],
     createdAt: raw.createdAt,
     updatedAt: raw.updatedAt,
   };
@@ -60,6 +62,7 @@ function toEmergency(raw: RawIncident): Emergency {
 
 export function useEmergencies() {
   const { token } = useAuth();
+  const socket = useSocket();
   const [emergencies, setEmergencies] = useState<Emergency[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -90,6 +93,30 @@ export function useEmergencies() {
       cancelled = true;
     };
   }, [token]);
+
+  // GET /incidents only ever returns non-terminal incidents, so this list is
+  // meant to hold live ones only -- see useEmergenciesWithHistory, which adds
+  // completed/cancelled incidents separately from GET /admin/history. A
+  // terminal update here removes the incident (its marker/row disappears)
+  // rather than upserting it as "Resolved"/"Cancelled" into this list.
+  useEffect(() => {
+    function handleIncidentUpdate(raw: RawIncident) {
+      const emergency = toEmergency(raw);
+      const isTerminal = emergency.status === "Resolved" || emergency.status === "Cancelled";
+
+      setEmergencies((prev) => {
+        if (isTerminal) return prev.filter((e) => e.id !== emergency.id);
+        const exists = prev.some((e) => e.id === emergency.id);
+        if (!exists) return [emergency, ...prev];
+        return prev.map((e) => (e.id === emergency.id ? emergency : e));
+      });
+    }
+
+    socket.on("admin:incidentUpdate", handleIncidentUpdate);
+    return () => {
+      socket.off("admin:incidentUpdate", handleIncidentUpdate);
+    };
+  }, [socket]);
 
   return { emergencies, loading, error };
 }

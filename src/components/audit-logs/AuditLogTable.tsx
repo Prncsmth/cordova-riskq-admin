@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
-import { ACTIVITY_TYPE_STYLE } from "@/lib/adminActivity";
+import { ACTIVITY_TYPE_STYLE, getActivityStyle } from "@/lib/adminActivity";
 import { formatDate } from "@/lib/utils";
 import type { AdminActivity, AdminActivityType } from "@/hooks/useRecentActivity";
 
@@ -102,7 +102,7 @@ export default function AuditLogTable({
           </thead>
           <tbody className="divide-y divide-border/70">
             {filtered.map((activity, index) => {
-              const style = ACTIVITY_TYPE_STYLE[activity.type];
+              const style = getActivityStyle(activity.type);
               const Icon = style.icon;
 
               return (

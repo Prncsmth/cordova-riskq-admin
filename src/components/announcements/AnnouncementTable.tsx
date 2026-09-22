@@ -42,7 +42,8 @@ export default function AnnouncementTable({
 }) {
   const [pendingId, setPendingId] = useState<string | null>(null);
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, title: string) {
+    if (!window.confirm(`Delete "${title}"? This can't be undone.`)) return;
     setPendingId(id);
     try {
       await onDelete(id);
@@ -128,7 +129,7 @@ export default function AnnouncementTable({
 
               <button
                 type="button"
-                onClick={() => handleDelete(a.id)}
+                onClick={() => handleDelete(a.id, a.title)}
                 disabled={pendingId === a.id}
                 aria-label={`Delete ${a.title}`}
                 className="shrink-0 rounded-full p-2 text-muted transition hover:bg-danger-light hover:text-danger disabled:opacity-50"

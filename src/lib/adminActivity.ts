@@ -1,4 +1,4 @@
-import { BellRing, ShieldCheck, CheckCircle2, Building2, UserPlus } from "lucide-react";
+import { Activity, BellRing, ShieldCheck, CheckCircle2, Building2, UserPlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AdminActivity, AdminActivityType } from "@/hooks/useRecentActivity";
 
@@ -12,6 +12,18 @@ export const ACTIVITY_TYPE_STYLE: Record<
   evacuation_center_updated: { icon: Building2, label: "Evacuation Center", color: "text-warning" },
   user_registered: { icon: UserPlus, label: "New User", color: "text-primary" },
 };
+
+const DEFAULT_ACTIVITY_STYLE = { icon: Activity, label: "Activity", color: "text-muted" };
+
+// activity.type comes from a live socket payload / REST response that's
+// only compile-time cast to AdminActivityType, never runtime-validated -- a
+// new activity kind added backend-first, a typo, or version skew between
+// the two independently-deployed repos could send a value outside this
+// lookup's keys. Falls back instead of letting a direct index throw
+// undefined and crash the feed for every connected admin.
+export function getActivityStyle(type: string) {
+  return ACTIVITY_TYPE_STYLE[type as AdminActivityType] ?? DEFAULT_ACTIVITY_STYLE;
+}
 
 // Where "View" on a notification/audit row should send the admin -- the feed
 // has no per-item entity id to deep-link to, only a type, so this points at
