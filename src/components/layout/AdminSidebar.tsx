@@ -15,6 +15,7 @@ import {
   Settings,
   Map,
   Megaphone,
+  Phone,
   ScrollText,
 } from "lucide-react";
 import SidebarGroup from "./SidebarGroup";
@@ -108,6 +109,7 @@ export default function AdminSidebar() {
           label="Resources"
           items={[
             { href: "/evacuation-centers", label: "Evacuation Centers", icon: Building2 },
+            { href: "/hotlines", label: "Hotlines", icon: Phone },
           ]}
         />
 
