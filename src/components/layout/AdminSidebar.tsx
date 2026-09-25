@@ -68,8 +68,11 @@ export default function AdminSidebar() {
                 RDOVA
               </span>
               &nbsp;
-              <span style={{ color: "#FE6B47" }}>RISKQ</span>
+              <span style={{ color: "var(--brand-riskq)" }}>RISKQ</span>
             </h1>
+            <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-tertiary">
+              MDRRMO Admin Portal
+            </p>
           </div>
 
         </div>

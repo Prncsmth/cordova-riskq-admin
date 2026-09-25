@@ -65,7 +65,7 @@ export default function AnalyticsPage() {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.label} className="flex items-center gap-4">
+            <Card key={stat.label} className="flex items-center gap-4 shadow-md">
               <Icon size={22} className={`shrink-0 ${stat.color}`} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{stat.label}</p>

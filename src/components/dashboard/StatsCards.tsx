@@ -52,7 +52,7 @@ export default function StatsCards() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.06 }}
-            className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs"
+            className="rounded-2xl border border-border/70 bg-surface p-6 shadow-md"
           >
             <div className="flex items-start justify-between">
               <div>

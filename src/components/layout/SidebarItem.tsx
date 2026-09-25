@@ -25,11 +25,11 @@ export default function SidebarItem({
   return (
     <Link
       href={href}
-      className={`group relative flex items-center rounded-full text-sm font-bold transition-all duration-200 ${
+      className={`group relative flex items-center rounded-xl text-sm font-bold transition-all duration-200 ${
         collapsed ? "mx-auto h-11 w-11 justify-center" : "w-full gap-3 px-4 py-2.5"
       } ${
         active
-          ? "bg-[#C1121F] text-white shadow-[0_4px_12px_-2px_rgba(193,18,31,0.4)]"
+          ? "bg-primary text-white shadow-md"
           : "text-foreground/80 hover:bg-black/4 hover:text-foreground active:scale-[0.98] dark:hover:bg-white/6"
       }`}
     >

@@ -1,14 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Waves, Sun, CloudSun, CloudLightning } from "lucide-react";
+import { Waves, Sun, CloudSun, CloudLightning, Calendar } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import Badge from "@/components/ui/Badge";
 
 function getGreeting(hour: number) {
   if (hour < 12) return "Good morning";
   if (hour < 18) return "Good afternoon";
   return "Good evening";
 }
+
+const TIDE_BADGE_VARIANT = {
+  Normal: "success",
+  Watch: "warning",
+  Warning: "danger",
+} as const;
 
 // Mock data for UI — replace with a real weather API once available.
 // August sits in the Philippine rainy season, and cloud cover here lines up
@@ -33,12 +40,6 @@ const tide = {
   message: "Elevated tide levels expected this afternoon — monitor Day-as and Buagsong for coastal flooding.",
 };
 
-const tideStyles = {
-  Normal: { bg: "bg-success-light", text: "text-success" },
-  Watch: { bg: "bg-warning-light", text: "text-warning" },
-  Warning: { bg: "bg-danger-light", text: "text-danger" },
-};
-
 export default function DashboardHeader() {
   const { user } = useAuth();
   const [now, setNow] = useState<Date | null>(null);
@@ -47,16 +48,15 @@ export default function DashboardHeader() {
     setNow(new Date());
   }, []);
 
-  const tideStyle = tideStyles[tide.level];
   const WeatherIcon = weatherIcons[weather.condition].icon;
 
   return (
-    <div className="rounded-3xl border border-border/60 bg-surface p-6 shadow-xs lg:p-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="rounded-3xl border border-border/60 bg-surface p-5 shadow-xs lg:p-6">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             {now ? getGreeting(now.getHours()) : "Welcome"}
-            {user?.name ? `, ${user.name}` : ""}
+            {user?.name ? `, ${user.name}` : ""}!
           </h1>
 
           <p className="mt-1 text-sm text-muted">
@@ -71,7 +71,8 @@ export default function DashboardHeader() {
             <span className="hidden text-muted sm:inline">&middot; {weather.description}</span>
           </div>
 
-          <div className="glass-strong rounded-xl border border-(--glass-border) px-4 py-2.5 text-sm font-medium text-foreground shadow-sm">
+          <div className="glass-strong flex items-center gap-2 rounded-xl border border-(--glass-border) px-4 py-2.5 text-sm font-medium text-foreground shadow-sm">
+            <Calendar size={16} className="text-muted" strokeWidth={2.25} />
             {now
               ? now.toLocaleDateString(undefined, {
                   year: "numeric",
@@ -83,12 +84,19 @@ export default function DashboardHeader() {
         </div>
       </div>
 
-      <div className={`relative mt-5 flex items-center gap-3 rounded-2xl border border-(--glass-border) p-3.5 ${tideStyle.bg}`}>
-        <Waves size={20} className={`shrink-0 ${tideStyle.text}`} strokeWidth={2.25} />
+      {/* Single accent (the Badge) carries the tide level; icon/label/banner
+          stay neutral so the status isn't repeated in four places at once. */}
+      <div className="relative mt-4 flex items-center gap-3 rounded-2xl border border-border/60 bg-background/60 p-3">
+        <Waves size={20} className="shrink-0 text-muted" strokeWidth={2.25} />
 
         <div className="min-w-0">
-          <p className={`text-sm font-semibold ${tideStyle.text}`}>Tide Level: {tide.level}</p>
-          <p className="text-xs text-foreground/70">{tide.message}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-foreground">Tide Level</p>
+            <Badge variant={TIDE_BADGE_VARIANT[tide.level]} solid>
+              {tide.level}
+            </Badge>
+          </div>
+          <p className="mt-0.5 text-xs text-muted">{tide.message}</p>
         </div>
       </div>
     </div>
