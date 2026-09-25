@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Inter } from "next/font/google";
+import { Inter, Archivo_Black } from "next/font/google";
 import {
   LayoutDashboard,
   Siren,
@@ -22,6 +22,9 @@ import SidebarItem from "./SidebarItem";
 import { useSidebar } from "./SidebarContext";
 
 const inter = Inter({ subsets: ["latin"], weight: ["600", "700"] });
+// Matches CordovaRiskQ-Frontend's HomeHeader wordmark exactly: Archivo Black
+// ships a single 400 cut that already renders as a heavy black weight.
+const archivoBlack = Archivo_Black({ subsets: ["latin"], weight: "400" });
 
 export default function AdminSidebar() {
   const { collapsed } = useSidebar();
@@ -38,13 +41,13 @@ export default function AdminSidebar() {
         <div className="flex items-center gap-3">
 
           {/* Logo */}
-          <div className="relative h-10 w-10 shrink-0 drop-shadow-sm">
+          <div className="relative h-[42px] w-[42px] shrink-0 drop-shadow-sm">
             <Image
               src="/images/logo.png"
               alt="Cordova RISKQ Logo"
               fill
               priority
-              sizes="40px"
+              sizes="42px"
               className="object-contain"
             />
           </div>
@@ -55,19 +58,18 @@ export default function AdminSidebar() {
               collapsed ? "w-0 -translate-x-2 opacity-0" : "w-auto translate-x-0 opacity-100"
             }`}
           >
-            <h1 className={`${inter.className} flex items-center text-xl font-bold tracking-tight`}>
-              <span className="inline-flex items-center" style={{ color: "var(--brand-cordova)" }}>
+            <h1 className={`${archivoBlack.className} flex flex-col text-xl leading-none tracking-[-1px]`}>
+              <span className="mb-[-2px] inline-flex items-center" style={{ color: "var(--brand-cordova)" }}>
                 C
                 <Image
                   src="/images/cordova-logo.png"
                   alt="O"
-                  width={18}
-                  height={18}
-                  className="mx-0.5 inline-block object-contain"
+                  width={20}
+                  height={20}
+                  className="-mx-px inline-block object-contain"
                 />
                 RDOVA
               </span>
-              &nbsp;
               <span style={{ color: "var(--brand-riskq)" }}>RISKQ</span>
             </h1>
             <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-tertiary">
