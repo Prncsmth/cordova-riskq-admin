@@ -2,8 +2,9 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import Map, { Marker, Popup } from "react-map-gl/mapbox";
+import Map, { Marker, Popup, Source, Layer } from "react-map-gl/mapbox";
 import type { MapRef } from "react-map-gl/mapbox";
 import {
   Layers,
@@ -18,6 +19,9 @@ import {
   Plus,
   Minus,
   MapPin,
+  Search,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -26,7 +30,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 export type LiveMapMarkerType = "incident" | "responder" | "evacuation";
 
 import { useSidebar } from "@/components/layout/SidebarContext";
-import { CORDOVA_CENTER, CORDOVA_MAP_BOUNDS } from "@/lib/cordovaBarangays";
+import { CORDOVA_BARANGAYS, CORDOVA_CENTER, CORDOVA_MAP_BOUNDS } from "@/lib/cordovaBarangays";
+import cordovaBoundary from "@/lib/cordovaBoundary.geojson.json";
 
 export type LiveMapMarker = {
   id: string;
@@ -37,7 +42,7 @@ export type LiveMapMarker = {
 
 export const markerConfig: Record<LiveMapMarkerType, { icon: LucideIcon; color: string; label: string }> = {
   incident: { icon: Siren, color: "#dc2626", label: "Active Incidents" },
-  responder: { icon: ShieldCheck, color: "#1d4ed8", label: "Responders" },
+  responder: { icon: ShieldCheck, color: "#b45309", label: "Responders" },
   evacuation: { icon: Building2, color: "#1e8e3e", label: "Evacuation Centers" },
 };
 
@@ -81,8 +86,12 @@ export default function LiveMap({
   controls = true,
 }: LiveMapProps) {
   const mapRef = useRef<MapRef>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { collapsed } = useSidebar();
   const [showLayerMenu, setShowLayerMenu] = useState(false);
+  const [showBarangayMenu, setShowBarangayMenu] = useState(false);
+  const [barangayQuery, setBarangayQuery] = useState("");
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeStyle, setActiveStyle] = useState<MapStyleName>("Road");
   const [visibleTypes, setVisibleTypes] = useState<Record<LiveMapMarkerType, boolean>>({
     incident: true,
@@ -92,6 +101,10 @@ export default function LiveMap({
   const [selectedMarker, setSelectedMarker] = useState<LiveMapMarker | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [minZoom, setMinZoom] = useState(13);
+
+  const filteredBarangays = CORDOVA_BARANGAYS.filter((b) =>
+    b.name.toLowerCase().includes(barangayQuery.trim().toLowerCase())
+  );
 
   const visibleMarkers = markers.filter((marker) => visibleTypes[marker.type]);
 
@@ -117,6 +130,28 @@ export default function LiveMap({
     return () => clearTimeout(id);
   }, [collapsed]);
 
+  // Tracks fullscreen state from the browser itself, not just our own
+  // toggle -- the user can also exit via Esc, which only fires this event,
+  // never our button's onClick. Also resizes the map canvas once the
+  // fullscreen transition's layout settles, same reasoning as the
+  // sidebar-collapse effect above.
+  useEffect(() => {
+    function handleFullscreenChange() {
+      setIsFullscreen(document.fullscreenElement === containerRef.current);
+      setTimeout(() => mapRef.current?.getMap()?.resize(), 80);
+    }
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  function toggleFullscreen() {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      containerRef.current?.requestFullscreen();
+    }
+  }
+
   if (!MAPBOX_TOKEN) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-background p-4 text-center text-sm text-muted">
@@ -126,6 +161,7 @@ export default function LiveMap({
   }
 
   return (
+    <div ref={containerRef} className="relative h-full w-full">
       <Map
         ref={mapRef}
         mapboxAccessToken={MAPBOX_TOKEN}
@@ -144,6 +180,24 @@ export default function LiveMap({
         onResize={clampZoomToBounds}
         style={{ width: "100%", height: "100%" }}
       >
+        {/* Cordova municipal boundary -- subtle fill + outline so it reads
+            as context, not a block over markers/roads underneath. Same
+            source data and tide-teal accent as the mobile app's own
+            showCordovaBoundary (constants/cordovaBoundary.geojson.json),
+            for visual consistency between the two. */}
+        <Source id="cordova-boundary" type="geojson" data={cordovaBoundary}>
+          <Layer
+            id="cordova-boundary-fill"
+            type="fill"
+            paint={{ "fill-color": "#0e7b86", "fill-opacity": 0.06 }}
+          />
+          <Layer
+            id="cordova-boundary-line"
+            type="line"
+            paint={{ "line-color": "#0e7b86", "line-width": 2 }}
+          />
+        </Source>
+
         {/* Zoom + recenter controls, grouped bottom-right like a native map app */}
         {controls && (
           <div className="absolute bottom-6 right-4 z-40 flex flex-col items-center gap-2.5">
@@ -270,6 +324,79 @@ export default function LiveMap({
         </div>
         )}
 
+        {/* Jump to barangay -- quick-access search, direct-click like the
+            always-visible toolbar buttons on reference map tools, scoped to
+            what's actually useful for dispatch: finding a barangay fast
+            instead of manually panning. */}
+        {controls && (
+        <div className="absolute left-16 top-4 z-50">
+          <button
+            aria-label="Jump to barangay"
+            onClick={() => setShowBarangayMenu((s) => !s)}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-surface text-foreground shadow-md transition-all duration-150 hover:scale-105 active:scale-95"
+          >
+            <Search size={18} strokeWidth={2.25} />
+          </button>
+
+          {showBarangayMenu && (
+            <div className="mt-2 w-56 overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-md">
+              <div className="border-b border-border/70 p-2">
+                <input
+                  autoFocus
+                  value={barangayQuery}
+                  onChange={(e) => setBarangayQuery(e.target.value)}
+                  placeholder="Search barangay..."
+                  className="w-full rounded-lg border border-border bg-background/60 px-3 py-1.5 text-xs text-foreground outline-none transition focus:border-primary"
+                />
+              </div>
+
+              <div className="max-h-56 overflow-y-auto py-1">
+                {filteredBarangays.length === 0 ? (
+                  <p className="px-3.5 py-3 text-center text-xs text-muted">No matches.</p>
+                ) : (
+                  filteredBarangays.map((b) => (
+                    <button
+                      key={b.id}
+                      type="button"
+                      onClick={() => {
+                        mapRef.current?.getMap().flyTo({
+                          center: [b.longitude, b.latitude],
+                          zoom: 16,
+                          duration: 800,
+                        });
+                        setShowBarangayMenu(false);
+                        setBarangayQuery("");
+                      }}
+                      className="block w-full px-3.5 py-2 text-left text-xs font-medium text-foreground transition-colors hover:bg-primary-light/30"
+                    >
+                      {b.name}
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+        )}
+
+        {/* Fullscreen -- for a dispatch wall/monitor setup */}
+        {controls && (
+        <div className="absolute right-4 top-4 z-50">
+          <button
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            onClick={toggleFullscreen}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-surface text-foreground shadow-md transition-all duration-150 hover:scale-105 active:scale-95"
+          >
+            {isFullscreen ? (
+              <Minimize2 size={18} strokeWidth={2.25} />
+            ) : (
+              <Maximize2 size={18} strokeWidth={2.25} />
+            )}
+          </button>
+        </div>
+        )}
+
         {mapReady &&
           visibleMarkers.map((marker) => {
             const config = markerConfig[marker.type];
@@ -280,50 +407,64 @@ export default function LiveMap({
                 key={marker.id}
                 longitude={marker.position[1]}
                 latitude={marker.position[0]}
-                anchor="bottom"
+                anchor={marker.type === "responder" ? "center" : "bottom"}
                 onClick={(event) => {
                   event.originalEvent.stopPropagation();
                   setSelectedMarker(marker);
                 }}
               >
-                <button
-                  type="button"
-                  aria-label={marker.label}
-                  className="group relative block"
-                  style={{ width: 32, height: 32 }}
-                >
-                  {marker.type === "incident" && (
-                    <span
-                      className="absolute bottom-0 left-1/2 h-3 w-3 -translate-x-1/2 animate-ping rounded-full opacity-50"
-                      style={{ background: config.color }}
-                    />
-                  )}
-                  {/* Teardrop pin -- category color fill with a thin white
-                      outline for definition against the map, white icon.
-                      Single closed path so the outline traces one clean
-                      outer silhouette with no seam. anchor="bottom" on the
-                      Marker means the tip (bottom of the path) is the exact
-                      coordinate. */}
-                  <svg
-                    width={32}
-                    height={32}
-                    viewBox="0 0 24 24"
-                    className="absolute inset-0 origin-bottom drop-shadow-md transition-transform duration-150 group-hover:scale-110"
+                {marker.type === "responder" ? (
+                  // Branded responder marker -- literally just the app logo,
+                  // circularly cropped, no pin shape or border. anchor is
+                  // "center" above (not "bottom" like the teardrop pins)
+                  // since a plain circle's center is the exact coordinate.
+                  <button
+                    type="button"
+                    aria-label={marker.label}
+                    className="relative block h-8 w-8 overflow-hidden rounded-full drop-shadow-md transition-transform duration-150 hover:scale-110"
                   >
-                    <path
-                      d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                      fill={config.color}
-                      stroke="white"
-                      strokeWidth={1.5}
-                    />
-                  </svg>
-                  <div
-                    className="pointer-events-none absolute left-0 top-0 flex items-center justify-center"
-                    style={{ width: 32, height: 22 }}
+                    <Image src="/images/logo.png" alt="" fill sizes="32px" className="object-cover" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    aria-label={marker.label}
+                    className="group relative block"
+                    style={{ width: 32, height: 32 }}
                   >
-                    <Icon size={14} color="white" strokeWidth={2.25} />
-                  </div>
-                </button>
+                    {marker.type === "incident" && (
+                      <span
+                        className="absolute bottom-0 left-1/2 h-3 w-3 -translate-x-1/2 animate-ping rounded-full opacity-50"
+                        style={{ background: config.color }}
+                      />
+                    )}
+                    {/* Teardrop pin -- category color fill with a thin white
+                        outline for definition against the map, white icon.
+                        Single closed path so the outline traces one clean
+                        outer silhouette with no seam. anchor="bottom" on the
+                        Marker means the tip (bottom of the path) is the exact
+                        coordinate. */}
+                    <svg
+                      width={32}
+                      height={32}
+                      viewBox="0 0 24 24"
+                      className="absolute inset-0 origin-bottom drop-shadow-md transition-transform duration-150 group-hover:scale-110"
+                    >
+                      <path
+                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+                        fill={config.color}
+                        stroke="white"
+                        strokeWidth={1.5}
+                      />
+                    </svg>
+                    <div
+                      className="pointer-events-none absolute left-0 top-0 flex items-center justify-center"
+                      style={{ width: 32, height: 22 }}
+                    >
+                      <Icon size={14} color="white" strokeWidth={2.25} />
+                    </div>
+                  </button>
+                )}
               </Marker>
             );
           })}
@@ -340,15 +481,21 @@ export default function LiveMap({
           >
             <div className="min-w-[160px] py-0.5">
               <div className="flex items-center gap-2 pr-2">
-                <span
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
-                  style={{ background: markerConfig[selectedMarker.type].color }}
-                >
-                  {(() => {
-                    const Icon = markerConfig[selectedMarker.type].icon;
-                    return <Icon size={14} color="white" strokeWidth={2.5} />;
-                  })()}
-                </span>
+                {selectedMarker.type === "responder" ? (
+                  <div className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full">
+                    <Image src="/images/logo.png" alt="" fill sizes="28px" className="object-cover" />
+                  </div>
+                ) : (
+                  <span
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                    style={{ background: markerConfig[selectedMarker.type].color }}
+                  >
+                    {(() => {
+                      const Icon = markerConfig[selectedMarker.type].icon;
+                      return <Icon size={14} color="white" strokeWidth={2.5} />;
+                    })()}
+                  </span>
+                )}
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-foreground">{selectedMarker.label}</p>
                   <p className="text-[11px] capitalize text-muted">{selectedMarker.type}</p>
@@ -367,5 +514,6 @@ export default function LiveMap({
           </Popup>
         )}
       </Map>
+    </div>
   );
 }

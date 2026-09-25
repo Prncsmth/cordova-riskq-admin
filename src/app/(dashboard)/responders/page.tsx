@@ -53,7 +53,7 @@ export default function RespondersPage() {
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
-            <Card key={card.label} className="flex items-center gap-4">
+            <Card key={card.label} className="flex items-center gap-4 shadow-md">
               <Icon size={22} className={`shrink-0 ${card.color}`} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">{card.label}</p>

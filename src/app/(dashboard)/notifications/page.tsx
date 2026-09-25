@@ -51,7 +51,7 @@ export default function NotificationsPage() {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-3">
-        <Card className="flex items-center gap-4">
+        <Card className="flex items-center gap-4 shadow-md">
           <Bell size={22} className="shrink-0 text-primary" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Total</p>
@@ -59,7 +59,7 @@ export default function NotificationsPage() {
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4">
+        <Card className="flex items-center gap-4 shadow-md">
           <Bell size={22} className="shrink-0 text-danger" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Unread</p>
@@ -67,7 +67,7 @@ export default function NotificationsPage() {
           </div>
         </Card>
 
-        <Card className="flex items-center gap-4">
+        <Card className="flex items-center gap-4 shadow-md">
           <MailOpen size={22} className="shrink-0 text-success" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-tertiary">Read</p>

@@ -43,7 +43,7 @@ export default function LiveMapPreview() {
 
       <div className="flex flex-wrap items-center gap-4 border-t border-border/70 px-4 py-3 text-xs text-text-tertiary">
         <LegendDot color="bg-danger" label="Active Incident" />
-        <LegendDot color="bg-info" label="Responder" />
+        <LegendDot color="bg-warning" label="Responder" />
         <LegendDot color="bg-success" label="Evacuation Center" />
       </div>
     </div>

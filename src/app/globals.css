@@ -31,6 +31,11 @@
      color, not the theme's --primary. Too dark to read on the dark-mode
      sidebar as-is, so it gets its own brighter dark-mode value below. */
   --brand-cordova: #a70707;
+  /* Sidebar wordmark "RISKQ" — bright enough to read on both light and dark
+     backgrounds as-is, so unlike --brand-cordova it needs no dark-mode
+     override. Reused for page titles so headers read as branded, not just
+     another red CTA/danger element. */
+  --brand-riskq: #fe6b47;
 
   /* macOS-style vibrancy tokens */
   --glass: rgba(255, 255, 255, 0.72);

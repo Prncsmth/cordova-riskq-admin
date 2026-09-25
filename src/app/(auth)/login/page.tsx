@@ -39,23 +39,22 @@ export default function LoginPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-background">
-      <div className="relative grid min-h-screen lg:grid-cols-5">
+      <div className="relative grid min-h-screen lg:grid-cols-2">
         {/* LEFT PANEL */}
         <section
-          className="relative hidden overflow-hidden lg:col-span-2 lg:flex"
+          className="relative hidden overflow-hidden lg:flex"
           style={{
-            backgroundImage: "url('/images/mdrrmo.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center 70%",
+            background: "linear-gradient(155deg, var(--brand-cordova) 0%, #6e0d0d 45%, #17181a 100%)",
           }}
         >
-          {/* Vignette instead of a flat wash — keeps the top/bottom text
-              zones legible while letting the photo itself read clearly
-              through the middle. */}
-          <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/35 to-black/55" />
+          {/* Soft glow instead of a photo -- adds depth without needing a
+              legibility scrim under the text, so the badge/pill below can
+              sit directly on the gradient with no box around them. */}
+          <div className="pointer-events-none absolute -right-32 -top-32 h-[36rem] w-[36rem] rounded-full bg-white/10 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-40 -left-24 h-[30rem] w-[30rem] rounded-full bg-black/30 blur-3xl" />
 
           <div className="relative z-10 flex h-full flex-col p-12 text-white">
-            <div className="inline-flex w-fit items-center gap-3 rounded-2xl border border-white/15 bg-black/35 px-4 py-3 shadow-lg backdrop-blur-xl">
+            <div className="inline-flex w-fit items-center gap-3">
               <div className="relative h-11 w-11 shrink-0">
                 <Image src="/images/logo.png" alt="" fill sizes="44px" className="object-contain" priority />
               </div>
@@ -68,7 +67,7 @@ export default function LoginPage() {
             </div>
 
             <div className="flex flex-1 flex-col justify-center">
-              <div className="mb-6 h-1 w-12 rounded-full bg-danger" />
+              <div className="mb-6 h-1 w-12 rounded-full bg-white" />
               <h2 className="text-4xl font-bold leading-tight tracking-tight">
                 Coordinated emergency
                 <br />
@@ -82,15 +81,15 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-black/35 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white/80 backdrop-blur-xl">
-              <span className="h-1.5 w-1.5 rounded-full bg-danger" />
+            <div className="inline-flex w-fit items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/80">
+              <span className="h-1.5 w-1.5 rounded-full bg-white" />
               MDRRMO &middot; Cordova, Cebu
             </div>
           </div>
         </section>
 
         {/* RIGHT PANEL */}
-        <section className="flex items-center justify-center p-6 lg:col-span-3 lg:p-10">
+        <section className="flex items-center justify-center p-6 lg:p-10">
           <div className="w-full max-w-md rounded-3xl border border-border/70 bg-surface p-8 shadow-lg sm:p-10">
             <div className="flex flex-col items-center text-center">
               <div className="relative h-14 w-14">
