@@ -27,7 +27,10 @@ const INCIDENT_STATUS_TO_ALERT_STATUS: Record<string, SosAlertStatus> = {
   on_the_way: "Acknowledged",
   arrived: "Acknowledged",
   completed: "Resolved",
-  cancelled: "Resolved",
+  // Was folded into "Resolved" -- a citizen who cancelled their own SOS
+  // read as if a responder had actually resolved it. Mirrors the backend's
+  // sosAlertStatus.ts (this table is the frontend copy of that mapping).
+  cancelled: "Cancelled",
 };
 
 function toSosAlert(raw: RawSosAlert): SosAlert {
@@ -98,6 +101,7 @@ export function useSosAlertSummary() {
     New: number;
     Acknowledged: number;
     Resolved: number;
+    Cancelled: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

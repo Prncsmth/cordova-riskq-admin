@@ -25,9 +25,10 @@ const statusVariant = {
   New: "danger",
   Acknowledged: "warning",
   Resolved: "success",
+  Cancelled: "default",
 } as const;
 
-const statusFilters = ["All", "New", "Acknowledged", "Resolved"] as const;
+const statusFilters = ["All", "New", "Acknowledged", "Resolved", "Cancelled"] as const;
 
 function initials(name: string) {
   return name

@@ -1,4 +1,4 @@
-export type SosAlertStatus = "New" | "Acknowledged" | "Resolved";
+export type SosAlertStatus = "New" | "Acknowledged" | "Resolved" | "Cancelled";
 
 export interface SosAlert {
   id: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BellRing, CheckCheck, ShieldCheck, Siren } from "lucide-react";
+import { BellRing, CheckCheck, ShieldCheck, Siren, XCircle } from "lucide-react";
 import Card from "@/components/ui/Card";
 import SosAlertTable from "@/components/sos-alerts/SosAlertTable";
 import { useSosAlerts, useSosAlertSummary } from "@/hooks/useSosAlerts";
@@ -46,6 +46,12 @@ export default function SosAlertsPage() {
       icon: ShieldCheck,
       color: "text-success",
     },
+    {
+      label: "Cancelled",
+      value: String(summary?.Cancelled ?? 0),
+      icon: XCircle,
+      color: "text-muted",
+    },
   ];
 
   return (
@@ -57,7 +63,7 @@ export default function SosAlertsPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
