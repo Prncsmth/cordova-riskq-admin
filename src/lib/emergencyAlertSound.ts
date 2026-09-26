@@ -1,24 +1,36 @@
 // Plays the emergency alert sound for incident:new / sos:new arrivals (see
-// EmergencyAlertProvider). Tries /sounds/emergency-alert.mp3 first -- drop a
-// real file at that path in /public to use it -- and falls back to a
-// synthesized siren tone (Web Audio oscillators) since no such asset ships
-// with this repo, so the alert still makes sound out of the box.
-const SOUND_SRC = "/sounds/emergency-alert.mp3";
+// EmergencyAlertProvider). SOS and a routine incident report intentionally
+// sound different -- SOS is the one that should make someone look up from
+// their desk; a routine report shouldn't carry the same weight, or every
+// incident starts to feel like a life-threatening one and admins tune out
+// the sound entirely.
+export type EmergencyAlertKind = "sos" | "incident";
 
-let audioEl: HTMLAudioElement | null = null;
-let audioFileMissing = false;
+// Tries /sounds/emergency-alert-<kind>.mp3 first -- drop real files at
+// those paths in /public to use them -- and falls back to a synthesized
+// tone (Web Audio oscillators) since neither ships with this repo, so the
+// alert still makes sound out of the box.
+const SOUND_SRC: Record<EmergencyAlertKind, string> = {
+  sos: "/sounds/emergency-alert-sos.m4a",
+  incident: "/sounds/emergency-alert-incident.m4a",
+};
+
+const audioEls: Partial<Record<EmergencyAlertKind, HTMLAudioElement>> = {};
+const audioFileMissing: Partial<Record<EmergencyAlertKind, boolean>> = {};
 let audioCtx: AudioContext | null = null;
 
-function getAudioElement(): HTMLAudioElement {
-  if (!audioEl) {
-    audioEl = new Audio(SOUND_SRC);
-    audioEl.preload = "auto";
-    audioEl.volume = 0.85;
-    audioEl.addEventListener("error", () => {
-      audioFileMissing = true;
+function getAudioElement(kind: EmergencyAlertKind): HTMLAudioElement {
+  let el = audioEls[kind];
+  if (!el) {
+    el = new Audio(SOUND_SRC[kind]);
+    el.preload = "auto";
+    el.volume = kind === "sos" ? 0.9 : 0.6;
+    el.addEventListener("error", () => {
+      audioFileMissing[kind] = true;
     });
+    audioEls[kind] = el;
   }
-  return audioEl;
+  return el;
 }
 
 function getAudioContext(): AudioContext | null {
@@ -29,26 +41,21 @@ function getAudioContext(): AudioContext | null {
   return audioCtx;
 }
 
-// Four-beat alternating tone, closer to a dispatch alert than a single
-// beep -- loud/short enough to notice without being a genuine siren.
-function playSynthesizedSiren() {
+function playTones(tones: number[], toneDuration: number, waveform: OscillatorType, peakGain: number) {
   const ctx = getAudioContext();
   if (!ctx) return;
 
   const now = ctx.currentTime;
-  const tones = [880, 660, 880, 660];
-  const toneDuration = 0.18;
-
   tones.forEach((freq, i) => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = "square";
+    osc.type = waveform;
     osc.frequency.value = freq;
 
     const start = now + i * toneDuration;
     const end = start + toneDuration;
     gain.gain.setValueAtTime(0, start);
-    gain.gain.linearRampToValueAtTime(0.25, start + 0.02);
+    gain.gain.linearRampToValueAtTime(peakGain, start + 0.02);
     gain.gain.linearRampToValueAtTime(0, end - 0.02);
 
     osc.connect(gain);
@@ -58,17 +65,38 @@ function playSynthesizedSiren() {
   });
 }
 
-export function playEmergencyAlertSound() {
-  if (audioFileMissing) {
-    playSynthesizedSiren();
+// Six-beat alternating square-wave siren, louder and longer than the
+// incident chime below -- deliberately closer to a real dispatch alert
+// since SOS means someone is in immediate danger.
+function playSosSiren() {
+  playTones([880, 660, 880, 660, 880, 660], 0.16, "square", 0.32);
+}
+
+// Two-note ascending sine chime -- soft and short, reads as "something
+// happened" rather than "emergency," for a routine incident report.
+function playIncidentChime() {
+  playTones([660, 880], 0.22, "sine", 0.16);
+}
+
+function playSynthesizedFallback(kind: EmergencyAlertKind) {
+  if (kind === "sos") {
+    playSosSiren();
+  } else {
+    playIncidentChime();
+  }
+}
+
+export function playEmergencyAlertSound(kind: EmergencyAlertKind) {
+  if (audioFileMissing[kind]) {
+    playSynthesizedFallback(kind);
     return;
   }
 
-  const el = getAudioElement();
+  const el = getAudioElement(kind);
   el.currentTime = 0;
   el.play().catch(() => {
     // Covers both a load failure that hasn't fired `error` yet and the
     // browser's autoplay policy -- either way, still make some sound.
-    playSynthesizedSiren();
+    playSynthesizedFallback(kind);
   });
 }

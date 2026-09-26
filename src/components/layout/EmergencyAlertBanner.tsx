@@ -13,22 +13,37 @@ export default function EmergencyAlertBanner() {
     <div className="pointer-events-none fixed inset-x-0 top-4 z-[100] flex justify-center px-4">
       <div
         role="alert"
-        className={`pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-2xl border p-4 shadow-lg backdrop-blur ${
+        className={`pointer-events-auto flex items-center gap-3 rounded-2xl border shadow-lg backdrop-blur transition-all ${
           alert.isSos
-            ? "border-danger/30 bg-danger text-white"
-            : "border-danger/20 bg-surface text-foreground"
+            ? "w-full max-w-lg border-danger/40 bg-danger p-5 text-white"
+            : "w-full max-w-md border-danger/20 bg-surface p-4 text-foreground"
         }`}
       >
-        <span
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-            alert.isSos ? "bg-white/15" : "bg-danger-light text-danger"
-          }`}
-        >
-          <Siren size={19} className={alert.isSos ? "text-white" : ""} />
+        <span className="relative flex shrink-0 items-center justify-center">
+          {/* Pulsing ring only on SOS -- the loudest visual cue on the page,
+              reserved for the case that actually needs someone's attention
+              right now. */}
+          {alert.isSos && (
+            <span className="absolute h-12 w-12 animate-ping rounded-full bg-white/40" />
+          )}
+          <span
+            className={`relative flex items-center justify-center rounded-full ${
+              alert.isSos ? "h-12 w-12 bg-white/15" : "h-10 w-10 bg-danger-light text-danger"
+            }`}
+          >
+            <Siren size={alert.isSos ? 22 : 19} className={alert.isSos ? "text-white" : ""} />
+          </span>
         </span>
 
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold">{alert.title}</p>
+          <span
+            className={`mb-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+              alert.isSos ? "bg-white/20 text-white" : "bg-danger-light text-danger"
+            }`}
+          >
+            {alert.isSos ? "SOS" : "Incident Report"}
+          </span>
+          <p className={`font-semibold ${alert.isSos ? "text-base" : "text-sm"}`}>{alert.title}</p>
           <p className={`truncate text-xs ${alert.isSos ? "text-white/85" : "text-muted"}`}>
             {alert.detail}
           </p>

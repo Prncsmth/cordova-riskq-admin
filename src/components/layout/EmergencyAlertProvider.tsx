@@ -2,10 +2,12 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useEmergencies } from "@/hooks/useEmergencies";
-import { playEmergencyAlertSound } from "@/lib/emergencyAlertSound";
+import { playEmergencyAlertSound, type EmergencyAlertKind } from "@/lib/emergencyAlertSound";
 import EmergencyAlertBanner from "@/components/layout/EmergencyAlertBanner";
 
 const SOUND_STORAGE_KEY = "riskq_admin_emergency_sound";
+// Only a routine incident report auto-dismisses -- SOS stays on screen
+// until an admin actually looks at it or dismisses it themselves.
 const AUTO_DISMISS_MS = 10000;
 
 export type EmergencyAlert = {
@@ -18,7 +20,7 @@ export type EmergencyAlert = {
 type EmergencyAlertContextValue = {
   soundEnabled: boolean;
   setSoundEnabled: (enabled: boolean) => void;
-  testSound: () => void;
+  testSound: (kind: EmergencyAlertKind) => void;
   alert: EmergencyAlert | null;
   dismissAlert: () => void;
 };
@@ -60,8 +62,8 @@ export function EmergencyAlertProvider({ children }: { children: React.ReactNode
     setAlert(null);
   }, []);
 
-  const testSound = useCallback(() => {
-    playEmergencyAlertSound();
+  const testSound = useCallback((kind: EmergencyAlertKind) => {
+    playEmergencyAlertSound(kind);
   }, []);
 
   useEffect(() => {
@@ -77,15 +79,17 @@ export function EmergencyAlertProvider({ children }: { children: React.ReactNode
       )[0];
 
       if (newest) {
+        const isSos = newest.source === "sos";
         setAlert({
           id: newest.id,
-          title: newest.source === "sos" ? "SOS Alert" : "New Incident Reported",
+          title: isSos ? "SOS Alert" : "New Incident Reported",
           detail: `${newest.type} — ${newest.locationName}`,
-          isSos: newest.source === "sos",
+          isSos,
         });
-        if (soundEnabledRef.current) playEmergencyAlertSound();
+        if (soundEnabledRef.current) playEmergencyAlertSound(isSos ? "sos" : "incident");
+
         if (dismissTimer.current) clearTimeout(dismissTimer.current);
-        dismissTimer.current = setTimeout(() => setAlert(null), AUTO_DISMISS_MS);
+        dismissTimer.current = isSos ? null : setTimeout(() => setAlert(null), AUTO_DISMISS_MS);
       }
     }
 

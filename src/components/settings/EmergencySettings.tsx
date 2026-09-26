@@ -31,15 +31,24 @@ export default function EmergencySettings() {
         <SettingRow
           icon={Volume2}
           label="Test Alert Sound"
-          description="Preview what the emergency alert sounds like"
+          description="SOS and a routine incident report sound different on purpose"
         >
-          <button
-            type="button"
-            onClick={testSound}
-            className="rounded-xl border border-border px-3.5 py-2 text-sm font-medium text-foreground transition hover:bg-background/60 active:scale-[0.98]"
-          >
-            Play Test
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => testSound("incident")}
+              className="rounded-xl border border-border px-3.5 py-2 text-sm font-medium text-foreground transition hover:bg-background/60 active:scale-[0.98]"
+            >
+              Incident
+            </button>
+            <button
+              type="button"
+              onClick={() => testSound("sos")}
+              className="rounded-xl border border-danger/30 bg-danger-light px-3.5 py-2 text-sm font-medium text-danger transition hover:bg-danger/15 active:scale-[0.98]"
+            >
+              SOS
+            </button>
+          </div>
         </SettingRow>
       </Card>
     </section>
