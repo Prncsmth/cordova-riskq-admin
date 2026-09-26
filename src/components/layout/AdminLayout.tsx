@@ -4,6 +4,7 @@ import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
+import { EmergencyAlertProvider } from "./EmergencyAlertProvider";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -37,17 +38,19 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen text-foreground">
-      <AdminSidebar />
+    <EmergencyAlertProvider>
+      <div className="min-h-screen text-foreground">
+        <AdminSidebar />
 
-      <div
-        className={`transition-[padding] duration-200 ease-in-out ${collapsed ? "lg:pl-18" : "lg:pl-64"}`}
-      >
-        {!isFullscreenMap && <AdminHeader />}
+        <div
+          className={`transition-[padding] duration-200 ease-in-out ${collapsed ? "lg:pl-18" : "lg:pl-64"}`}
+        >
+          {!isFullscreenMap && <AdminHeader />}
 
-        <main className={isFullscreenMap ? "" : "p-6 lg:p-8"}>{children}</main>
+          <main className={isFullscreenMap ? "" : "p-6 lg:p-8"}>{children}</main>
+        </div>
       </div>
-    </div>
+    </EmergencyAlertProvider>
   );
 }
 
