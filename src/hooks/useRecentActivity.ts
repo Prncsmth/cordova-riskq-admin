@@ -7,6 +7,7 @@ import { useSocket } from "@/hooks/useSocket";
 
 export type AdminActivityType =
   | "sos_alert"
+  | "incident_reported"
   | "responder_joined"
   | "incident_resolved"
   | "evacuation_center_updated"

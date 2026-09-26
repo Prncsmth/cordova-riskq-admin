@@ -9,7 +9,13 @@ import { timeAgo } from "@/lib/utils";
 
 export default function NotificationsMenu() {
   const [open, setOpen] = useState(false);
-  const { items, unreadCount, markRead, markAllRead } = useAdminNotifications(5);
+  // Was 5 -- that wasn't just "how many rows show in the dropdown", it was
+  // the hard cap on the entire underlying activity list (see
+  // useRecentActivity), so the unread badge structurally could never show
+  // more than 5 no matter how many notifications actually happened. The
+  // dropdown below is already scrollable (max-h-96 overflow-y-auto), so a
+  // larger limit both fixes the count and surfaces more real history.
+  const { items, unreadCount, markRead, markAllRead } = useAdminNotifications(20);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,8 +37,8 @@ export default function NotificationsMenu() {
       >
         <Bell size={19} />
         {unreadCount > 0 && (
-          <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger text-[10px] font-semibold text-white shadow-sm ring-2 ring-(--glass)">
-            {unreadCount}
+          <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold text-white shadow-sm ring-2 ring-(--glass)">
+            {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>

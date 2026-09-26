@@ -1,4 +1,4 @@
-import { Activity, BellRing, ShieldCheck, CheckCircle2, Building2, UserPlus } from "lucide-react";
+import { Activity, BellRing, FileWarning, ShieldCheck, CheckCircle2, Building2, UserPlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AdminActivity, AdminActivityType } from "@/hooks/useRecentActivity";
 
@@ -7,6 +7,7 @@ export const ACTIVITY_TYPE_STYLE: Record<
   { icon: LucideIcon; label: string; color: string }
 > = {
   sos_alert: { icon: BellRing, label: "SOS Alert", color: "text-danger" },
+  incident_reported: { icon: FileWarning, label: "Incident Report", color: "text-tide" },
   responder_joined: { icon: ShieldCheck, label: "Responder Joined", color: "text-info" },
   incident_resolved: { icon: CheckCircle2, label: "Incident Resolved", color: "text-success" },
   evacuation_center_updated: { icon: Building2, label: "Evacuation Center", color: "text-warning" },
@@ -30,6 +31,7 @@ export function getActivityStyle(type: string) {
 // the relevant list page rather than a specific (unknown) record.
 export const ACTIVITY_TYPE_HREF: Record<AdminActivityType, string> = {
   sos_alert: "/sos-alerts",
+  incident_reported: "/emergencies",
   responder_joined: "/responders",
   incident_resolved: "/incident-reports",
   evacuation_center_updated: "/evacuation-centers",
