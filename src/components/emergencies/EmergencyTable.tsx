@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
+import Pagination from "@/components/ui/Pagination";
 import type { Emergency } from "@/types/emergency";
 import { timeAgo } from "@/lib/utils";
 import { emergencyTypeStyles, defaultEmergencyTypeStyle, emergencyStatusStyle } from "@/lib/emergencyStyles";
@@ -22,6 +23,13 @@ export default function EmergencyTable({
 }) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("All");
+  // Client-side pagination -- unlike Responders/Users/SOS Alerts, this
+  // table already loads its full (live + history) list into memory and
+  // filters it in place, so paginating the already-filtered array here
+  // matches that existing pattern instead of adding server-side paging to
+  // useEmergenciesWithHistory just for this.
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const filtered = useMemo(() => {
     return emergencies.filter((emergency) => {
@@ -37,6 +45,31 @@ export default function EmergencyTable({
       return matchesStatus && matchesQuery;
     });
   }, [emergencies, query, statusFilter]);
+
+  // Resets to page 1 when the search/status filter changes, computed
+  // during render (React's recommended pattern for "adjusting state when
+  // a prop/value changes") rather than in an effect -- avoids the extra
+  // render-then-correct flash an effect-based reset would cause.
+  const [prevFilterKey, setPrevFilterKey] = useState({ query, statusFilter });
+  if (prevFilterKey.query !== query || prevFilterKey.statusFilter !== statusFilter) {
+    setPrevFilterKey({ query, statusFilter });
+    setPage(1);
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  // Clamped at render time, not via a separate effect -- if a live update
+  // (an incident resolving and dropping out of the list, via
+  // useEmergencies' socket merge) shrinks the result set out from under
+  // whatever page the admin is on, this pulls the effective page back in
+  // range without touching `page` state itself, so a distant update never
+  // forces them back to page 1 the way the filter-change reset above does.
+  const effectivePage = Math.min(page, totalPages);
+  const paginated = filtered.slice((effectivePage - 1) * pageSize, effectivePage * pageSize);
+
+  function handlePageSizeChange(size: number) {
+    setPageSize(size);
+    setPage(1);
+  }
 
   if (loading) {
     return (
@@ -106,7 +139,7 @@ export default function EmergencyTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/70">
-            {filtered.map((emergency) => {
+            {paginated.map((emergency) => {
               const style = emergencyTypeStyles[emergency.type] ?? defaultEmergencyTypeStyle;
               const Icon = style.icon;
               const status = emergencyStatusStyle[emergency.status];
@@ -151,6 +184,14 @@ export default function EmergencyTable({
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        page={effectivePage}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
     </div>
   );
 }
