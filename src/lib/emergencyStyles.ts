@@ -1,4 +1,4 @@
-import { HeartPulse, Flame, Car, ShieldAlert, CloudRain, FileQuestion } from "lucide-react";
+import { HeartPulse, Flame, Car, ShieldAlert, CloudRain, Siren, FileQuestion } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { EmergencyStatus, EmergencyType } from "@/types/emergency";
 
@@ -10,6 +10,10 @@ export const emergencyTypeStyles: Record<EmergencyType, { icon: LucideIcon; colo
   Accident: { icon: Car, color: "text-warning" },
   Crime: { icon: ShieldAlert, color: "text-primary" },
   Disaster: { icon: CloudRain, color: "text-info" },
+  // Was folded into "Other" (see incidentCategory.ts) -- gave every SOS-
+  // triggered incident the same generic icon/label as an uncategorized one
+  // in the Live Incidents table, with nothing marking it as SOS.
+  SOS: { icon: Siren, color: "text-danger" },
   Other: { icon: FileQuestion, color: "text-muted" },
 };
 

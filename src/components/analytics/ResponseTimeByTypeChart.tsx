@@ -15,6 +15,7 @@ const TYPE_COLORS: Record<EmergencyType, string> = {
   Disaster: "#0891b2",
   Accident: "#b45309",
   Crime: "#c8102e",
+  SOS: "#7c3aed",
   Other: "#6b7280",
 };
 

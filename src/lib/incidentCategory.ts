@@ -5,7 +5,7 @@ const CATEGORY_TO_TYPE: Record<string, EmergencyType> = {
   fire: "Fire",
   "road-accident": "Accident",
   flood: "Disaster",
-  sos: "Other",
+  sos: "SOS",
   other: "Other",
 };
 

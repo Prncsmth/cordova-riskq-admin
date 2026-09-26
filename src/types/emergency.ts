@@ -10,6 +10,7 @@ export type EmergencyType =
   | "Accident"
   | "Crime"
   | "Disaster"
+  | "SOS"
   | "Other";
 
 export interface Emergency {
