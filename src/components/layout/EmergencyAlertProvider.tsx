@@ -2,7 +2,11 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useEmergencies } from "@/hooks/useEmergencies";
-import { playEmergencyAlertSound, type EmergencyAlertKind } from "@/lib/emergencyAlertSound";
+import {
+  playEmergencyAlertSound,
+  unlockEmergencyAlertAudio,
+  type EmergencyAlertKind,
+} from "@/lib/emergencyAlertSound";
 import EmergencyAlertBanner from "@/components/layout/EmergencyAlertBanner";
 
 const SOUND_STORAGE_KEY = "riskq_admin_emergency_sound";
@@ -34,7 +38,15 @@ export function EmergencyAlertProvider({ children }: { children: React.ReactNode
   // existing purely to watch for brand-new arrivals doesn't interfere with,
   // or double up on, however many other components render from it.
   const { emergencies } = useEmergencies();
-  const [soundEnabled, setSoundEnabledState] = useState(true);
+  // Lazy initializer instead of defaulting to true + patching in a mount
+  // effect -- Next's recommended pattern for client-only persisted state
+  // (see preventing-flash-before-hydration.md), and avoids the
+  // react-hooks/set-state-in-effect cascading-render lint error.
+  const [soundEnabled, setSoundEnabledState] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const saved = localStorage.getItem(SOUND_STORAGE_KEY);
+    return saved === null ? true : saved === "true";
+  });
   const [alert, setAlert] = useState<EmergencyAlert | null>(null);
   // null until the first load resolves -- distinguishes "every incident
   // already pending when the dashboard opened" (not a real arrival, no
@@ -47,9 +59,23 @@ export function EmergencyAlertProvider({ children }: { children: React.ReactNode
     soundEnabledRef.current = soundEnabled;
   }, [soundEnabled]);
 
+  // Browsers won't play audio for a background-triggered alert until the
+  // page has seen a real user gesture -- prime it on whichever comes first,
+  // then stop listening. Without this, a dispatcher who just loads the
+  // dashboard and watches it (the actual point of this screen) never hears
+  // the very first alert.
   useEffect(() => {
-    const saved = localStorage.getItem(SOUND_STORAGE_KEY);
-    if (saved !== null) setSoundEnabledState(saved === "true");
+    function handleFirstInteraction() {
+      unlockEmergencyAlertAudio();
+      document.removeEventListener("pointerdown", handleFirstInteraction);
+      document.removeEventListener("keydown", handleFirstInteraction);
+    }
+    document.addEventListener("pointerdown", handleFirstInteraction);
+    document.addEventListener("keydown", handleFirstInteraction);
+    return () => {
+      document.removeEventListener("pointerdown", handleFirstInteraction);
+      document.removeEventListener("keydown", handleFirstInteraction);
+    };
   }, []);
 
   const setSoundEnabled = useCallback((enabled: boolean) => {

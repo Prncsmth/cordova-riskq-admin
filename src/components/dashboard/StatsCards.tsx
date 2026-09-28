@@ -13,6 +13,11 @@ export default function StatsCards() {
 
   const activeIncidents = emergencies.filter((e) => e.status === "Active").length;
   const sosAlertsToday = emergencies.filter((e) => e.source === "sos" && isToday(e.createdAt)).length;
+  // Proxy metric, not a real headcount -- no field anywhere records how many
+  // people an incident/SOS actually helped, so this counts resolved cases
+  // instead (both incident-report- and SOS-sourced, since both live in the
+  // same emergencies list) as a stand-in until that's tracked for real.
+  const peopleAssisted = emergencies.filter((e) => e.status === "Resolved").length;
 
   const cards = [
     {
@@ -35,7 +40,7 @@ export default function StatsCards() {
     },
     {
       title: "People Assisted",
-      value: null,
+      value: peopleAssisted,
       color: "text-info",
       icon: HeartHandshake,
     },
