@@ -86,6 +86,43 @@ function playSynthesizedFallback(kind: EmergencyAlertKind) {
   }
 }
 
+let audioUnlocked = false;
+
+// Browsers block audio (both the Web Audio API and <audio> elements) from
+// playing until the page has seen at least one real user gesture -- but a
+// new SOS/incident arrives over a background poll/socket, not a click, so
+// without this the very first alert (and every alert, if nothing else on
+// the page ever plays audio) is silently dropped: no error, no sound.
+// Call this once from any real user-gesture handler (see
+// EmergencyAlertProvider's first-interaction listener) to prime both audio
+// paths while still inside that gesture's call stack.
+export function unlockEmergencyAlertAudio(): void {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === "suspended") {
+    ctx.resume().catch(() => {});
+  }
+
+  (Object.keys(SOUND_SRC) as EmergencyAlertKind[]).forEach((kind) => {
+    const el = getAudioElement(kind);
+    const targetVolume = el.volume;
+    el.volume = 0;
+    el.play()
+      .then(() => {
+        el.pause();
+        el.currentTime = 0;
+        el.volume = targetVolume;
+      })
+      .catch(() => {
+        // No real file yet, or still blocked for some other reason -- the
+        // synthesized fallback only needs the AudioContext resumed above.
+        el.volume = targetVolume;
+      });
+  });
+}
+
 export function playEmergencyAlertSound(kind: EmergencyAlertKind) {
   if (audioFileMissing[kind]) {
     playSynthesizedFallback(kind);
