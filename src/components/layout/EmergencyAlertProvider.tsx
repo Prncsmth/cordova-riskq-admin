@@ -37,7 +37,7 @@ export function EmergencyAlertProvider({ children }: { children: React.ReactNode
   // also call it for. Each call keeps its own live-merged list, so this one
   // existing purely to watch for brand-new arrivals doesn't interfere with,
   // or double up on, however many other components render from it.
-  const { emergencies } = useEmergencies();
+  const { emergencies, loading } = useEmergencies();
   // Lazy initializer instead of defaulting to true + patching in a mount
   // effect -- Next's recommended pattern for client-only persisted state
   // (see preventing-flash-before-hydration.md), and avoids the
@@ -93,6 +93,12 @@ export function EmergencyAlertProvider({ children }: { children: React.ReactNode
   }, []);
 
   useEffect(() => {
+    // Wait for the initial GET /incidents before taking the baseline --
+    // seeding it from the still-empty pre-load list made every incident
+    // already pending look like a new arrival, so the newest one popped up
+    // (with sound) again on every page refresh.
+    if (loading) return;
+
     const previous = knownIds.current;
     const next = new Set(emergencies.map((e) => e.id));
 
@@ -120,7 +126,7 @@ export function EmergencyAlertProvider({ children }: { children: React.ReactNode
     }
 
     knownIds.current = next;
-  }, [emergencies]);
+  }, [emergencies, loading]);
 
   return (
     <EmergencyAlertContext.Provider

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
+import Pagination from "@/components/ui/Pagination";
 import { ACTIVITY_TYPE_STYLE, getActivityStyle } from "@/lib/adminActivity";
 import { formatDate } from "@/lib/utils";
 import type { AdminActivity, AdminActivityType } from "@/hooks/useRecentActivity";
@@ -20,6 +21,8 @@ export default function AuditLogTable({
 }) {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<(typeof typeFilters)[number]>("All");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const filtered = useMemo(() => {
     return activities.filter((activity) => {
@@ -34,6 +37,23 @@ export default function AuditLogTable({
       return matchesType && matchesQuery;
     });
   }, [activities, query, typeFilter]);
+
+  // Reset to page 1 when filters change, during render rather than in an effect.
+  const [prevFilterKey, setPrevFilterKey] = useState({ query, typeFilter });
+  if (prevFilterKey.query !== query || prevFilterKey.typeFilter !== typeFilter) {
+    setPrevFilterKey({ query, typeFilter });
+    setPage(1);
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const effectivePage = Math.min(page, totalPages);
+  const pageStart = (effectivePage - 1) * pageSize;
+  const paginated = filtered.slice(pageStart, pageStart + pageSize);
+
+  function handlePageSizeChange(size: number) {
+    setPageSize(size);
+    setPage(1);
+  }
 
   if (loading) {
     return (
@@ -101,12 +121,12 @@ export default function AuditLogTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/70">
-            {filtered.map((activity, index) => {
+            {paginated.map((activity, index) => {
               const style = getActivityStyle(activity.type);
               const Icon = style.icon;
 
               return (
-                <tr key={index} className="transition-colors hover:bg-background/70">
+                <tr key={pageStart + index}className="transition-colors hover:bg-background/70">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <Icon size={20} className={`shrink-0 ${style.color}`} />
@@ -129,6 +149,14 @@ export default function AuditLogTable({
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        page={effectivePage}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
     </div>
   );
 }

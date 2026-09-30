@@ -26,16 +26,25 @@ type SosAlertTableProps = {
   pageSize: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
+  onCloseAlert: (alert: SosAlert, outcome: "resolved" | "dismissed") => void;
+  closingAlertId: string | null;
 };
 
 const statusVariant = {
   New: "danger",
   Acknowledged: "warning",
+  Unattended: "info",
   Resolved: "success",
   Cancelled: "default",
 } as const;
 
-const statusFilters = ["All", "New", "Acknowledged", "Resolved", "Cancelled"] as const;
+const statusFilters = ["All", "New", "Acknowledged", "Unattended", "Resolved", "Cancelled"] as const;
+
+// Mirrors the backend's canAdminCloseSosIncident: only alerts no responder
+// has joined yet can be closed from here.
+function canAdminClose(alert: SosAlert) {
+  return alert.status === "New" || alert.status === "Unattended";
+}
 
 function initials(name: string) {
   return name
@@ -59,6 +68,8 @@ export default function SosAlertTable({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  onCloseAlert,
+  closingAlertId,
 }: SosAlertTableProps) {
   // Triage view of this page's alerts: unaddressed ("New") ones first,
   // oldest-first among those, so nothing waiting for a look sinks to the
@@ -138,6 +149,7 @@ export default function SosAlertTable({
                 <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Location</th>
                 <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Received</th>
                 <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Status</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/70">
@@ -178,13 +190,39 @@ export default function SosAlertTable({
                       {alert.status}
                     </Badge>
                   </td>
+                  <td className="p-4">
+                    {canAdminClose(alert) ? (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => onCloseAlert(alert, "resolved")}
+                          disabled={closingAlertId === alert.id}
+                          title="Mark as handled outside the app, e.g. by phone"
+                          className="rounded-lg bg-success-light px-2.5 py-1 text-xs font-semibold text-success transition hover:opacity-80 disabled:opacity-40"
+                        >
+                          Resolve
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onCloseAlert(alert, "dismissed")}
+                          disabled={closingAlertId === alert.id}
+                          title="Dismiss as a false alarm or duplicate"
+                          className="rounded-lg bg-background px-2.5 py-1 text-xs font-semibold text-muted transition hover:text-foreground disabled:opacity-40"
+                        >
+                          Dismiss
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted">—</span>
+                    )}
+                  </td>
                 </tr>
                 );
               })}
 
               {alerts.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-10 text-center text-sm text-muted">
+                  <td colSpan={5} className="p-10 text-center text-sm text-muted">
                     No SOS alerts match your search and filters.
                   </td>
                 </tr>

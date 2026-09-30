@@ -17,6 +17,7 @@ import {
   Megaphone,
   Phone,
   ScrollText,
+  LifeBuoy,
 } from "lucide-react";
 import SidebarGroup from "./SidebarGroup";
 import SidebarItem from "./SidebarItem";
@@ -119,6 +120,7 @@ export default function AdminSidebar() {
             { href: "/analytics", label: "Analytics", icon: BarChart3 },
             { href: "/reports", label: "Reports", icon: FileBarChart },
             { href: "/announcements", label: "Announcements", icon: Megaphone },
+            { href: "/support-requests", label: "Support Requests", icon: LifeBuoy },
             { href: "/audit-logs", label: "Audit Logs", icon: ScrollText },
             { href: "/settings", label: "Settings", icon: Settings },
           ]}

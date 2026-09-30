@@ -1,24 +1,48 @@
 "use client";
 
 import { useState } from "react";
-import { BellRing, CheckCheck, ShieldCheck, Siren, XCircle } from "lucide-react";
+import { BellRing, CheckCheck, Hourglass, ShieldCheck, Siren, XCircle } from "lucide-react";
 import Card from "@/components/ui/Card";
 import SosAlertTable from "@/components/sos-alerts/SosAlertTable";
-import { useSosAlerts, useSosAlertSummary } from "@/hooks/useSosAlerts";
+import { closeSosAlert, useSosAlerts, useSosAlertSummary } from "@/hooks/useSosAlerts";
+import { useAuth } from "@/hooks/useAuth";
 import { usePaginationState } from "@/hooks/usePaginationState";
-import type { SosAlertStatus } from "@/types/sos-alert";
+import type { SosAlert, SosAlertStatus } from "@/types/sos-alert";
+
+const CLOSE_CONFIRM_COPY = {
+  resolved: "Mark this SOS alert as resolved? Use this when it was handled outside the app (e.g. by phone).",
+  dismissed: "Dismiss this SOS alert? Use this for a false alarm or duplicate.",
+};
 
 export default function SosAlertsPage() {
+  const { token } = useAuth();
   const pagination = usePaginationState();
   const [statusFilter, setStatusFilter] = useState<"All" | SosAlertStatus>("All");
+  // Bumped after an admin close so the list and summary cards refetch.
+  const [reloadKey, setReloadKey] = useState(0);
+  const [closingAlertId, setClosingAlertId] = useState<string | null>(null);
 
-  const { alerts, total, loading, error } = useSosAlerts(pagination, statusFilter);
-  const { summary } = useSosAlertSummary();
+  const { alerts, total, loading, error } = useSosAlerts(pagination, statusFilter, reloadKey);
+  const { summary } = useSosAlertSummary(reloadKey);
   const totalPages = Math.max(1, Math.ceil(total / pagination.pageSize));
 
   function handleStatusFilterChange(value: "All" | SosAlertStatus) {
     setStatusFilter(value);
     pagination.resetPage();
+  }
+
+  async function handleCloseAlert(alert: SosAlert, outcome: "resolved" | "dismissed") {
+    if (!token || !window.confirm(CLOSE_CONFIRM_COPY[outcome])) return;
+
+    setClosingAlertId(alert.id);
+    try {
+      await closeSosAlert(token, alert.id, outcome);
+      setReloadKey((key) => key + 1);
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : "Failed to close SOS alert.");
+    } finally {
+      setClosingAlertId(null);
+    }
   }
 
   const stats = [
@@ -39,6 +63,12 @@ export default function SosAlertsPage() {
       value: String(summary?.Acknowledged ?? 0),
       icon: CheckCheck,
       color: "text-warning",
+    },
+    {
+      label: "Unattended",
+      value: String(summary?.Unattended ?? 0),
+      icon: Hourglass,
+      color: "text-info",
     },
     {
       label: "Resolved",
@@ -63,7 +93,7 @@ export default function SosAlertsPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -91,6 +121,8 @@ export default function SosAlertsPage() {
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
         onPageSizeChange={pagination.setPageSize}
+        onCloseAlert={handleCloseAlert}
+        closingAlertId={closingAlertId}
       />
     </div>
   );

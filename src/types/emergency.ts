@@ -2,7 +2,9 @@ export type EmergencyStatus =
   | "Active"
   | "Responding"
   | "Resolved"
-  | "Cancelled";
+  | "Cancelled"
+  // An SOS no responder joined before the backend's expiry sweep closed it.
+  | "Unattended";
 
 export type EmergencyType =
   | "Medical"
@@ -31,6 +33,9 @@ export interface Emergency {
   // like ResponderDetails that needs to know "is this responder working this
   // incident" must check this list, not just responderId.
   responderIds?: string[];
+  // The same active roster with names and each responder's own step
+  // (joined/on_the_way/arrived) -- what EmergencyDetails renders live.
+  responders?: { id: string; name: string; status: string }[];
   createdAt: string;
   updatedAt: string;
 }

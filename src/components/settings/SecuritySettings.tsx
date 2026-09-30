@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Monitor, LogOut } from "lucide-react";
+import { Lock, LogOut } from "lucide-react";
 import Card from "@/components/ui/Card";
 import SettingRow from "@/components/settings/SettingRow";
 import { useAuth } from "@/hooks/useAuth";
@@ -131,15 +131,6 @@ export default function SecuritySettings() {
               </button>
             </SettingRow>
           )}
-
-          <SettingRow icon={Monitor} label="Active Sessions" description="1 device currently signed in">
-            <button
-              type="button"
-              className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs transition-all duration-150 hover:border-primary/40 hover:bg-primary-light/30 active:scale-[0.97]"
-            >
-              Manage
-            </button>
-          </SettingRow>
         </Card>
       </div>
 

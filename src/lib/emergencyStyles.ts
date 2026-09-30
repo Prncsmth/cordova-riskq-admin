@@ -1,5 +1,6 @@
 import { HeartPulse, Flame, Car, ShieldAlert, CloudRain, Siren, FileQuestion } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { BadgeVariant } from "@/components/ui/Badge";
 import type { EmergencyStatus, EmergencyType } from "@/types/emergency";
 
 // Shared by EmergencyTable (list) and EmergencyDetails (detail page) so the
@@ -19,9 +20,15 @@ export const emergencyTypeStyles: Record<EmergencyType, { icon: LucideIcon; colo
 
 export const defaultEmergencyTypeStyle = emergencyTypeStyles.Other;
 
-export const emergencyStatusStyle: Record<EmergencyStatus, { variant: "danger" | "warning" | "success" | "default"; solid: boolean }> = {
+export const emergencyStatusStyle: Record<EmergencyStatus, { variant: BadgeVariant; solid: boolean }> = {
   Active: { variant: "danger", solid: true },
   Responding: { variant: "warning", solid: false },
   Resolved: { variant: "success", solid: false },
   Cancelled: { variant: "default", solid: false },
+  // Matches the SOS Alerts page's Unattended badge.
+  Unattended: { variant: "info", solid: false },
 };
+
+// Statuses that mean the incident is closed -- dropped from the live
+// incidents list and the live map.
+export const TERMINAL_EMERGENCY_STATUSES: EmergencyStatus[] = ["Resolved", "Cancelled", "Unattended"];

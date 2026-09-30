@@ -6,6 +6,7 @@ import { Search, Flame, CloudRain, Car, HeartPulse, FileText } from "lucide-reac
 import type { LucideIcon } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
+import Pagination from "@/components/ui/Pagination";
 import type { IncidentReport } from "@/types/incident-report";
 import { timeAgo } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ const statusVariant = {
   Responding: "warning",
   Resolved: "success",
   Cancelled: "default",
+  Unattended: "info",
 } as const;
 
 const typeStyles: Record<string, { icon: LucideIcon; color: string }> = {
@@ -38,6 +40,8 @@ export default function IncidentReportTable({
 }) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("All");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const filtered = useMemo(() => {
     return reports.filter((report) => {
@@ -53,6 +57,22 @@ export default function IncidentReportTable({
       return matchesStatus && matchesQuery;
     });
   }, [reports, query, statusFilter]);
+
+  // Reset to page 1 when filters change, during render rather than in an effect.
+  const [prevFilterKey, setPrevFilterKey] = useState({ query, statusFilter });
+  if (prevFilterKey.query !== query || prevFilterKey.statusFilter !== statusFilter) {
+    setPrevFilterKey({ query, statusFilter });
+    setPage(1);
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const effectivePage = Math.min(page, totalPages);
+  const paginated = filtered.slice((effectivePage - 1) * pageSize, effectivePage * pageSize);
+
+  function handlePageSizeChange(size: number) {
+    setPageSize(size);
+    setPage(1);
+  }
 
   if (loading) {
     return (
@@ -122,7 +142,7 @@ export default function IncidentReportTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/70">
-            {filtered.map((report) => {
+            {paginated.map((report) => {
               const style = typeStyles[report.type] ?? defaultTypeStyle;
               const Icon = style.icon;
 
@@ -164,6 +184,14 @@ export default function IncidentReportTable({
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        page={effectivePage}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
     </div>
   );
 }

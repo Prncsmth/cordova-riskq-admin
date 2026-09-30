@@ -16,6 +16,9 @@ type RawSosAlert = {
   reporter: { id: string; name: string | null; mobile: string | null };
   incidentId: string | null;
   incidentStatus: string | null;
+  // Backend-derived bucket -- also covers alerts with no incident, which
+  // incidentStatus alone can't (see the backend's sosAlertStatus.ts).
+  alertStatus?: SosAlertStatus;
 };
 
 // SosAlert.status itself never changes after creation (always "active") --
@@ -31,6 +34,9 @@ const INCIDENT_STATUS_TO_ALERT_STATUS: Record<string, SosAlertStatus> = {
   // read as if a responder had actually resolved it. Mirrors the backend's
   // sosAlertStatus.ts (this table is the frontend copy of that mapping).
   cancelled: "Cancelled",
+  // Set by the backend's expiry sweep once a pending SOS goes unanswered
+  // past its window -- otherwise an ignored alert read as "New" forever.
+  expired: "Unattended",
 };
 
 function toSosAlert(raw: RawSosAlert): SosAlert {
@@ -40,12 +46,29 @@ function toSosAlert(raw: RawSosAlert): SosAlert {
     locationName: raw.locationLabel ?? "Location unavailable",
     latitude: raw.latitude ?? 0,
     longitude: raw.longitude ?? 0,
-    status: raw.incidentStatus ? (INCIDENT_STATUS_TO_ALERT_STATUS[raw.incidentStatus] ?? "New") : "New",
+    status:
+      raw.alertStatus ??
+      (raw.incidentStatus ? (INCIDENT_STATUS_TO_ALERT_STATUS[raw.incidentStatus] ?? "New") : "New"),
+    incidentId: raw.incidentId,
     createdAt: raw.createdAt,
   };
 }
 
-export function useSosAlerts(pagination: ReturnType<typeof usePaginationState>, alertStatus: "All" | SosAlertStatus) {
+// Admin close for a New/Unattended alert: "resolved" if it was handled
+// outside the app (e.g. by phone), "dismissed" for a false alarm/duplicate.
+export function closeSosAlert(token: string, alertId: string, outcome: "resolved" | "dismissed") {
+  return apiFetch<{ success: true }>(`/admin/sos-alerts/${alertId}/close`, {
+    token,
+    method: "PATCH",
+    body: JSON.stringify({ outcome }),
+  });
+}
+
+export function useSosAlerts(
+  pagination: ReturnType<typeof usePaginationState>,
+  alertStatus: "All" | SosAlertStatus,
+  reloadKey = 0,
+) {
   const { token } = useAuth();
   const { page, pageSize, search } = pagination;
   const [alerts, setAlerts] = useState<SosAlert[]>([]);
@@ -89,20 +112,14 @@ export function useSosAlerts(pagination: ReturnType<typeof usePaginationState>, 
     return () => {
       cancelled = true;
     };
-  }, [token, page, pageSize, search, alertStatus]);
+  }, [token, page, pageSize, search, alertStatus, reloadKey]);
 
   return { alerts, total, loading, error };
 }
 
-export function useSosAlertSummary() {
+export function useSosAlertSummary(reloadKey = 0) {
   const { token } = useAuth();
-  const [summary, setSummary] = useState<{
-    total: number;
-    New: number;
-    Acknowledged: number;
-    Resolved: number;
-    Cancelled: number;
-  } | null>(null);
+  const [summary, setSummary] = useState<(Record<SosAlertStatus, number> & { total: number }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -131,7 +148,7 @@ export function useSosAlertSummary() {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, reloadKey]);
 
   return { summary, loading, error };
 }

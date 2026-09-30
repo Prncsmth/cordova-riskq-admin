@@ -5,6 +5,7 @@ import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useSocket } from "@/hooks/useSocket";
 import { categoryToEmergencyType } from "@/lib/incidentCategory";
+import { TERMINAL_EMERGENCY_STATUSES } from "@/lib/emergencyStyles";
 import { Emergency, EmergencyStatus } from "@/types/emergency";
 
 type RawIncident = {
@@ -37,6 +38,7 @@ const STATUS_TO_EMERGENCY_STATUS: Record<string, EmergencyStatus> = {
   arrived: "Responding",
   completed: "Resolved",
   cancelled: "Cancelled",
+  expired: "Unattended",
 };
 
 function toEmergency(raw: RawIncident): Emergency {
@@ -55,6 +57,7 @@ function toEmergency(raw: RawIncident): Emergency {
     responderId: raw.acceptedByResponderId ?? undefined,
     responderName: acceptedResponder?.name,
     responderIds: raw.responders?.map((r) => r.id) ?? [],
+    responders: raw.responders ?? [],
     createdAt: raw.createdAt,
     updatedAt: raw.updatedAt,
   };
@@ -102,7 +105,7 @@ export function useEmergencies() {
   useEffect(() => {
     function handleIncidentUpdate(raw: RawIncident) {
       const emergency = toEmergency(raw);
-      const isTerminal = emergency.status === "Resolved" || emergency.status === "Cancelled";
+      const isTerminal = TERMINAL_EMERGENCY_STATUSES.includes(emergency.status);
 
       setEmergencies((prev) => {
         if (isTerminal) return prev.filter((e) => e.id !== emergency.id);
@@ -123,6 +126,7 @@ export function useEmergencies() {
 
 export function useEmergency(id: string) {
   const { token } = useAuth();
+  const socket = useSocket();
   const [emergency, setEmergency] = useState<Emergency | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -153,6 +157,21 @@ export function useEmergency(id: string) {
       cancelled = true;
     };
   }, [token, id]);
+
+  // Same admin:incidentUpdate stream useEmergencies listens to, narrowed to
+  // this one incident -- keeps the status badge and assigned responder live
+  // as responders join, head out, arrive, or close it, without a reload.
+  useEffect(() => {
+    function handleIncidentUpdate(raw: RawIncident) {
+      if (raw.id !== id) return;
+      setEmergency(toEmergency(raw));
+    }
+
+    socket.on("admin:incidentUpdate", handleIncidentUpdate);
+    return () => {
+      socket.off("admin:incidentUpdate", handleIncidentUpdate);
+    };
+  }, [socket, id]);
 
   return { emergency, loading, error };
 }

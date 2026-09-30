@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { MapPin, Clock, ShieldCheck, ShieldQuestion, Siren, MessageSquareText } from "lucide-react";
 import Card from "@/components/ui/Card";
-import Badge from "@/components/ui/Badge";
+import Badge, { type BadgeVariant } from "@/components/ui/Badge";
 import { useEmergency } from "@/hooks/useEmergencies";
 import { emergencyTypeStyles, defaultEmergencyTypeStyle, emergencyStatusStyle } from "@/lib/emergencyStyles";
 import { timeAgo, formatDate } from "@/lib/utils";
@@ -16,6 +16,16 @@ const MiniMap = dynamic(() => import("@/components/map/MiniMap"), {
     </div>
   ),
 });
+
+// Each responder's own roster step (backend IncidentResponder.status), shown
+// per row -- the incident-level "Responding" badge can't say who is where.
+const responderStepStyle: Record<string, { label: string; variant: BadgeVariant; color: string }> = {
+  joined: { label: "Joined", variant: "info", color: "text-info" },
+  on_the_way: { label: "On the way", variant: "warning", color: "text-warning" },
+  arrived: { label: "Arrived", variant: "success", color: "text-success" },
+};
+
+const defaultResponderStep = { label: "Assigned", variant: "default" as BadgeVariant, color: "text-muted" };
 
 export default function EmergencyDetails({
   id,
@@ -44,6 +54,7 @@ export default function EmergencyDetails({
   const Icon = style.icon;
   const status = emergencyStatusStyle[emergency.status];
   const hasCoords = emergency.latitude !== 0 && emergency.longitude !== 0;
+  const responders = emergency.responders ?? [];
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -106,17 +117,29 @@ export default function EmergencyDetails({
       </Card>
 
       <Card>
-        <h2 className="font-semibold text-foreground">Assigned Responder</h2>
+        <h2 className="font-semibold text-foreground">
+          Assigned Responder{responders.length > 1 ? `s (${responders.length})` : ""}
+        </h2>
 
         <div className="mt-5">
-          {emergency.responderId ? (
-            <div className="flex items-center gap-3">
-              <ShieldCheck size={22} className="shrink-0 text-info" />
-              <div className="min-w-0">
-                <p className="font-medium text-foreground">{emergency.responderName ?? "Responder"}</p>
-                <p className="text-xs text-muted">Currently assigned</p>
-              </div>
-            </div>
+          {responders.length > 0 ? (
+            <ul className="space-y-4">
+              {responders.map((responder) => {
+                const step = responderStepStyle[responder.status] ?? defaultResponderStep;
+                return (
+                  <li key={responder.id} className="flex items-center gap-3">
+                    <ShieldCheck size={22} className={`shrink-0 ${step.color}`} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-foreground">{responder.name}</p>
+                      <p className="text-xs text-muted">
+                        {responder.id === emergency.responderId ? "First to accept" : "Joined to help"}
+                      </p>
+                    </div>
+                    <Badge variant={step.variant}>{step.label}</Badge>
+                  </li>
+                );
+              })}
+            </ul>
           ) : (
             <div className="flex items-center gap-3">
               <ShieldQuestion size={22} className="shrink-0 text-muted" />

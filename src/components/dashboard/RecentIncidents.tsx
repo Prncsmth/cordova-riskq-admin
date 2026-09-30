@@ -11,6 +11,7 @@ const statusVariant = {
   Responding: "warning",
   Resolved: "success",
   Cancelled: "default",
+  Unattended: "info",
 } as const;
 
 export default function RecentIncidents() {

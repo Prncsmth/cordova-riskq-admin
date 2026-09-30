@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useEmergencies } from "@/hooks/useEmergencies";
+import { TERMINAL_EMERGENCY_STATUSES } from "@/lib/emergencyStyles";
 import { useEvacuationCenters } from "@/hooks/useEvacuationCenters";
 import { useResponderLocations } from "@/hooks/useResponderLocations";
 import type { LiveMapMarker } from "@/components/map/LiveMap";
@@ -21,7 +22,7 @@ export function useLiveMapMarkers() {
       // returns every incident ever recorded (the full history the list
       // page filters client-side), so resolved/cancelled ones need
       // excluding here or they'd sit on the map forever.
-      .filter((e) => e.status !== "Resolved" && e.status !== "Cancelled")
+      .filter((e) => !TERMINAL_EMERGENCY_STATUSES.includes(e.status))
       .filter((e) => e.latitude !== 0 && e.longitude !== 0)
       .map((e) => ({
         id: e.id,
