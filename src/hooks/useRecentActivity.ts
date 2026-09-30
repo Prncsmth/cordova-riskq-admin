@@ -11,7 +11,8 @@ export type AdminActivityType =
   | "responder_joined"
   | "incident_resolved"
   | "evacuation_center_updated"
-  | "user_registered";
+  | "user_registered"
+  | "support_request";
 
 export type AdminActivity = {
   type: AdminActivityType;

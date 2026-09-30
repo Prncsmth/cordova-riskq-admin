@@ -1,4 +1,4 @@
-import { Activity, BellRing, FileWarning, ShieldCheck, CheckCircle2, Building2, UserPlus } from "lucide-react";
+import { Activity, BellRing, FileWarning, ShieldCheck, CheckCircle2, Building2, UserPlus, LifeBuoy } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AdminActivity, AdminActivityType } from "@/hooks/useRecentActivity";
 
@@ -12,6 +12,7 @@ export const ACTIVITY_TYPE_STYLE: Record<
   incident_resolved: { icon: CheckCircle2, label: "Incident Resolved", color: "text-success" },
   evacuation_center_updated: { icon: Building2, label: "Evacuation Center", color: "text-warning" },
   user_registered: { icon: UserPlus, label: "New User", color: "text-primary" },
+  support_request: { icon: LifeBuoy, label: "Support Request", color: "text-info" },
 };
 
 const DEFAULT_ACTIVITY_STYLE = { icon: Activity, label: "Activity", color: "text-muted" };
@@ -36,6 +37,7 @@ export const ACTIVITY_TYPE_HREF: Record<AdminActivityType, string> = {
   incident_resolved: "/incident-reports",
   evacuation_center_updated: "/evacuation-centers",
   user_registered: "/users",
+  support_request: "/support-requests",
 };
 
 // AdminActivity items have no id of their own (derived, not stored) -- this

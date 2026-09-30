@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Search, LifeBuoy, Mail, Phone } from "lucide-react";
 import Badge, { type BadgeVariant } from "@/components/ui/Badge";
 import Pagination from "@/components/ui/Pagination";
-import type { SupportRequest, SupportRequestStatus } from "@/types/support-request";
+import { REQUESTER_ROLE_LABEL, type SupportRequest, type SupportRequestStatus } from "@/types/support-request";
 
 const statusFilters = ["All", "open", "in_progress", "resolved"] as const;
 
@@ -27,6 +27,7 @@ export default function SupportRequestTable({
   error,
   actionError,
   onUpdateStatus,
+  freshIds,
   searchInput,
   onSearchChange,
   statusFilter,
@@ -42,6 +43,7 @@ export default function SupportRequestTable({
   error: string | null;
   actionError: string | null;
   onUpdateStatus: (id: string, status: SupportRequestStatus) => Promise<void>;
+  freshIds: string[];
   searchInput: string;
   onSearchChange: (value: string) => void;
   statusFilter: "All" | SupportRequestStatus;
@@ -121,7 +123,12 @@ export default function SupportRequestTable({
 
         <div className="divide-y divide-border/70">
           {supportRequests.map((r) => (
-            <div key={r.id} className="flex items-start gap-3 p-4 transition-colors hover:bg-background/50">
+            <div
+              key={r.id}
+              className={`flex items-start gap-3 p-4 transition-colors hover:bg-background/50 ${
+                freshIds.includes(r.id) ? "bg-primary-light/30 ring-1 ring-inset ring-primary/30" : ""
+              }`}
+            >
               <LifeBuoy
                 size={20}
                 className={`mt-0.5 shrink-0 ${r.status === "open" ? "text-danger" : "text-primary"}`}
@@ -134,12 +141,24 @@ export default function SupportRequestTable({
                     {STATUS_LABEL[r.status]}
                   </Badge>
                   <Badge>{r.topic}</Badge>
+                  {freshIds.includes(r.id) && (
+                    <Badge variant="info" solid>
+                      New
+                    </Badge>
+                  )}
                 </div>
 
                 <p className="mt-1 whitespace-pre-wrap text-sm text-muted">{r.message}</p>
 
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-tertiary">
-                  <span className="font-medium text-foreground/80">{r.user.name || "Unnamed user"}</span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="font-medium text-foreground/80">{r.user.name || "Unnamed user"}</span>
+                    {r.user.role && (
+                      <Badge variant={r.user.role === "responder" ? "info" : "default"}>
+                        {REQUESTER_ROLE_LABEL[r.user.role] ?? r.user.role}
+                      </Badge>
+                    )}
+                  </span>
                   <a href={`mailto:${r.user.email}`} className="inline-flex items-center gap-1 hover:text-primary">
                     <Mail size={12} />
                     {r.user.email}

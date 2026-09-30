@@ -5,18 +5,23 @@ import Link from "next/link";
 import { Search, Bell, MailOpen } from "lucide-react";
 import Card from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
+import Pagination from "@/components/ui/Pagination";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
 import { ACTIVITY_TYPE_STYLE, ACTIVITY_TYPE_HREF } from "@/lib/adminActivity";
 import { timeAgo } from "@/lib/utils";
 import type { AdminActivityType } from "@/hooks/useRecentActivity";
 
-const FEED_LIMIT = 50;
+// The backend's cap for GET /admin/activity (admin.service.ts's
+// getRecentActivity) -- paged client-side below.
+const FEED_LIMIT = 100;
 const typeFilters = ["All", ...Object.keys(ACTIVITY_TYPE_STYLE)] as (AdminActivityType | "All")[];
 
 export default function NotificationsPage() {
   const { items, loading, error, unreadCount, markRead, markAllRead } = useAdminNotifications(FEED_LIMIT);
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<(typeof typeFilters)[number]>("All");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const filtered = useMemo(() => {
     return items.filter(({ activity }) => {
@@ -29,6 +34,24 @@ export default function NotificationsPage() {
       return matchesType && matchesQuery;
     });
   }, [items, query, typeFilter]);
+
+  // Reset to page 1 when filters change, during render rather than in an effect.
+  const [prevFilterKey, setPrevFilterKey] = useState({ query, typeFilter });
+  if (prevFilterKey.query !== query || prevFilterKey.typeFilter !== typeFilter) {
+    setPrevFilterKey({ query, typeFilter });
+    setPage(1);
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  // Clamped at render time so live notifications shifting the list never
+  // leave the admin on an out-of-range page.
+  const effectivePage = Math.min(page, totalPages);
+  const paginated = filtered.slice((effectivePage - 1) * pageSize, effectivePage * pageSize);
+
+  function handlePageSizeChange(size: number) {
+    setPageSize(size);
+    setPage(1);
+  }
 
   return (
     <div className="space-y-6">
@@ -114,7 +137,7 @@ export default function NotificationsPage() {
           <EmptyState title="You're all caught up" description="New activity will show up here." />
         ) : (
           <div className="divide-y divide-border/70">
-            {filtered.map(({ activity, key, read }) => {
+            {paginated.map(({ activity, key, read }) => {
               const style = ACTIVITY_TYPE_STYLE[activity.type];
               const Icon = style.icon;
               return (
@@ -141,6 +164,16 @@ export default function NotificationsPage() {
               <p className="p-10 text-center text-sm text-muted">No notifications match your filters.</p>
             )}
           </div>
+        )}
+
+        {!loading && !error && items.length > 0 && (
+          <Pagination
+            page={effectivePage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={handlePageSizeChange}
+          />
         )}
       </div>
     </div>
