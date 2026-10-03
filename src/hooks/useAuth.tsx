@@ -53,7 +53,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsHydrated(true);
   }, []);
 
-  const authenticated = token !== null;
+  // Requires the stored user to actually be role "admin", not just the
+  // presence of a token -- login() already rejects a non-admin account, but
+  // this check previously only looked at the token, so a non-admin token
+  // obtained any other way (e.g. calling the shared /auth/login endpoint
+  // directly) still passed. The backend independently re-checks role on
+  // every /admin/* route and the Socket.IO admin room join regardless, so
+  // this is defense-in-depth for a cleaner client experience, not the real
+  // security boundary.
+  const authenticated = token !== null && user?.role === "admin";
 
   const login = useCallback(async (email: string, password: string) => {
     const response = await apiFetch<LoginResponse>("/auth/login", {
