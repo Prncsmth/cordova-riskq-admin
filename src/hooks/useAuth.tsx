@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useSyncExternalStore } from "react";
 import { apiFetch } from "@/lib/api";
 import { User } from "@/types/user";
 
@@ -26,15 +26,65 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function readStoredUser(): User | null {
-  if (typeof window === "undefined") return null;
+// localStorage-backed external store (read via useSyncExternalStore below)
+// instead of useState+useEffect -- reading localStorage is a synchronous
+// setState call inside an effect body, which React's set-state-in-effect
+// rule flags as a cascading-render smell. It's also the wrong tool here
+// specifically: authenticated gates a redirect in AdminLayout, so getting
+// the server/first-client-paint snapshot wrong risks a real hydration
+// mismatch, not just a lint complaint. useSyncExternalStore is the API
+// built for exactly this -- external (non-React) state that must agree
+// with the server on the first paint and only diverge after hydration.
+type AuthSnapshot = { token: string | null; user: User | null };
+
+const SERVER_SNAPSHOT: AuthSnapshot = { token: null, user: null };
+let cachedSnapshot: AuthSnapshot | null = null;
+const listeners = new Set<() => void>();
+
+function readAuthFromStorage(): AuthSnapshot {
+  const token = localStorage.getItem(TOKEN_KEY);
   const raw = localStorage.getItem(USER_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as User;
-  } catch {
-    return null;
+  let user: User | null = null;
+  if (raw) {
+    try {
+      user = JSON.parse(raw) as User;
+    } catch {
+      user = null;
+    }
   }
+  return { token, user };
+}
+
+function getAuthSnapshot(): AuthSnapshot {
+  if (cachedSnapshot === null) {
+    cachedSnapshot = readAuthFromStorage();
+  }
+  return cachedSnapshot;
+}
+
+function getServerAuthSnapshot(): AuthSnapshot {
+  return SERVER_SNAPSHOT;
+}
+
+function setAuthSnapshot(next: AuthSnapshot): void {
+  cachedSnapshot = next;
+  listeners.forEach((listener) => listener());
+}
+
+function subscribeAuth(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+// Standard React idiom for "has this component hydrated on the client yet" --
+// subscribe is a no-op since it never changes after mount, so this never
+// calls setState at all (there's nothing to call it from).
+function useHasMounted(): boolean {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 }
 
 // Single shared auth state via Context, same pattern as ThemeProvider --
@@ -43,15 +93,8 @@ function readStoredUser(): User | null {
 // component's own hook instance, leaving UserMenu/DashboardHeader's
 // already-mounted copies of `user` stale until a full page reload.
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    setToken(localStorage.getItem(TOKEN_KEY));
-    setUser(readStoredUser());
-    setIsHydrated(true);
-  }, []);
+  const { token, user } = useSyncExternalStore(subscribeAuth, getAuthSnapshot, getServerAuthSnapshot);
+  const isHydrated = useHasMounted();
 
   // Requires the stored user to actually be role "admin", not just the
   // presence of a token -- login() already rejects a non-admin account, but
@@ -84,25 +127,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(TOKEN_KEY, response.token);
     localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
     localStorage.setItem(AUTH_FLAG_KEY, "true");
-    setToken(response.token);
-    setUser(nextUser);
+    setAuthSnapshot({ token: response.token, user: nextUser });
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(AUTH_FLAG_KEY);
-    setToken(null);
-    setUser(null);
+    setAuthSnapshot({ token: null, user: null });
   }, []);
 
   const updateUser = useCallback((patch: Partial<Pick<User, "name" | "email">>) => {
-    setUser((prev) => {
-      if (!prev) return prev;
-      const next = { ...prev, ...patch };
-      localStorage.setItem(USER_KEY, JSON.stringify(next));
-      return next;
-    });
+    const current = getAuthSnapshot();
+    if (!current.user) return;
+    const next = { ...current.user, ...patch };
+    localStorage.setItem(USER_KEY, JSON.stringify(next));
+    setAuthSnapshot({ token: current.token, user: next });
   }, []);
 
   return (
