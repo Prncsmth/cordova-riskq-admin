@@ -7,13 +7,13 @@ import AnnouncementPreview from "@/components/announcements/AnnouncementPreview"
 import AnnouncementTable from "@/components/announcements/AnnouncementTable";
 import { useAnnouncements } from "@/hooks/useAnnouncements";
 import { usePaginationState } from "@/hooks/usePaginationState";
-import type { AnnouncementAudience, AnnouncementPriority } from "@/types/announcement";
+import type { Announcement, AnnouncementAudience, AnnouncementPriority } from "@/types/announcement";
 
 export default function AnnouncementsPage() {
   const pagination = usePaginationState();
   const [priorityFilter, setPriorityFilter] = useState<"All" | AnnouncementPriority>("All");
 
-  const { announcements, total, loading, error, actionError, create, remove } = useAnnouncements(
+  const { announcements, total, loading, error, actionError, create, update, remove } = useAnnouncements(
     pagination,
     priorityFilter,
   );
@@ -25,10 +25,29 @@ export default function AnnouncementsPage() {
   const [audience, setAudience] = useState<AnnouncementAudience>("All Users");
   const [barangay, setBarangay] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   function handlePriorityFilterChange(value: "All" | AnnouncementPriority) {
     setPriorityFilter(value);
     pagination.resetPage();
+  }
+
+  function resetForm() {
+    setTitle("");
+    setBody("");
+    setPriority("Normal");
+    setAudience("All Users");
+    setBarangay("");
+    setEditingId(null);
+  }
+
+  function handleEdit(announcement: Announcement) {
+    setEditingId(announcement.id);
+    setTitle(announcement.title);
+    setBody(announcement.content);
+    setPriority(announcement.priority);
+    setAudience(announcement.audience);
+    setBarangay(announcement.barangayName ?? "");
   }
 
   async function handlePublish() {
@@ -37,18 +56,19 @@ export default function AnnouncementsPage() {
     if (isPublishing) return;
     setIsPublishing(true);
     try {
-      await create({
+      const input = {
         title,
         content: body,
         priority,
         audience,
         barangayName: audience === "Specific Barangay" ? barangay : undefined,
-      });
-      setTitle("");
-      setBody("");
-      setPriority("Normal");
-      setAudience("All Users");
-      setBarangay("");
+      };
+      if (editingId) {
+        await update(editingId, input);
+      } else {
+        await create(input);
+      }
+      resetForm();
     } catch {
       // surfaced via useAnnouncements' actionError state, rendered in the table
     } finally {
@@ -80,6 +100,8 @@ export default function AnnouncementsPage() {
           onBarangayChange={setBarangay}
           onPublish={handlePublish}
           isPublishing={isPublishing}
+          editingId={editingId}
+          onCancelEdit={resetForm}
         />
 
         <AnnouncementPreview title={title} body={body} priority={priority} audience={audience} />
@@ -92,6 +114,7 @@ export default function AnnouncementsPage() {
           loading={loading}
           error={error}
           actionError={actionError}
+          onEdit={handleEdit}
           onDelete={remove}
           searchInput={pagination.searchInput}
           onSearchChange={pagination.setSearchInput}

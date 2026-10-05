@@ -17,7 +17,7 @@ export default function SidebarItem({
   icon: Icon,
 }: SidebarItemProps) {
   const pathname = usePathname();
-  const { collapsed } = useSidebar();
+  const { collapsed, setMobileOpen } = useSidebar();
 
   const active =
     pathname === href || pathname.startsWith(`${href}/`);
@@ -25,6 +25,7 @@ export default function SidebarItem({
   return (
     <Link
       href={href}
+      onClick={() => setMobileOpen(false)}
       className={`group relative flex items-center rounded-xl text-sm font-bold transition-all duration-200 ${
         collapsed ? "mx-auto h-11 w-11 justify-center" : "w-full gap-3 px-4 py-2.5"
       } ${

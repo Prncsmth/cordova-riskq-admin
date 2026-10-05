@@ -29,14 +29,25 @@ const inter = Inter({ subsets: ["latin"], weight: ["600", "700"] });
 const archivoBlack = Archivo_Black({ subsets: ["latin"], weight: "400" });
 
 export default function AdminSidebar() {
-  const { collapsed } = useSidebar();
+  const { collapsed, mobileOpen, setMobileOpen } = useSidebar();
 
   return (
-    <aside
-      className={`${inter.className} glass fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-(--glass-border) shadow-xl transition-[width] duration-200 ease-in-out lg:flex ${
-        collapsed ? "w-18" : "w-64"
-      }`}
-    >
+    <>
+      {/* Backdrop -- mobile drawer only, tapping it closes the sidebar the
+          same as tapping the hamburger again. */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={`${inter.className} glass fixed inset-y-0 left-0 z-50 flex flex-col border-r border-(--glass-border) shadow-xl transition-transform duration-200 ease-in-out lg:z-40 lg:translate-x-0 lg:transition-[width] ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        } ${collapsed ? "w-64 lg:w-18" : "w-64"}`}
+      >
 
       {/* Logo / Header */}
       <div className="flex h-20 shrink-0 items-center overflow-hidden border-b border-(--glass-border) px-4">
@@ -127,6 +138,7 @@ export default function AdminSidebar() {
         />
       </nav>
 
-    </aside>
+      </aside>
+    </>
   );
 }

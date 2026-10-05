@@ -19,6 +19,12 @@ type AnnouncementFormProps = {
   onBarangayChange: (value: string) => void;
   onPublish: () => void;
   isPublishing: boolean;
+  // Non-null while editing an existing announcement instead of composing a
+  // new one -- swaps the heading/button copy and shows Cancel, same form
+  // either way so the draft fields (title/body/priority/audience/barangay)
+  // don't need a second, parallel set of state.
+  editingId?: string | null;
+  onCancelEdit?: () => void;
 };
 
 export default function AnnouncementForm({
@@ -34,12 +40,18 @@ export default function AnnouncementForm({
   onBarangayChange,
   onPublish,
   isPublishing,
+  editingId = null,
+  onCancelEdit,
 }: AnnouncementFormProps) {
+  const isEditing = editingId !== null;
+
   return (
     <Card>
       <div className="flex items-center gap-2.5">
         <Megaphone size={18} className="shrink-0 text-primary" />
-        <h2 className="font-semibold text-foreground">Create Announcement</h2>
+        <h2 className="font-semibold text-foreground">
+          {isEditing ? "Edit Announcement" : "Create Announcement"}
+        </h2>
       </div>
 
       <form
@@ -130,13 +142,32 @@ export default function AnnouncementForm({
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={isPublishing}
-          className="w-full rounded-xl bg-primary px-5 py-3 font-semibold text-white shadow-xs transition-all duration-150 hover:bg-primary-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-        >
-          {isPublishing ? "Publishing…" : "Publish Announcement"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            disabled={isPublishing}
+            className="flex-1 rounded-xl bg-primary px-5 py-3 font-semibold text-white shadow-xs transition-all duration-150 hover:bg-primary-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none"
+          >
+            {isEditing
+              ? isPublishing
+                ? "Saving…"
+                : "Save Changes"
+              : isPublishing
+                ? "Publishing…"
+                : "Publish Announcement"}
+          </button>
+
+          {isEditing && (
+            <button
+              type="button"
+              onClick={onCancelEdit}
+              disabled={isPublishing}
+              className="rounded-xl border border-border px-5 py-3 font-semibold text-foreground transition-all duration-150 hover:bg-background/60 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
     </Card>
   );
