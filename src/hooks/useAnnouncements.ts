@@ -86,6 +86,27 @@ export function useAnnouncements(
     [token],
   );
 
+  const update = useCallback(
+    async (id: string, input: CreateAnnouncementInput) => {
+      if (!token) return;
+
+      setActionError(null);
+
+      try {
+        await apiFetch<{ success: true; announcement: Announcement }>(`/admin/announcements/${id}`, {
+          method: "PATCH",
+          body: JSON.stringify(input),
+          token,
+        });
+        setRefetchToken((t) => t + 1);
+      } catch (err) {
+        setActionError(err instanceof Error ? err.message : "Failed to update announcement.");
+        throw err;
+      }
+    },
+    [token],
+  );
+
   const remove = useCallback(
     async (id: string) => {
       if (!token) return;
@@ -106,5 +127,5 @@ export function useAnnouncements(
     [token],
   );
 
-  return { announcements, total, loading, error, actionError, create, remove };
+  return { announcements, total, loading, error, actionError, create, update, remove };
 }

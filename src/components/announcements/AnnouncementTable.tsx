@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Megaphone, Trash2 } from "lucide-react";
+import { Search, Megaphone, Pencil, Trash2 } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Pagination from "@/components/ui/Pagination";
 import type { Announcement, AnnouncementPriority } from "@/types/announcement";
@@ -14,6 +14,7 @@ export default function AnnouncementTable({
   loading,
   error,
   actionError,
+  onEdit,
   onDelete,
   searchInput,
   onSearchChange,
@@ -29,6 +30,7 @@ export default function AnnouncementTable({
   loading: boolean;
   error: string | null;
   actionError: string | null;
+  onEdit: (announcement: Announcement) => void;
   onDelete: (id: string) => Promise<void>;
   searchInput: string;
   onSearchChange: (value: string) => void;
@@ -127,15 +129,25 @@ export default function AnnouncementTable({
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => handleDelete(a.id, a.title)}
-                disabled={pendingId === a.id}
-                aria-label={`Delete ${a.title}`}
-                className="shrink-0 rounded-full p-2 text-muted transition hover:bg-danger-light hover:text-danger disabled:opacity-50"
-              >
-                <Trash2 size={15} />
-              </button>
+              <div className="flex shrink-0 items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => onEdit(a)}
+                  aria-label={`Edit ${a.title}`}
+                  className="rounded-full p-2 text-muted transition hover:bg-primary-light/40 hover:text-primary"
+                >
+                  <Pencil size={15} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(a.id, a.title)}
+                  disabled={pendingId === a.id}
+                  aria-label={`Delete ${a.title}`}
+                  className="rounded-full p-2 text-muted transition hover:bg-danger-light hover:text-danger disabled:opacity-50"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
             </div>
           ))}
 
