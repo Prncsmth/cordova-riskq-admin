@@ -23,6 +23,8 @@ export default function AnnouncementsPage() {
   const [body, setBody] = useState("");
   const [priority, setPriority] = useState<AnnouncementPriority>("Normal");
   const [audience, setAudience] = useState<AnnouncementAudience>("All Users");
+  // Only ever set from an older announcement being edited -- new ones can't
+  // target a barangay any more (see AnnouncementForm's audiences).
   const [barangay, setBarangay] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -97,7 +99,6 @@ export default function AnnouncementsPage() {
           onBodyChange={setBody}
           onPriorityChange={setPriority}
           onAudienceChange={setAudience}
-          onBarangayChange={setBarangay}
           onPublish={handlePublish}
           isPublishing={isPublishing}
           editingId={editingId}
