@@ -9,14 +9,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@prisma/client": "^7.10.0",
     "framer-motion": "^12.42.2",
     "lucide-react": "^1.26.0",
     "mapbox-gl": "^3.28.1",
-    "next": "latest",
-    "react": "latest",
+    "next": "16.3.8",
+    "react": "19.2.4",
     "react-countup": "^6.5.3",
-    "react-dom": "latest",
+    "react-dom": "19.2.4",
     "react-map-gl": "^8.1.2",
     "recharts": "^3.10.0",
     "socket.io-client": "^4.8.3"
@@ -27,9 +26,8 @@
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "eslint": "latest",
-    "eslint-config-next": "latest",
+    "eslint-config-next": "16.3.8",
     "postcss": "latest",
-    "prisma": "^8.0.0-rc.12",
     "tailwindcss": "latest",
     "typescript": "latest"
   }
