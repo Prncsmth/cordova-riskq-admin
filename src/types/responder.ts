@@ -7,5 +7,6 @@ export interface Responder {
   phone: string | null;
   isOnDuty: boolean;
   unit: ResponderUnit | null;
+  assignedBarangay: string | null;
   createdAt: string;
 }

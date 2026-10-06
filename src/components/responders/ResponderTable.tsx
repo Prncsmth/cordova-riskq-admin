@@ -6,6 +6,8 @@ import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import Pagination from "@/components/ui/Pagination";
 import type { Responder, ResponderUnit } from "@/types/responder";
+import type { BarangayFilter } from "@/hooks/useResponders";
+import { CORDOVA_BARANGAY_NAMES } from "@/constants/barangays";
 import { formatDate } from "@/lib/utils";
 
 type DutyFilter = "all" | "on-duty" | "off-duty";
@@ -30,6 +32,8 @@ export default function ResponderTable({
   onDutyFilterChange,
   unitFilter,
   onUnitFilterChange,
+  barangayFilter,
+  onBarangayFilterChange,
   page,
   totalPages,
   pageSize,
@@ -45,6 +49,8 @@ export default function ResponderTable({
   onDutyFilterChange: (value: DutyFilter) => void;
   unitFilter: UnitFilter;
   onUnitFilterChange: (value: UnitFilter) => void;
+  barangayFilter: BarangayFilter;
+  onBarangayFilterChange: (value: BarangayFilter) => void;
   page: number;
   totalPages: number;
   pageSize: number;
@@ -93,6 +99,20 @@ export default function ResponderTable({
             <option value="MDRRMO">MDRRMO</option>
             <option value="unclassified">Unclassified</option>
           </select>
+
+          <select
+            value={barangayFilter}
+            onChange={(e) => onBarangayFilterChange(e.target.value)}
+            className="rounded-xl border border-border bg-background/60 py-2 px-3 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+          >
+            <option value="all">All barangays</option>
+            {CORDOVA_BARANGAY_NAMES.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+            <option value="unassigned">Unassigned</option>
+          </select>
         </div>
       </div>
 
@@ -112,6 +132,7 @@ export default function ResponderTable({
                 <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Phone</th>
                 <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Duty</th>
                 <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Unit</th>
+                <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Barangay</th>
                 <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Joined</th>
                 <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Action</th>
               </tr>
@@ -137,6 +158,7 @@ export default function ResponderTable({
                     </Badge>
                   </td>
                   <td className="p-4 text-muted">{responder.unit ?? "Unclassified"}</td>
+                  <td className="p-4 text-muted">{responder.assignedBarangay ?? "Unassigned"}</td>
                   <td className="p-4 text-muted">{formatDate(responder.createdAt)}</td>
                   <td className="p-4">
                     <Link

@@ -23,12 +23,14 @@ type AdminUserRow = {
   mobile: string | null;
   role: string;
   unit: string | null;
+  assignedBarangay: string | null;
   isOnDuty: boolean;
   createdAt: string;
 };
 
 type DutyFilter = "all" | "on-duty" | "off-duty";
 type UnitFilter = "all" | "BDRRMO" | "MDRRMO" | "unclassified";
+export type BarangayFilter = "all" | string;
 
 function toResponder(row: AdminUserRow): Responder {
   return {
@@ -38,18 +40,19 @@ function toResponder(row: AdminUserRow): Responder {
     phone: row.mobile,
     isOnDuty: row.isOnDuty,
     unit: row.unit === "BDRRMO" || row.unit === "MDRRMO" ? row.unit : null,
+    assignedBarangay: row.assignedBarangay,
     createdAt: row.createdAt,
   };
 }
 
 export function useResponders(
   pagination: ReturnType<typeof usePaginationState>,
-  filters: { duty: DutyFilter; unit: UnitFilter },
+  filters: { duty: DutyFilter; unit: UnitFilter; barangay: BarangayFilter },
 ) {
   const { token } = useAuth();
   const socket = useSocket();
   const { page, pageSize, search } = pagination;
-  const { duty, unit } = filters;
+  const { duty, unit, barangay } = filters;
   const [responders, setResponders] = useState<Responder[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -70,6 +73,7 @@ export function useResponders(
     if (duty === "on-duty") params.set("duty", "true");
     if (duty === "off-duty") params.set("duty", "false");
     if (unit !== "all") params.set("unit", unit);
+    if (barangay !== "all") params.set("barangay", barangay);
 
     apiFetch<{ success: true; users: AdminUserRow[]; total: number }>(
       `/admin/users?${params.toString()}`,
@@ -93,7 +97,7 @@ export function useResponders(
     return () => {
       cancelled = true;
     };
-  }, [token, page, pageSize, search, duty, unit]);
+  }, [token, page, pageSize, search, duty, unit, barangay]);
 
   // Keeps an already-loaded page's Duty column live -- patches the
   // matching row in place rather than refetching, so an unrelated toggle
@@ -223,5 +227,18 @@ export function useResponder(id: string) {
     };
   }, [socket]);
 
-  return { responder, loading, error };
+  const updateBarangay = useCallback(
+    async (barangay: string | null) => {
+      if (!token) return;
+
+      const response = await apiFetch<{ success: true; user: { id: string; assignedBarangay: string | null } }>(
+        `/admin/users/${id}/barangay`,
+        { method: "PATCH", body: JSON.stringify({ barangay }), token },
+      );
+      setResponder((prev) => (prev ? { ...prev, assignedBarangay: response.user.assignedBarangay } : prev));
+    },
+    [token, id],
+  );
+
+  return { responder, loading, error, updateBarangay };
 }
