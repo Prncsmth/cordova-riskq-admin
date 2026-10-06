@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const authenticated = token !== null && user?.role === "admin";
 
   const login = useCallback(async (email: string, password: string) => {
-    const response = await apiFetch<LoginResponse>("/auth/login", {
+    const response = await apiFetch<LoginResponse>("/admin/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
