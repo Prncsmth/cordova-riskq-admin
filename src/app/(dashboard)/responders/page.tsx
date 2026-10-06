@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ShieldCheck, ShieldHalf, ShieldOff } from "lucide-react";
 import Card from "@/components/ui/Card";
 import ResponderTable from "@/components/responders/ResponderTable";
-import { useResponders, useResponderSummary } from "@/hooks/useResponders";
+import { useResponders, useResponderSummary, type BarangayFilter } from "@/hooks/useResponders";
 import { usePaginationState } from "@/hooks/usePaginationState";
 import type { ResponderUnit } from "@/types/responder";
 
@@ -15,10 +15,12 @@ export default function RespondersPage() {
   const pagination = usePaginationState();
   const [dutyFilter, setDutyFilter] = useState<DutyFilter>("all");
   const [unitFilter, setUnitFilter] = useState<UnitFilter>("all");
+  const [barangayFilter, setBarangayFilter] = useState<BarangayFilter>("all");
 
   const { responders, total, loading, error } = useResponders(pagination, {
     duty: dutyFilter,
     unit: unitFilter,
+    barangay: barangayFilter,
   });
   const { summary } = useResponderSummary();
   const totalPages = Math.max(1, Math.ceil(total / pagination.pageSize));
@@ -30,6 +32,11 @@ export default function RespondersPage() {
 
   function handleUnitFilterChange(value: UnitFilter) {
     setUnitFilter(value);
+    pagination.resetPage();
+  }
+
+  function handleBarangayFilterChange(value: BarangayFilter) {
+    setBarangayFilter(value);
     pagination.resetPage();
   }
 
@@ -74,6 +81,8 @@ export default function RespondersPage() {
         onDutyFilterChange={handleDutyFilterChange}
         unitFilter={unitFilter}
         onUnitFilterChange={handleUnitFilterChange}
+        barangayFilter={barangayFilter}
+        onBarangayFilterChange={handleBarangayFilterChange}
         page={pagination.page}
         totalPages={totalPages}
         pageSize={pagination.pageSize}

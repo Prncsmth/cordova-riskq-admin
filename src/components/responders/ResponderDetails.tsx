@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Mail, Phone, Building2, Calendar, Siren, History } from "lucide-react";
+import { Mail, Phone, Building2, MapPin, Calendar, Siren, History } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
@@ -11,6 +12,7 @@ import { useIncidentHistory } from "@/hooks/useIncidentHistory";
 import { categoryToEmergencyType } from "@/lib/incidentCategory";
 import { formatMinutes } from "@/lib/incidentStats";
 import { formatDate, timeAgo } from "@/lib/utils";
+import { CORDOVA_BARANGAY_NAMES } from "@/constants/barangays";
 
 function initials(name: string) {
   return name
@@ -26,9 +28,23 @@ export default function ResponderDetails({
 }: {
   id: string;
 }) {
-  const { responder, loading, error } = useResponder(id);
+  const { responder, loading, error, updateBarangay } = useResponder(id);
   const { emergencies, loading: emergenciesLoading, error: emergenciesError } = useEmergencies();
   const { records: history, loading: historyLoading, error: historyError } = useIncidentHistory({ responderId: id });
+  const [savingBarangay, setSavingBarangay] = useState(false);
+  const [barangayError, setBarangayError] = useState<string | null>(null);
+
+  async function handleBarangayChange(value: string) {
+    setSavingBarangay(true);
+    setBarangayError(null);
+    try {
+      await updateBarangay(value === "" ? null : value);
+    } catch (err) {
+      setBarangayError(err instanceof Error ? err.message : "Failed to update barangay.");
+    } finally {
+      setSavingBarangay(false);
+    }
+  }
 
   // e.responderId is only the single legacy "accepted" responder -- check
   // the full active roster (responderIds) so a non-primary responder who
@@ -114,6 +130,27 @@ export default function ResponderDetails({
             <div>
               <p className="text-xs text-muted">Joined</p>
               <p className="text-sm font-medium text-foreground">{formatDate(responder.createdAt)}</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2.5">
+            <MapPin size={16} className="mt-0.5 shrink-0 text-muted" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-muted">Assigned Barangay</p>
+              <select
+                value={responder.assignedBarangay ?? ""}
+                onChange={(e) => handleBarangayChange(e.target.value)}
+                disabled={savingBarangay}
+                className="mt-1 w-full max-w-50 rounded-lg border border-border bg-background/60 py-1.5 px-2.5 text-sm font-medium text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15 disabled:opacity-60"
+              >
+                <option value="">Unassigned</option>
+                {CORDOVA_BARANGAY_NAMES.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+              {barangayError && <p className="mt-1 text-xs text-red-700">{barangayError}</p>}
             </div>
           </div>
         </div>
