@@ -2,6 +2,8 @@
 // barangay location and to keep the live map locked to the municipality.
 // Coordinates sourced from PhilAtlas (https://www.philatlas.com/visayas/r07/cebu/cordova.html).
 
+import { haversineDistanceKm } from "@/lib/geo";
+
 export type Barangay = {
   id: string;
   name: string;
@@ -39,6 +41,20 @@ export const CORDOVA_MAP_BOUNDS: [[number, number], [number, number]] = [
 export function findBarangay(name: string): Barangay | undefined {
   const normalized = name.trim().toLowerCase();
   return CORDOVA_BARANGAYS.find((b) => b.name.toLowerCase() === normalized);
+}
+
+// Closest barangay center to a GPS point -- mirrors the mobile app's own
+// constants/cordovaBarangays.ts getNearestBarangay, used there the same way
+// (labeling a live location, not a precise boundary check). Good enough to
+// say "this incident is around Day-as" for surfacing nearby responders; not
+// precise enough to treat as an authoritative geofence.
+export function getNearestBarangay(latitude: number, longitude: number): Barangay {
+  return CORDOVA_BARANGAYS.reduce((closest, barangay) =>
+    haversineDistanceKm({ latitude, longitude }, barangay) <
+    haversineDistanceKm({ latitude, longitude }, closest)
+      ? barangay
+      : closest,
+  );
 }
 
 /**
