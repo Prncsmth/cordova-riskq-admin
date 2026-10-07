@@ -1,12 +1,27 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { MapPin, Clock, ShieldCheck, ShieldQuestion, Siren, MessageSquareText } from "lucide-react";
+import Link from "next/link";
+import {
+  MapPin,
+  Clock,
+  ShieldCheck,
+  ShieldQuestion,
+  Siren,
+  MessageSquareText,
+  Maximize2,
+  Users,
+} from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge, { type BadgeVariant } from "@/components/ui/Badge";
 import { useEmergency } from "@/hooks/useEmergencies";
+import { useResponders } from "@/hooks/useResponders";
+import { usePaginationState } from "@/hooks/usePaginationState";
+import { getNearestBarangay } from "@/lib/cordovaBarangays";
 import { emergencyTypeStyles, defaultEmergencyTypeStyle, emergencyStatusStyle } from "@/lib/emergencyStyles";
 import { timeAgo, formatDate } from "@/lib/utils";
+import type { Emergency } from "@/types/emergency";
+import type { LucideIcon } from "lucide-react";
 
 const MiniMap = dynamic(() => import("@/components/map/MiniMap"), {
   ssr: false,
@@ -55,6 +70,44 @@ export default function EmergencyDetails({
   const status = emergencyStatusStyle[emergency.status];
   const hasCoords = emergency.latitude !== 0 && emergency.longitude !== 0;
   const responders = emergency.responders ?? [];
+  const assignedIds = new Set(responders.map((r) => r.id));
+
+  // Nearest-barangay-by-distance, same approximation the mobile app uses to
+  // label a live location -- good enough to surface "who else covers this
+  // area," not precise enough to be an authoritative boundary check.
+  const nearestBarangay = hasCoords
+    ? getNearestBarangay(emergency.latitude, emergency.longitude)
+    : null;
+
+  return <EmergencyDetailsView emergency={emergency} style={style} Icon={Icon} status={status} hasCoords={hasCoords} responders={responders} assignedIds={assignedIds} nearestBarangay={nearestBarangay} />;
+}
+
+function EmergencyDetailsView({
+  emergency,
+  style,
+  Icon,
+  status,
+  hasCoords,
+  responders,
+  assignedIds,
+  nearestBarangay,
+}: {
+  emergency: Emergency;
+  style: { color: string };
+  Icon: LucideIcon;
+  status: { variant: BadgeVariant; solid: boolean };
+  hasCoords: boolean;
+  responders: { id: string; name: string; status: string }[];
+  assignedIds: Set<string>;
+  nearestBarangay: { id: string; name: string } | null;
+}) {
+  const barangayPagination = usePaginationState(50);
+  const { responders: barangayResponders, loading: barangayLoading } = useResponders(barangayPagination, {
+    duty: "all",
+    unit: "all",
+    barangay: nearestBarangay?.name ?? "__none__",
+  });
+  const nearbyResponders = barangayResponders.filter((r) => !assignedIds.has(r.id));
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -82,13 +135,25 @@ export default function EmergencyDetails({
         </div>
 
         <div className="mt-6 border-t border-border/70 pt-6">
-          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-            <MapPin size={15} className="text-muted" />
-            {emergency.locationName}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-foreground">
+              <MapPin size={15} className="shrink-0 text-muted" />
+              <span className="truncate">{emergency.locationName}</span>
+            </div>
+
+            {hasCoords && (
+              <Link
+                href={`/live-map?lat=${emergency.latitude}&lng=${emergency.longitude}`}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs transition-all duration-150 hover:bg-primary-light/40 active:scale-[0.97]"
+              >
+                <Maximize2 size={13} />
+                View on Map
+              </Link>
+            )}
           </div>
 
           {hasCoords && (
-            <div className="mt-3 h-40 w-full overflow-hidden rounded-xl border border-border/70 shadow-xs">
+            <div className="mt-3 h-48 w-full overflow-hidden rounded-xl border border-border/70 shadow-xs">
               <MiniMap latitude={emergency.latitude} longitude={emergency.longitude} label={emergency.locationName} />
             </div>
           )}
@@ -116,41 +181,76 @@ export default function EmergencyDetails({
         </div>
       </Card>
 
-      <Card>
-        <h2 className="font-semibold text-foreground">
-          Assigned Responder{responders.length > 1 ? `s (${responders.length})` : ""}
-        </h2>
+      <div className="space-y-6">
+        <Card>
+          <h2 className="font-semibold text-foreground">
+            Assigned Responder{responders.length > 1 ? `s (${responders.length})` : ""}
+          </h2>
 
-        <div className="mt-5">
-          {responders.length > 0 ? (
-            <ul className="space-y-4">
-              {responders.map((responder) => {
-                const step = responderStepStyle[responder.status] ?? defaultResponderStep;
-                return (
-                  <li key={responder.id} className="flex items-center gap-3">
-                    <ShieldCheck size={22} className={`shrink-0 ${step.color}`} />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium text-foreground">{responder.name}</p>
-                      <p className="text-xs text-muted">
-                        {responder.id === emergency.responderId ? "First to accept" : "Joined to help"}
-                      </p>
-                    </div>
-                    <Badge variant={step.variant}>{step.label}</Badge>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <div className="flex items-center gap-3">
-              <ShieldQuestion size={22} className="shrink-0 text-muted" />
-              <div>
-                <p className="text-sm font-medium text-foreground">Unassigned</p>
-                <p className="text-xs text-muted">No responder assigned yet.</p>
+          <div className="mt-5">
+            {responders.length > 0 ? (
+              <ul className="space-y-4">
+                {responders.map((responder) => {
+                  const step = responderStepStyle[responder.status] ?? defaultResponderStep;
+                  return (
+                    <li key={responder.id} className="flex items-center gap-3">
+                      <ShieldCheck size={22} className={`shrink-0 ${step.color}`} />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium text-foreground">{responder.name}</p>
+                        <p className="text-xs text-muted">
+                          {responder.id === emergency.responderId ? "First to accept" : "Joined to help"}
+                        </p>
+                      </div>
+                      <Badge variant={step.variant}>{step.label}</Badge>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <div className="flex items-center gap-3">
+                <ShieldQuestion size={22} className="shrink-0 text-muted" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">Unassigned</p>
+                  <p className="text-xs text-muted">No responder assigned yet.</p>
+                </div>
               </div>
+            )}
+          </div>
+        </Card>
+
+        {nearestBarangay && (
+          <Card>
+            <div className="flex items-center gap-2">
+              <Users size={16} className="shrink-0 text-muted" />
+              <h2 className="font-semibold text-foreground">Responders near {nearestBarangay.name}</h2>
             </div>
-          )}
-        </div>
-      </Card>
+
+            <div className="mt-5">
+              {barangayLoading ? (
+                <p className="text-sm text-muted">Loading…</p>
+              ) : nearbyResponders.length > 0 ? (
+                <ul className="space-y-3">
+                  {nearbyResponders.map((responder) => (
+                    <li key={responder.id} className="flex items-center gap-3">
+                      <span
+                        className={`h-2 w-2 shrink-0 rounded-full ${responder.isOnDuty ? "bg-success" : "bg-muted"}`}
+                      />
+                      <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{responder.name}</p>
+                      <Badge variant={responder.isOnDuty ? "success" : "default"}>
+                        {responder.isOnDuty ? "On Duty" : "Off Duty"}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted">
+                  No responders assigned to {nearestBarangay.name} yet.
+                </p>
+              )}
+            </div>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
