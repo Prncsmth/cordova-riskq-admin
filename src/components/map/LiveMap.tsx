@@ -311,7 +311,7 @@ export default function LiveMap({
                       >
                         <span
                           className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                            on ? "translate-x-[17px]" : "translate-x-0.5"
+                            on ? "translate-x-4.25" : "translate-x-0.5"
                           }`}
                         />
                       </span>
@@ -479,7 +479,7 @@ export default function LiveMap({
             closeOnClick={false}
             onClose={() => setSelectedMarker(null)}
           >
-            <div className="min-w-[160px] py-0.5">
+            <div className="min-w-40 py-0.5">
               <div className="flex items-center gap-2 pr-2">
                 {selectedMarker.type === "responder" ? (
                   <div className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full">
