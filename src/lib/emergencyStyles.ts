@@ -25,10 +25,10 @@ export const emergencyStatusStyle: Record<EmergencyStatus, { variant: BadgeVaria
   Responding: { variant: "warning", solid: false },
   Resolved: { variant: "success", solid: false },
   Cancelled: { variant: "default", solid: false },
-  // Matches the SOS Alerts page's Unattended badge.
-  Unattended: { variant: "info", solid: false },
+  // Matches the SOS Alerts page's Expired badge.
+  Expired: { variant: "info", solid: false },
 };
 
 // Statuses that mean the incident is closed -- dropped from the live
 // incidents list and the live map.
-export const TERMINAL_EMERGENCY_STATUSES: EmergencyStatus[] = ["Resolved", "Cancelled", "Unattended"];
+export const TERMINAL_EMERGENCY_STATUSES: EmergencyStatus[] = ["Resolved", "Cancelled", "Expired"];

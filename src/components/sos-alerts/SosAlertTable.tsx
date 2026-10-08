@@ -4,7 +4,10 @@ import { useMemo } from "react";
 import { Search, MapPinned } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Pagination from "@/components/ui/Pagination";
+import UnattendedBadge, { UNATTENDED_ROW_CLASS } from "@/components/emergencies/UnattendedBadge";
+import { useNow } from "@/hooks/useNow";
 import type { SosAlert, SosAlertStatus } from "@/types/sos-alert";
+import { isUnattendedIncident } from "@/lib/unattended";
 import { timeAgo } from "@/lib/utils";
 import { haversineDistanceKm } from "@/lib/geo";
 
@@ -40,6 +43,13 @@ const statusVariant = {
 
 const statusFilters = ["All", "New", "Acknowledged", "Unattended", "Resolved", "Cancelled"] as const;
 
+// "Unattended" stays the value (it's the backend's alertStatus filter) but
+// reads "Expired" -- the live, derived UNATTENDED badge (lib/unattended.ts)
+// is a different thing: a still-New alert nobody has picked up yet.
+function statusLabel(status: (typeof statusFilters)[number]): string {
+  return status === "Unattended" ? "Expired" : status;
+}
+
 // Mirrors the backend's canAdminCloseSosIncident: only alerts no responder
 // has joined yet can be closed from here.
 function canAdminClose(alert: SosAlert) {
@@ -71,6 +81,7 @@ export default function SosAlertTable({
   onCloseAlert,
   closingAlertId,
 }: SosAlertTableProps) {
+  const now = useNow();
   // Triage view of this page's alerts: unaddressed ("New") ones first,
   // oldest-first among those, so nothing waiting for a look sinks to the
   // bottom under a wall of already-handled rows. Acknowledged/Resolved/
@@ -130,7 +141,7 @@ export default function SosAlertTable({
                   : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
               }`}
             >
-              {status}
+              {statusLabel(status)}
             </button>
           ))}
         </div>
@@ -155,10 +166,13 @@ export default function SosAlertTable({
             <tbody className="divide-y divide-border/70">
               {sortedAlerts.map((alert) => {
                 const nearby = clusterCounts.get(alert.id);
+                const unattended = isUnattendedIncident(alert, now);
                 return (
                 <tr
                   key={alert.id}
-                  className={`transition-colors hover:bg-background/70 ${alert.status === "New" ? "bg-danger-light/20" : ""}`}
+                  className={`transition-colors hover:bg-background/70 ${
+                    unattended ? UNATTENDED_ROW_CLASS : alert.status === "New" ? "bg-danger-light/20" : ""
+                  }`}
                 >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
@@ -186,9 +200,12 @@ export default function SosAlertTable({
                   </td>
                   <td className="p-4 text-muted">{timeAgo(alert.createdAt)}</td>
                   <td className="p-4">
-                    <Badge variant={statusVariant[alert.status]} solid={alert.status === "New"}>
-                      {alert.status}
-                    </Badge>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <Badge variant={statusVariant[alert.status]} solid={alert.status === "New"}>
+                        {statusLabel(alert.status)}
+                      </Badge>
+                      {unattended && <UnattendedBadge />}
+                    </div>
                   </td>
                   <td className="p-4">
                     {canAdminClose(alert) ? (

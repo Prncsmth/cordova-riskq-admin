@@ -11,9 +11,9 @@ import { Emergency, EmergencyStatus } from "@/types/emergency";
 type RawIncident = {
   id: string;
   category: string;
-  // "sos" | "report" on the list endpoint (GET /incidents); the admin-facing
-  // detail endpoint (GET /incidents/:id) doesn't return this field at all,
-  // so it's optional here and defaults to "report" in toEmergency().
+  // "sos" | "report" -- returned by both GET /incidents and GET /incidents/:id
+  // for admins (and in the admin:incidentUpdate broadcast). Optional only as
+  // a defensive fallback: toEmergency() treats a missing value as "report".
   source?: string;
   details?: string | null;
   locationLabel: string;
@@ -38,7 +38,7 @@ const STATUS_TO_EMERGENCY_STATUS: Record<string, EmergencyStatus> = {
   arrived: "Responding",
   completed: "Resolved",
   cancelled: "Cancelled",
-  expired: "Unattended",
+  expired: "Expired",
 };
 
 function toEmergency(raw: RawIncident): Emergency {

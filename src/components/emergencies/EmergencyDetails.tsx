@@ -14,7 +14,11 @@ import {
 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge, { type BadgeVariant } from "@/components/ui/Badge";
+import { incidentSourceLabel } from "@/lib/incidentSource";
+import { isUnattendedIncident } from "@/lib/unattended";
+import UnattendedBadge from "@/components/emergencies/UnattendedBadge";
 import { useEmergency } from "@/hooks/useEmergencies";
+import { useNow } from "@/hooks/useNow";
 import { useResponders } from "@/hooks/useResponders";
 import { usePaginationState } from "@/hooks/usePaginationState";
 import { getNearestBarangay } from "@/lib/cordovaBarangays";
@@ -108,6 +112,8 @@ function EmergencyDetailsView({
     barangay: nearestBarangay?.name ?? "__none__",
   });
   const nearbyResponders = barangayResponders.filter((r) => !assignedIds.has(r.id));
+  const now = useNow();
+  const unattended = isUnattendedIncident(emergency, now);
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -127,9 +133,11 @@ function EmergencyDetailsView({
                   SOS
                 </span>
               )}
+              {unattended && <UnattendedBadge />}
             </div>
             <p className="mt-1 text-xs text-text-tertiary">
-              {emergency.id} &middot; Reported {timeAgo(emergency.createdAt)}
+              {emergency.id} &middot; Source: {incidentSourceLabel(emergency.source)} &middot;
+              Reported {timeAgo(emergency.createdAt)}
             </p>
           </div>
         </div>

@@ -65,7 +65,8 @@ export default function SosAlertsPage() {
       color: "text-warning",
     },
     {
-      label: "Unattended",
+      // Backend "expired" bucket (keyed "Unattended" in the summary).
+      label: "Expired",
       value: String(summary?.Unattended ?? 0),
       icon: Hourglass,
       color: "text-info",

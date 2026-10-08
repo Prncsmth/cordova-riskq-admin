@@ -6,7 +6,10 @@ import { Search } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import Pagination from "@/components/ui/Pagination";
+import UnattendedBadge, { UNATTENDED_ROW_CLASS } from "@/components/emergencies/UnattendedBadge";
+import { useNow } from "@/hooks/useNow";
 import type { Emergency } from "@/types/emergency";
+import { isUnattendedIncident } from "@/lib/unattended";
 import { timeAgo } from "@/lib/utils";
 import { emergencyTypeStyles, defaultEmergencyTypeStyle, emergencyStatusStyle } from "@/lib/emergencyStyles";
 
@@ -23,6 +26,7 @@ export default function EmergencyTable({
 }) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("All");
+  const now = useNow();
   // Client-side pagination -- unlike Responders/Users/SOS Alerts, this
   // table already loads its full (live + history) list into memory and
   // filters it in place, so paginating the already-filtered array here
@@ -143,9 +147,13 @@ export default function EmergencyTable({
               const style = emergencyTypeStyles[emergency.type] ?? defaultEmergencyTypeStyle;
               const Icon = style.icon;
               const status = emergencyStatusStyle[emergency.status];
+              const unattended = isUnattendedIncident(emergency, now);
 
               return (
-                <tr key={emergency.id} className="transition-colors hover:bg-background/70">
+                <tr
+                  key={emergency.id}
+                  className={`transition-colors hover:bg-background/70 ${unattended ? UNATTENDED_ROW_CLASS : ""}`}
+                >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <Icon size={20} className={`shrink-0 ${style.color}`} />
@@ -158,9 +166,12 @@ export default function EmergencyTable({
                   <td className="p-4 text-foreground">{emergency.locationName}</td>
                   <td className="p-4 text-muted">{emergency.responderName ?? "Unassigned"}</td>
                   <td className="p-4">
-                    <Badge variant={status.variant} solid={status.solid}>
-                      {emergency.status}
-                    </Badge>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <Badge variant={status.variant} solid={status.solid}>
+                        {emergency.status}
+                      </Badge>
+                      {unattended && <UnattendedBadge />}
+                    </div>
                   </td>
                   <td className="p-4">
                     <Link

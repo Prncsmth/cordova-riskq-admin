@@ -7,7 +7,10 @@ import type { LucideIcon } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import Pagination from "@/components/ui/Pagination";
+import UnattendedBadge, { UNATTENDED_ROW_CLASS } from "@/components/emergencies/UnattendedBadge";
+import { useNow } from "@/hooks/useNow";
 import type { IncidentReport } from "@/types/incident-report";
+import { isUnattendedIncident } from "@/lib/unattended";
 import { timeAgo } from "@/lib/utils";
 
 const statusVariant = {
@@ -15,7 +18,7 @@ const statusVariant = {
   Responding: "warning",
   Resolved: "success",
   Cancelled: "default",
-  Unattended: "info",
+  Expired: "info",
 } as const;
 
 const typeStyles: Record<string, { icon: LucideIcon; color: string }> = {
@@ -42,6 +45,7 @@ export default function IncidentReportTable({
   const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("All");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const now = useNow();
 
   const filtered = useMemo(() => {
     return reports.filter((report) => {
@@ -145,9 +149,13 @@ export default function IncidentReportTable({
             {paginated.map((report) => {
               const style = typeStyles[report.type] ?? defaultTypeStyle;
               const Icon = style.icon;
+              const unattended = isUnattendedIncident(report, now);
 
               return (
-                <tr key={report.id} className="transition-colors hover:bg-background/70">
+                <tr
+                  key={report.id}
+                  className={`transition-colors hover:bg-background/70 ${unattended ? UNATTENDED_ROW_CLASS : ""}`}
+                >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <Icon size={20} className={`shrink-0 ${style.color}`} />
@@ -166,9 +174,12 @@ export default function IncidentReportTable({
                   <td className="p-4 text-muted">{report.locationName}</td>
                   <td className="p-4 text-muted">{timeAgo(report.createdAt)}</td>
                   <td className="p-4">
-                    <Badge variant={statusVariant[report.status]} solid={report.status === "Active"}>
-                      {report.status}
-                    </Badge>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <Badge variant={statusVariant[report.status]} solid={report.status === "Active"}>
+                        {report.status}
+                      </Badge>
+                      {unattended && <UnattendedBadge />}
+                    </div>
                   </td>
                 </tr>
               );
