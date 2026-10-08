@@ -3,8 +3,10 @@ export type EmergencyStatus =
   | "Responding"
   | "Resolved"
   | "Cancelled"
-  // An SOS no responder joined before the backend's expiry sweep closed it.
-  | "Unattended";
+  // Backend "expired": an SOS no responder joined before the backend's
+  // expiry sweep closed it. Not the live, derived "unattended" state (see
+  // lib/unattended.ts).
+  | "Expired";
 
 export type EmergencyType =
   | "Medical"

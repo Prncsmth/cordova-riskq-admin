@@ -126,14 +126,20 @@ export default function AdminSidebar() {
         />
 
         <SidebarGroup
-          label="System"
+          label="Communication"
           items={[
-            { href: "/analytics", label: "Analytics", icon: BarChart3 },
-            { href: "/reports", label: "Reports", icon: FileBarChart },
             { href: "/announcements", label: "Announcements", icon: Megaphone },
             { href: "/support-requests", label: "Support Requests", icon: LifeBuoy },
-            { href: "/audit-logs", label: "Audit Logs", icon: ScrollText },
+          ]}
+        />
+
+        <SidebarGroup
+          label="System"
+          items={[
+            { href: "/reports", label: "Export Reports", icon: FileBarChart },
+            { href: "/analytics", label: "Analytics", icon: BarChart3 },
             { href: "/settings", label: "Settings", icon: Settings },
+            { href: "/audit-logs", label: "Audit Logs", icon: ScrollText },
           ]}
         />
       </nav>

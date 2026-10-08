@@ -8,8 +8,9 @@ import Card from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
 import { useResponder } from "@/hooks/useResponders";
 import { useEmergencies } from "@/hooks/useEmergencies";
-import { useIncidentHistory } from "@/hooks/useIncidentHistory";
+import { useResponderIncidentHistory } from "@/hooks/useIncidentHistory";
 import { categoryToEmergencyType } from "@/lib/incidentCategory";
+import { incidentSourceLabel } from "@/lib/incidentSource";
 import { formatMinutes } from "@/lib/incidentStats";
 import { formatDate, timeAgo } from "@/lib/utils";
 import { CORDOVA_BARANGAY_NAMES } from "@/constants/barangays";
@@ -30,7 +31,15 @@ export default function ResponderDetails({
 }) {
   const { responder, loading, error, updateBarangay } = useResponder(id);
   const { emergencies, loading: emergenciesLoading, error: emergenciesError } = useEmergencies();
-  const { records: history, loading: historyLoading, error: historyError } = useIncidentHistory({ responderId: id });
+  const {
+    records: history,
+    total: historyTotal,
+    loading: historyLoading,
+    loadingMore: historyLoadingMore,
+    error: historyError,
+    hasMore: historyHasMore,
+    loadMore: loadMoreHistory,
+  } = useResponderIncidentHistory(id);
   const [savingBarangay, setSavingBarangay] = useState(false);
   const [barangayError, setBarangayError] = useState<string | null>(null);
 
@@ -193,48 +202,85 @@ export default function ResponderDetails({
         <div className="flex items-center gap-2.5">
           <History size={18} className="shrink-0 text-primary" />
           <h2 className="font-semibold text-foreground">Past Incidents</h2>
+          {historyTotal > 0 && <span className="text-xs text-muted">({historyTotal})</span>}
         </div>
 
         <div className="mt-5">
           {historyLoading ? (
             <p className="text-sm text-muted">Loading…</p>
-          ) : historyError ? (
+          ) : historyError && history.length === 0 ? (
             <p className="text-sm text-red-700">{historyError}</p>
           ) : history.length === 0 ? (
             <p className="text-sm text-muted">No past incidents recorded for this responder.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">
-                    <th className="pb-2 pr-4">Type</th>
-                    <th className="pb-2 pr-4">Location</th>
-                    <th className="pb-2 pr-4">Response Time</th>
-                    <th className="pb-2 pr-4">Date</th>
-                    <th className="pb-2">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/70">
-                  {history.map((record) => (
-                    <tr key={record.id}>
-                      <td className="py-3 pr-4 font-medium text-foreground">
-                        {categoryToEmergencyType(record.category)}
-                      </td>
-                      <td className="py-3 pr-4 text-muted">{record.locationLabel}</td>
-                      <td className="py-3 pr-4 text-muted">
-                        {record.responseTimeSeconds !== null ? formatMinutes(record.responseTimeSeconds) : "—"}
-                      </td>
-                      <td className="py-3 pr-4 text-muted">{formatDate(record.createdAt)}</td>
-                      <td className="py-3">
-                        <Badge variant={record.status === "completed" ? "success" : "default"}>
-                          {record.status === "completed" ? "Resolved" : "Cancelled"}
-                        </Badge>
-                      </td>
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">
+                      <th className="pb-2 pr-4">Ref ID</th>
+                      <th className="pb-2 pr-4">Type</th>
+                      <th className="pb-2 pr-4">Source</th>
+                      <th className="pb-2 pr-4">Location</th>
+                      <th className="pb-2 pr-4">Response Time</th>
+                      <th className="pb-2 pr-4">Resolution Time</th>
+                      <th className="pb-2 pr-4">Date</th>
+                      <th className="pb-2">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-border/70">
+                    {history.map((record) => {
+                      const leftEarly = record.responders.find((r) => r.id === id)?.status === "left";
+                      return (
+                        <tr key={record.id}>
+                          <td className="py-3 pr-4">
+                            <Link
+                              href={`/emergencies/${record.id}`}
+                              title={record.id}
+                              className="font-mono text-xs text-primary hover:underline"
+                            >
+                              {record.id.slice(0, 8)}
+                            </Link>
+                          </td>
+                          <td className="py-3 pr-4 font-medium text-foreground">
+                            {categoryToEmergencyType(record.category)}
+                          </td>
+                          <td className="py-3 pr-4 text-muted">{incidentSourceLabel(record.source)}</td>
+                          <td className="py-3 pr-4 text-muted">{record.locationLabel}</td>
+                          <td className="py-3 pr-4 text-muted">
+                            {record.responseTimeSeconds !== null ? formatMinutes(record.responseTimeSeconds) : "—"}
+                          </td>
+                          <td className="py-3 pr-4 text-muted">
+                            {record.resolutionTimeSeconds != null ? formatMinutes(record.resolutionTimeSeconds) : "—"}
+                          </td>
+                          <td className="py-3 pr-4 text-muted">{formatDate(record.createdAt)}</td>
+                          <td className="py-3">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <Badge variant={record.status === "completed" ? "success" : "default"}>
+                                {record.status === "completed" ? "Resolved" : "Cancelled"}
+                              </Badge>
+                              {leftEarly && <span className="text-xs text-muted">Left early</span>}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {historyError && <p className="mt-3 text-sm text-red-700">{historyError}</p>}
+              {historyHasMore && (
+                <button
+                  type="button"
+                  onClick={loadMoreHistory}
+                  disabled={historyLoadingMore}
+                  className="mt-4 w-full rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-background/60 disabled:opacity-60"
+                >
+                  {historyLoadingMore ? "Loading…" : historyError ? "Retry" : "Load more"}
+                </button>
+              )}
+            </>
           )}
         </div>
       </Card>

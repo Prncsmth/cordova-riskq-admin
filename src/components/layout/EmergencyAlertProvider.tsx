@@ -2,6 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useEmergencies } from "@/hooks/useEmergencies";
+import { useNow } from "@/hooks/useNow";
+import { isUnattendedIncident } from "@/lib/unattended";
 import {
   playEmergencyAlertSound,
   unlockEmergencyAlertAudio,
@@ -127,6 +129,36 @@ export function EmergencyAlertProvider({ children }: { children: React.ReactNode
 
     knownIds.current = next;
   }, [emergencies, loading]);
+
+  // Sounds once when an incident crosses into UNATTENDED (lib/unattended.ts).
+  // `now` re-runs this every UNATTENDED_CHECK_INTERVAL_MS so the crossing is
+  // noticed even when no new data arrives; a plain re-render doesn't re-run
+  // it at all.
+  //
+  // alertedUnattendedIds holds exactly the incidents unattended as of the
+  // last check, so one that stays unattended never sounds again, and one
+  // that's picked up and later back to pending can sound again. null until
+  // the first load resolves: incidents already unattended when the dashboard
+  // opens are seeded silently -- their badges already say so, and a refresh
+  // shouldn't replay an alarm for every old incident.
+  const now = useNow();
+  const alertedUnattendedIds = useRef<Set<string> | null>(null);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const unattended = emergencies.filter((e) => isUnattendedIncident(e, now));
+    const previous = alertedUnattendedIds.current;
+    alertedUnattendedIds.current = new Set(unattended.map((e) => e.id));
+    if (!previous) return;
+
+    const newlyUnattended = unattended.filter((e) => !previous.has(e.id));
+    // One sound per check however many crossed at once -- the SOS siren if
+    // any of them is an SOS.
+    if (newlyUnattended.length > 0 && soundEnabledRef.current) {
+      playEmergencyAlertSound(newlyUnattended.some((e) => e.source === "sos") ? "sos" : "incident");
+    }
+  }, [emergencies, loading, now]);
 
   return (
     <EmergencyAlertContext.Provider

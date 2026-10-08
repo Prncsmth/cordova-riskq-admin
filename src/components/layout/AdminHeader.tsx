@@ -3,6 +3,7 @@
 import { Menu } from "lucide-react";
 import UserMenu from "./UserMenu";
 import NotificationsMenu from "./NotificationsMenu";
+import ConnectionStatus from "./ConnectionStatus";
 import { ThemeToggle } from "./ThemeProvider";
 import { useSidebar } from "./SidebarContext";
 
@@ -33,6 +34,8 @@ export default function AdminHeader() {
         </button>
 
         <div className="flex flex-1 items-center justify-end gap-4">
+          <ConnectionStatus />
+
           <ThemeToggle />
 
           <NotificationsMenu />

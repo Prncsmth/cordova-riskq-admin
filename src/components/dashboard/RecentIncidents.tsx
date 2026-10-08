@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { Siren } from "lucide-react";
 import Badge from "@/components/ui/Badge";
+import UnattendedBadge, { UNATTENDED_ROW_CLASS } from "@/components/emergencies/UnattendedBadge";
 import { useEmergencies } from "@/hooks/useEmergencies";
+import { useNow } from "@/hooks/useNow";
+import { isUnattendedIncident } from "@/lib/unattended";
 import { timeAgo } from "@/lib/utils";
 
 const statusVariant = {
@@ -11,12 +14,13 @@ const statusVariant = {
   Responding: "warning",
   Resolved: "success",
   Cancelled: "default",
-  Unattended: "info",
+  Expired: "info",
 } as const;
 
 export default function RecentIncidents() {
   const { emergencies, loading, error } = useEmergencies();
   const recent = emergencies.slice(0, 5);
+  const now = useNow();
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
@@ -48,18 +52,27 @@ export default function RecentIncidents() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/70">
-              {recent.map((incident) => (
-                <tr key={incident.id} className="transition-colors hover:bg-background/70">
-                  <td className="p-4 font-medium text-foreground">{incident.type}</td>
-                  <td className="p-4 text-muted">{incident.locationName}</td>
-                  <td className="p-4 text-muted">{timeAgo(incident.createdAt)}</td>
-                  <td className="p-4">
-                    <Badge variant={statusVariant[incident.status]} solid={incident.status === "Active"}>
-                      {incident.status}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
+              {recent.map((incident) => {
+                const unattended = isUnattendedIncident(incident, now);
+                return (
+                  <tr
+                    key={incident.id}
+                    className={`transition-colors hover:bg-background/70 ${unattended ? UNATTENDED_ROW_CLASS : ""}`}
+                  >
+                    <td className="p-4 font-medium text-foreground">{incident.type}</td>
+                    <td className="p-4 text-muted">{incident.locationName}</td>
+                    <td className="p-4 text-muted">{timeAgo(incident.createdAt)}</td>
+                    <td className="p-4">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <Badge variant={statusVariant[incident.status]} solid={incident.status === "Active"}>
+                          {incident.status}
+                        </Badge>
+                        {unattended && <UnattendedBadge />}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
