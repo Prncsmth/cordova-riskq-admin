@@ -240,5 +240,25 @@ export function useResponder(id: string) {
     [token, id],
   );
 
-  return { responder, loading, error, updateBarangay };
+  // Reuses the role endpoint (role stays "responder") -- it's the one that
+  // sets unit, and it doesn't touch the responder's session or incidents.
+  const updateUnit = useCallback(
+    async (unit: "BDRRMO" | "MDRRMO") => {
+      if (!token) return;
+
+      const response = await apiFetch<{ success: true; user: { id: string; unit: string | null } }>(
+        `/admin/users/${id}/role`,
+        { method: "PATCH", body: JSON.stringify({ role: "responder", unit }), token },
+      );
+      const updatedUnit = response.user.unit;
+      setResponder((prev) =>
+        prev
+          ? { ...prev, unit: updatedUnit === "BDRRMO" || updatedUnit === "MDRRMO" ? updatedUnit : null }
+          : prev,
+      );
+    },
+    [token, id],
+  );
+
+  return { responder, loading, error, updateBarangay, updateUnit };
 }
