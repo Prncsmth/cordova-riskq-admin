@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { Search, MapPinned } from "lucide-react";
+import Link from "next/link";
+import { Search, MapPinned, Maximize2 } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Pagination from "@/components/ui/Pagination";
 import UnattendedBadge, { UNATTENDED_ROW_CLASS } from "@/components/emergencies/UnattendedBadge";
@@ -129,22 +130,17 @@ export default function SosAlertTable({
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5">
+        <select
+          value={statusFilter}
+          onChange={(e) => onStatusFilterChange(e.target.value as "All" | SosAlertStatus)}
+          className="rounded-xl border border-border bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+        >
           {statusFilters.map((status) => (
-            <button
-              key={status}
-              type="button"
-              onClick={() => onStatusFilterChange(status)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
-                statusFilter === status
-                  ? "bg-primary text-white shadow-xs"
-                  : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
-              }`}
-            >
+            <option key={status} value={status}>
               {statusLabel(status)}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
       </div>
 
       {loading ? (
@@ -208,30 +204,40 @@ export default function SosAlertTable({
                     </div>
                   </td>
                   <td className="p-4">
-                    {canAdminClose(alert) ? (
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => onCloseAlert(alert, "resolved")}
-                          disabled={closingAlertId === alert.id}
-                          title="Mark as handled outside the app, e.g. by phone"
-                          className="rounded-lg bg-success-light px-2.5 py-1 text-xs font-semibold text-success transition hover:opacity-80 disabled:opacity-40"
+                    <div className="flex items-center gap-1.5">
+                      {(alert.latitude !== 0 || alert.longitude !== 0) && (
+                        <Link
+                          href={`/live-map?lat=${alert.latitude}&lng=${alert.longitude}`}
+                          title="View this alert's location on the live map"
+                          className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-background px-2.5 py-1 text-xs font-semibold text-muted transition hover:text-foreground"
                         >
-                          Resolve
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onCloseAlert(alert, "dismissed")}
-                          disabled={closingAlertId === alert.id}
-                          title="Dismiss as a false alarm or duplicate"
-                          className="rounded-lg bg-background px-2.5 py-1 text-xs font-semibold text-muted transition hover:text-foreground disabled:opacity-40"
-                        >
-                          Dismiss
-                        </button>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-muted">—</span>
-                    )}
+                          <Maximize2 size={12} />
+                          View
+                        </Link>
+                      )}
+                      {canAdminClose(alert) && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => onCloseAlert(alert, "resolved")}
+                            disabled={closingAlertId === alert.id}
+                            title="Mark as handled outside the app, e.g. by phone"
+                            className="rounded-lg bg-success-light px-2.5 py-1 text-xs font-semibold text-success transition hover:opacity-80 disabled:opacity-40"
+                          >
+                            Resolve
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onCloseAlert(alert, "dismissed")}
+                            disabled={closingAlertId === alert.id}
+                            title="Dismiss as a false alarm or duplicate"
+                            className="rounded-lg bg-background px-2.5 py-1 text-xs font-semibold text-muted transition hover:text-foreground disabled:opacity-40"
+                          >
+                            Dismiss
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
                 );

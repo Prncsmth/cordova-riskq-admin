@@ -17,7 +17,7 @@ import {
   Megaphone,
   Phone,
   ScrollText,
-  LifeBuoy,
+  Headset,
 } from "lucide-react";
 import SidebarGroup from "./SidebarGroup";
 import SidebarItem from "./SidebarItem";
@@ -85,7 +85,7 @@ export default function AdminSidebar() {
               </span>
               <span style={{ color: "var(--brand-riskq)" }}>RISKQ</span>
             </h1>
-            <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-tertiary">
+            <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted">
               MDRRMO Admin Portal
             </p>
           </div>
@@ -102,10 +102,10 @@ export default function AdminSidebar() {
         <SidebarGroup
           label="Emergency Operations"
           items={[
+            { href: "/live-map", label: "Live Map", icon: Map },
             { href: "/emergencies", label: "Live Incidents", icon: Siren },
             { href: "/sos-alerts", label: "SOS Alerts", icon: Bell },
             { href: "/incident-reports", label: "Incident Reports", icon: FileText },
-            { href: "/live-map", label: "Live Map", icon: Map },
           ]}
         />
 
@@ -129,7 +129,7 @@ export default function AdminSidebar() {
           label="Communication"
           items={[
             { href: "/announcements", label: "Announcements", icon: Megaphone },
-            { href: "/support-requests", label: "Support Requests", icon: LifeBuoy },
+            { href: "/support-requests", label: "Support Requests", icon: Headset },
           ]}
         />
 

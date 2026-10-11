@@ -24,7 +24,7 @@ export default function RecentIncidents() {
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-xs">
-      <div className="flex items-center justify-between border-b border-border/70 p-5">
+      <div className="flex items-center justify-between border-b border-border/70 p-4">
         <div className="flex items-center gap-2.5">
           <Siren size={18} className="shrink-0 text-danger" />
           <h2 className="text-lg font-semibold text-foreground">Recent Incidents</h2>
@@ -41,14 +41,14 @@ export default function RecentIncidents() {
       ) : recent.length === 0 ? (
         <p className="p-10 text-center text-sm text-muted">No active incidents.</p>
       ) : (
-        <div className="max-h-[420px] overflow-x-auto overflow-y-auto">
+        <div className="max-h-80 overflow-x-auto overflow-y-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-background/60">
               <tr>
-                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Type</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Location</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Time</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Status</th>
+                <th className="p-3 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Type</th>
+                <th className="p-3 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Location</th>
+                <th className="p-3 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Time</th>
+                <th className="p-3 text-xs font-semibold uppercase tracking-[0.1em] text-text-tertiary">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/70">
@@ -59,10 +59,10 @@ export default function RecentIncidents() {
                     key={incident.id}
                     className={`transition-colors hover:bg-background/70 ${unattended ? UNATTENDED_ROW_CLASS : ""}`}
                   >
-                    <td className="p-4 font-medium text-foreground">{incident.type}</td>
-                    <td className="p-4 text-muted">{incident.locationName}</td>
-                    <td className="p-4 text-muted">{timeAgo(incident.createdAt)}</td>
-                    <td className="p-4">
+                    <td className="p-3 font-medium text-foreground">{incident.type}</td>
+                    <td className="p-3 text-muted">{incident.locationName}</td>
+                    <td className="p-3 text-muted">{timeAgo(incident.createdAt)}</td>
+                    <td className="p-3">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <Badge variant={statusVariant[incident.status]} solid={incident.status === "Active"}>
                           {incident.status}

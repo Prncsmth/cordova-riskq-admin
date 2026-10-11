@@ -94,7 +94,11 @@ export default function SosAlertsPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      {/* auto-fit/minmax instead of a fixed column count: each card gets
+          just enough width to fit its label (170px covers "ACKNOWLEDGED" at
+          this tracking) and no more, so cards neither overflow at 6-across
+          nor stretch too wide at 3-across -- the row sizes itself. */}
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (

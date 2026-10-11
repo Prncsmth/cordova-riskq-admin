@@ -2,15 +2,18 @@
 "use client";
 
 import { useState } from "react";
-import { LifeBuoy } from "lucide-react";
+import { Headset } from "lucide-react";
 import SupportRequestTable from "@/components/support-requests/SupportRequestTable";
 import { usePaginationState } from "@/hooks/usePaginationState";
 import { useSupportRequests } from "@/hooks/useSupportRequests";
-import { REQUESTER_ROLE_LABEL, type SupportRequestStatus } from "@/types/support-request";
+import { REQUESTER_ROLE_LABEL, type SupportRequestStatus, type SupportRequestTopic } from "@/types/support-request";
 
 export default function SupportRequestsPage() {
   const pagination = usePaginationState();
   const [statusFilter, setStatusFilter] = useState<"All" | SupportRequestStatus>("All");
+  const [topicFilter, setTopicFilter] = useState<"All" | SupportRequestTopic>("All");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const {
     supportRequests,
@@ -22,11 +25,26 @@ export default function SupportRequestsPage() {
     updateStatus,
     freshIds,
     latestArrival,
-  } = useSupportRequests(pagination, statusFilter);
+  } = useSupportRequests(pagination, statusFilter, { topic: topicFilter, startDate, endDate });
   const totalPages = Math.max(1, Math.ceil(total / pagination.pageSize));
 
   function handleStatusFilterChange(value: "All" | SupportRequestStatus) {
     setStatusFilter(value);
+    pagination.resetPage();
+  }
+
+  function handleTopicFilterChange(value: "All" | SupportRequestTopic) {
+    setTopicFilter(value);
+    pagination.resetPage();
+  }
+
+  function handleStartDateChange(value: string) {
+    setStartDate(value);
+    pagination.resetPage();
+  }
+
+  function handleEndDateChange(value: string) {
+    setEndDate(value);
     pagination.resetPage();
   }
 
@@ -46,7 +64,7 @@ export default function SupportRequestsPage() {
           role="status"
           className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary-light/30 p-4 text-sm text-foreground"
         >
-          <LifeBuoy size={18} className="shrink-0 text-primary" />
+          <Headset size={18} className="shrink-0 text-primary" />
           <p>
             <span className="font-semibold">New support request</span> from{" "}
             {latestArrival.userName || "a user"}
@@ -67,6 +85,12 @@ export default function SupportRequestsPage() {
         onSearchChange={pagination.setSearchInput}
         statusFilter={statusFilter}
         onStatusFilterChange={handleStatusFilterChange}
+        topicFilter={topicFilter}
+        onTopicFilterChange={handleTopicFilterChange}
+        startDate={startDate}
+        onStartDateChange={handleStartDateChange}
+        endDate={endDate}
+        onEndDateChange={handleEndDateChange}
         page={pagination.page}
         totalPages={totalPages}
         pageSize={pagination.pageSize}

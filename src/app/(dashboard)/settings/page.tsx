@@ -1,6 +1,6 @@
 import AdminProfile from "@/components/settings/AdminProfile";
 import EmergencySettings from "@/components/settings/EmergencySettings";
-import NotificationSettings from "@/components/settings/NotificationSettings";
+import SystemInfo from "@/components/settings/SystemInfo";
 import SecuritySettings from "@/components/settings/SecuritySettings";
 
 export default function SettingsPage() {
@@ -10,7 +10,7 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold text-foreground">System Settings</h1>
 
         <p className="text-sm text-muted">
-          Configure Cordova RISKQ administration settings.
+          Manage your profile, emergency alerts, and account security.
         </p>
       </div>
 
@@ -19,7 +19,7 @@ export default function SettingsPage() {
       <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
         <div className="space-y-6">
           <EmergencySettings />
-          <NotificationSettings />
+          <SystemInfo />
         </div>
 
         <SecuritySettings />

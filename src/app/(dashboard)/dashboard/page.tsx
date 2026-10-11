@@ -28,7 +28,11 @@ export default function DashboardPage() {
         <RecentActivity />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      {/* items-start -- without it, a CSS grid row stretches every card to
+          match its tallest sibling (Responder Status, with its donut
+          chart), so the shorter cards end up with empty padding at the
+          bottom instead of sizing to their own content. */}
+      <div className="grid items-start gap-6 lg:grid-cols-3">
         <ResponderStatusDonut />
         <EvacuationCenterStatus />
         <QuickActions />

@@ -2,12 +2,18 @@
 "use client";
 
 import { useState } from "react";
-import { Search, LifeBuoy, Mail, Phone } from "lucide-react";
+import { Search, Headset, Mail, Phone } from "lucide-react";
 import Badge, { type BadgeVariant } from "@/components/ui/Badge";
 import Pagination from "@/components/ui/Pagination";
-import { REQUESTER_ROLE_LABEL, type SupportRequest, type SupportRequestStatus } from "@/types/support-request";
+import {
+  REQUESTER_ROLE_LABEL,
+  type SupportRequest,
+  type SupportRequestStatus,
+  type SupportRequestTopic,
+} from "@/types/support-request";
 
 const statusFilters = ["All", "open", "in_progress", "resolved"] as const;
+const topicFilters = ["All", "App issue", "Report help", "Account", "Other"] as const;
 
 const STATUS_LABEL: Record<SupportRequestStatus, string> = {
   open: "Open",
@@ -21,6 +27,13 @@ const STATUS_VARIANT: Record<SupportRequestStatus, BadgeVariant> = {
   resolved: "success",
 };
 
+// Short, stable reference shown to admins instead of the full UUID -- just
+// enough to tell two requests apart at a glance or quote one when following
+// up with a requester, without the visual noise of a full 36-character id.
+function shortRef(id: string): string {
+  return id.slice(0, 8).toUpperCase();
+}
+
 export default function SupportRequestTable({
   supportRequests,
   loading,
@@ -32,6 +45,12 @@ export default function SupportRequestTable({
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
+  topicFilter,
+  onTopicFilterChange,
+  startDate,
+  onStartDateChange,
+  endDate,
+  onEndDateChange,
   page,
   totalPages,
   pageSize,
@@ -48,6 +67,12 @@ export default function SupportRequestTable({
   onSearchChange: (value: string) => void;
   statusFilter: "All" | SupportRequestStatus;
   onStatusFilterChange: (value: "All" | SupportRequestStatus) => void;
+  topicFilter: "All" | SupportRequestTopic;
+  onTopicFilterChange: (value: "All" | SupportRequestTopic) => void;
+  startDate: string;
+  onStartDateChange: (value: string) => void;
+  endDate: string;
+  onEndDateChange: (value: string) => void;
   page: number;
   totalPages: number;
   pageSize: number;
@@ -57,6 +82,15 @@ export default function SupportRequestTable({
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   async function handleStatus(id: string, status: SupportRequestStatus) {
+    // Resolving is the one transition that tells the requester "this is
+    // done" (see SUPPORT_STATUS_NOTIFICATION_COPY on the backend) -- worth a
+    // confirm so it's not fired by an accidental dropdown click. open <->
+    // in_progress is reversible and low-stakes either way, so it stays a
+    // plain one-click change like it already was.
+    if (status === "resolved" && !window.confirm("Mark this support request as resolved?")) {
+      return;
+    }
+
     setPendingId(id);
     try {
       await onUpdateStatus(id, status);
@@ -121,6 +155,55 @@ export default function SupportRequestTable({
           </div>
         </div>
 
+        <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:gap-4">
+          <select
+            value={topicFilter}
+            onChange={(e) => onTopicFilterChange(e.target.value as "All" | SupportRequestTopic)}
+            className="rounded-xl border border-border bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+          >
+            {topicFilters.map((t) => (
+              <option key={t} value={t}>
+                {t === "All" ? "All categories" : t}
+              </option>
+            ))}
+          </select>
+
+          <div className="flex items-center gap-2 text-sm text-muted">
+            <label className="flex items-center gap-1.5">
+              From
+              <input
+                type="date"
+                value={startDate}
+                max={endDate || undefined}
+                onChange={(e) => onStartDateChange(e.target.value)}
+                className="rounded-xl border border-border bg-background/60 px-2.5 py-1.5 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+              />
+            </label>
+            <label className="flex items-center gap-1.5">
+              To
+              <input
+                type="date"
+                value={endDate}
+                min={startDate || undefined}
+                onChange={(e) => onEndDateChange(e.target.value)}
+                className="rounded-xl border border-border bg-background/60 px-2.5 py-1.5 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+              />
+            </label>
+            {(startDate || endDate) && (
+              <button
+                type="button"
+                onClick={() => {
+                  onStartDateChange("");
+                  onEndDateChange("");
+                }}
+                className="text-xs font-medium text-primary hover:text-primary-dark"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="divide-y divide-border/70">
           {supportRequests.map((r) => (
             <div
@@ -129,7 +212,7 @@ export default function SupportRequestTable({
                 freshIds.includes(r.id) ? "bg-primary-light/30 ring-1 ring-inset ring-primary/30" : ""
               }`}
             >
-              <LifeBuoy
+              <Headset
                 size={20}
                 className={`mt-0.5 shrink-0 ${r.status === "open" ? "text-danger" : "text-primary"}`}
               />
@@ -137,6 +220,9 @@ export default function SupportRequestTable({
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-foreground">{r.subject || `${r.topic} support request`}</p>
+                  <span className="font-mono text-[11px] text-text-tertiary" title={r.id}>
+                    #{shortRef(r.id)}
+                  </span>
                   <Badge variant={STATUS_VARIANT[r.status]} solid={r.status === "open"}>
                     {STATUS_LABEL[r.status]}
                   </Badge>
@@ -169,7 +255,10 @@ export default function SupportRequestTable({
                       {r.user.mobile}
                     </a>
                   )}
-                  <span>{new Date(r.createdAt).toLocaleString()}</span>
+                  <span>Submitted {new Date(r.createdAt).toLocaleString()}</span>
+                  {r.updatedAt !== r.createdAt && (
+                    <span>Updated {new Date(r.updatedAt).toLocaleString()}</span>
+                  )}
                 </div>
               </div>
 

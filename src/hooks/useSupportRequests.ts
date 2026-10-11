@@ -5,7 +5,7 @@ import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useSocket } from "@/hooks/useSocket";
 import type { usePaginationState } from "@/hooks/usePaginationState";
-import type { SupportRequest, SupportRequestStatus } from "@/types/support-request";
+import type { SupportRequest, SupportRequestStatus, SupportRequestTopic } from "@/types/support-request";
 
 type SupportRequestSocketEvent = {
   kind: "created" | "updated";
@@ -19,13 +19,35 @@ type SupportRequestSocketEvent = {
 // How long a just-arrived request keeps its "New" highlight.
 const FRESH_MS = 10_000;
 
+// <input type="date"> gives "YYYY-MM-DD", which the server would read as
+// UTC midnight (8 AM in the Philippines), dropping most of the "To" day.
+// Send the first/last instant of the browser's local day instead, like
+// useIncidentHistory does. Null for an empty or invalid date (not sent) --
+// including one like "2026-02-30", which Date would roll over to March.
+function dayBoundIso(day: string, edge: "start" | "end"): string | null {
+  if (!day) return null;
+  const date = new Date(`${day}T${edge === "start" ? "00:00:00.000" : "23:59:59.999"}`);
+  if (Number.isNaN(date.getTime())) return null;
+  const [year, month, dayOfMonth] = day.split("-").map(Number);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() + 1 !== month ||
+    date.getDate() !== dayOfMonth
+  ) {
+    return null;
+  }
+  return date.toISOString();
+}
+
 export function useSupportRequests(
   pagination: ReturnType<typeof usePaginationState>,
   status: "All" | SupportRequestStatus,
+  filters: { topic: "All" | SupportRequestTopic; startDate: string; endDate: string },
 ) {
   const { token } = useAuth();
   const socket = useSocket();
   const { page, pageSize, search } = pagination;
+  const { topic, startDate, endDate } = filters;
   const [supportRequests, setSupportRequests] = useState<SupportRequest[]>([]);
   const [total, setTotal] = useState(0);
   const [openCount, setOpenCount] = useState(0);
@@ -56,6 +78,11 @@ export function useSupportRequests(
     const params = new URLSearchParams({ page: String(page), limit: String(pageSize) });
     if (search) params.set("search", search);
     if (status !== "All") params.set("status", status);
+    if (topic !== "All") params.set("topic", topic);
+    const startIso = dayBoundIso(startDate, "start");
+    const endIso = dayBoundIso(endDate, "end");
+    if (startIso) params.set("startDate", startIso);
+    if (endIso) params.set("endDate", endIso);
 
     apiFetch<{
       success: true;
@@ -82,7 +109,7 @@ export function useSupportRequests(
     return () => {
       cancelled = true;
     };
-  }, [token, page, pageSize, search, status, refetchToken]);
+  }, [token, page, pageSize, search, status, topic, startDate, endDate, refetchToken]);
 
   useEffect(() => {
     function handleSupportRequest(event: SupportRequestSocketEvent) {
