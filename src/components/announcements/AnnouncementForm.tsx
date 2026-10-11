@@ -1,10 +1,12 @@
 import { Megaphone } from "lucide-react";
 import Card from "@/components/ui/Card";
-import { CORDOVA_BARANGAY_NAMES } from "@/constants/barangays";
 import type { AnnouncementAudience, AnnouncementPriority } from "@/types/announcement";
 
 const priorities: AnnouncementPriority[] = ["Normal", "Urgent"];
-const audiences: AnnouncementAudience[] = ["All Users", "Responders Only", "Specific Barangay"];
+// "Specific Barangay" is no longer offered for new announcements. An older
+// one already targeting a barangay still lists it while being edited (see
+// below) so saving it doesn't silently retarget it.
+const audiences: AnnouncementAudience[] = ["All Users", "Responders Only"];
 
 type AnnouncementFormProps = {
   title: string;
@@ -16,7 +18,6 @@ type AnnouncementFormProps = {
   onBodyChange: (value: string) => void;
   onPriorityChange: (value: AnnouncementPriority) => void;
   onAudienceChange: (value: AnnouncementAudience) => void;
-  onBarangayChange: (value: string) => void;
   onPublish: () => void;
   isPublishing: boolean;
   // Non-null while editing an existing announcement instead of composing a
@@ -37,7 +38,6 @@ export default function AnnouncementForm({
   onBodyChange,
   onPriorityChange,
   onAudienceChange,
-  onBarangayChange,
   onPublish,
   isPublishing,
   editingId = null,
@@ -117,30 +117,14 @@ export default function AnnouncementForm({
                   {a}
                 </option>
               ))}
+              {audience === "Specific Barangay" && (
+                <option value="Specific Barangay">
+                  {barangay ? `Specific Barangay (${barangay})` : "Specific Barangay"}
+                </option>
+              )}
             </select>
           </div>
         </div>
-
-        {audience === "Specific Barangay" && (
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-tertiary">Barangay</label>
-            <select
-              value={barangay}
-              onChange={(e) => onBarangayChange(e.target.value)}
-              required
-              className="w-full rounded-xl border border-border bg-surface p-2.5 text-sm shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
-            >
-              <option value="" disabled>
-                Select a barangay
-              </option>
-              {CORDOVA_BARANGAY_NAMES.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
         <div className="flex gap-2">
           <button
