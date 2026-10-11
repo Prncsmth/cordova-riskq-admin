@@ -29,7 +29,7 @@ export default function ResponderDetails({
 }: {
   id: string;
 }) {
-  const { responder, loading, error, updateBarangay } = useResponder(id);
+  const { responder, loading, error, updateBarangay, updateUnit } = useResponder(id);
   const { emergencies, loading: emergenciesLoading, error: emergenciesError } = useEmergencies();
   const {
     records: history,
@@ -42,6 +42,22 @@ export default function ResponderDetails({
   } = useResponderIncidentHistory(id);
   const [savingBarangay, setSavingBarangay] = useState(false);
   const [barangayError, setBarangayError] = useState<string | null>(null);
+
+  const [savingUnit, setSavingUnit] = useState(false);
+  const [unitError, setUnitError] = useState<string | null>(null);
+
+  async function handleUnitChange(value: string) {
+    if (value !== "BDRRMO" && value !== "MDRRMO") return;
+    setSavingUnit(true);
+    setUnitError(null);
+    try {
+      await updateUnit(value);
+    } catch (err) {
+      setUnitError(err instanceof Error ? err.message : "Failed to update unit.");
+    } finally {
+      setSavingUnit(false);
+    }
+  }
 
   async function handleBarangayChange(value: string) {
     setSavingBarangay(true);
@@ -128,9 +144,25 @@ export default function ResponderDetails({
 
           <div className="flex items-start gap-2.5">
             <Building2 size={16} className="mt-0.5 shrink-0 text-muted" />
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="text-xs text-muted">Unit</p>
-              <p className="text-sm font-medium text-foreground">{responder.unit ?? "Unclassified"}</p>
+              {/* Same control as Assigned Barangay below. BDRRMO responders
+                  open the app on their barangay; MDRRMO on all of Cordova. */}
+              <select
+                value={responder.unit ?? ""}
+                onChange={(e) => handleUnitChange(e.target.value)}
+                disabled={savingUnit}
+                className="mt-1 w-full max-w-50 rounded-lg border border-border bg-background/60 py-1.5 px-2.5 text-sm font-medium text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15 disabled:opacity-60"
+              >
+                {responder.unit === null && (
+                  <option value="" disabled>
+                    Unclassified
+                  </option>
+                )}
+                <option value="BDRRMO">BDRRMO</option>
+                <option value="MDRRMO">MDRRMO</option>
+              </select>
+              {unitError && <p className="mt-1 text-xs text-red-700">{unitError}</p>}
             </div>
           </div>
 

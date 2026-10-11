@@ -107,7 +107,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const authenticated = token !== null && user?.role === "admin";
 
   const login = useCallback(async (email: string, password: string) => {
-    const response = await apiFetch<LoginResponse>("/auth/login", {
+    // The admin dashboard's own endpoint (not the mobile app's shared
+    // /auth/login) -- the backend now rejects admin accounts there
+    // ("Admin accounts can only sign in through the admin dashboard"),
+    // since citizen/responder and admin logins are deliberately separate
+    // portals. See loginPortal.ts's assertPortalAllowed on the backend.
+    const response = await apiFetch<LoginResponse>("/admin/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });

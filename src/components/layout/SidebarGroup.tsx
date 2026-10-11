@@ -27,12 +27,25 @@ export default function SidebarGroup({ label, items }: SidebarGroupProps) {
 
   return (
     <div className="space-y-1">
+      {/* Deliberately muted, not an interactive-link color shift on hover
+          (no hover:text-primary) -- this toggles local collapse state, not
+          navigation, and shouldn't read like a clickable nav item the way
+          SidebarItem's active/hover states do. The faint persistent
+          background is what marks it as section chrome at rest, not just
+          on hover. */}
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between gap-2 px-4 py-1 text-[10px] font-bold uppercase tracking-wide text-text-tertiary transition hover:text-primary"
+        className="flex w-full items-center justify-between gap-2 rounded-md bg-background/60 px-3 py-1.5 text-[9px] font-bold uppercase text-muted transition-colors hover:bg-background"
         aria-expanded={open}
       >
+        {/* text-[9px] (not [10px]) and no tracking-wide -- "Emergency
+            Operations", the longest group label, was right at the edge of
+            truncating inside the sidebar's width at the larger/wider
+            setting. text-muted replaces text-text-tertiary, which isn't a
+            real token anywhere in globals.css -- it was rendering as
+            whatever color the text inherited by default, not an
+            intentional gray. */}
         <span className="min-w-0 truncate">{label}</span>
         <ChevronDown
           size={12}

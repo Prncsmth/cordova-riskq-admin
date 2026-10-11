@@ -40,7 +40,7 @@ export default function EvacuationCenterStatus() {
   }
 
   return (
-    <div className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
+    <div className="rounded-2xl border border-border/70 bg-surface p-5 shadow-xs">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <Building2 size={18} className="shrink-0 text-info" />
@@ -51,14 +51,14 @@ export default function EvacuationCenterStatus() {
         </Link>
       </div>
 
-      <div className="mt-5 space-y-1">
+      <div className="mt-3 space-y-1">
         {previewCenters.length === 0 ? (
           <p className="p-4 text-center text-sm text-muted">No evacuation centers yet.</p>
         ) : (
           previewCenters.map((center) => (
             <div
               key={center.id}
-              className="flex items-center justify-between rounded-xl p-2.5 text-sm transition-colors hover:bg-background/60"
+              className="flex items-center justify-between rounded-xl p-2 text-sm transition-colors hover:bg-background/60"
             >
               <span className="font-medium text-foreground">{center.name}</span>
               <Badge variant={center.status === "full" ? "danger" : "success"} solid={center.status === "full"}>

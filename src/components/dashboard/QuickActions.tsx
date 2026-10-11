@@ -11,20 +11,20 @@ const actions: { label: string; href: string; icon: LucideIcon; color: string }[
 
 export default function QuickActions() {
   return (
-    <div className="rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
+    <div className="rounded-2xl border border-border/70 bg-surface p-5 shadow-xs">
       <div className="flex items-center gap-2.5">
         <Zap size={18} className="shrink-0 text-primary" />
         <h2 className="text-lg font-semibold text-foreground">Quick Actions</h2>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-3 grid grid-cols-2 gap-2.5">
         {actions.map((action) => {
           const Icon = action.icon;
           return (
             <Link
               key={action.label}
               href={action.href}
-              className="flex flex-col items-start gap-3 rounded-xl border border-border/70 bg-background p-4 transition-colors duration-150 hover:border-primary/30 hover:bg-primary-light/20 active:scale-[0.98]"
+              className="flex flex-col items-start gap-2 rounded-xl border border-border/70 bg-background p-3 transition-colors duration-150 hover:border-primary/30 hover:bg-primary-light/20 active:scale-[0.98]"
             >
               <Icon size={20} className={action.color} />
               <span className="text-sm font-medium text-foreground">{action.label}</span>

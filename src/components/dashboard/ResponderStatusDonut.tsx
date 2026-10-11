@@ -40,7 +40,7 @@ export default function ResponderStatusDonut() {
   }
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-border/70 bg-surface p-6 shadow-xs">
+    <div className="flex h-full flex-col rounded-2xl border border-border/70 bg-surface p-5 shadow-xs">
       <div className="flex items-center gap-2.5">
         <ShieldCheck size={18} className="shrink-0 text-success" />
         <h2 className="text-lg font-semibold text-foreground">Responder Status</h2>
@@ -52,14 +52,14 @@ export default function ResponderStatusDonut() {
         </div>
       ) : (
         <>
-      <div className="relative mx-auto mt-3 h-44 w-44">
+      <div className="relative mx-auto mt-2 h-36 w-36">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
               dataKey="value"
-              innerRadius={55}
-              outerRadius={78}
+              innerRadius={45}
+              outerRadius={64}
               paddingAngle={4}
               stroke="none"
             >
@@ -76,7 +76,7 @@ export default function ResponderStatusDonut() {
         </div>
       </div>
 
-      <div className="mt-4 space-y-1">
+      <div className="mt-3 space-y-1">
         {data.map((entry) => (
           <div
             key={entry.name}
@@ -95,7 +95,7 @@ export default function ResponderStatusDonut() {
 
       <Link
         href="/responders"
-        className="mt-5 block w-full rounded-xl bg-primary py-2.5 text-center text-sm font-medium text-white shadow-xs transition-all duration-150 hover:bg-primary-dark active:scale-[0.98]"
+        className="mt-3 block w-full rounded-xl bg-primary py-2 text-center text-sm font-medium text-white shadow-xs transition-all duration-150 hover:bg-primary-dark active:scale-[0.98]"
       >
         View Responders
       </Link>
