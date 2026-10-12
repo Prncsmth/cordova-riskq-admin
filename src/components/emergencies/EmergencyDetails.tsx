@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   MapPin,
   Clock,
-  ShieldCheck,
   ShieldQuestion,
   Siren,
   MessageSquareText,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge, { type BadgeVariant } from "@/components/ui/Badge";
+import AvatarPhoto from "@/components/ui/AvatarPhoto";
 import { incidentSourceLabel } from "@/lib/incidentSource";
 import { isUnattendedIncident } from "@/lib/unattended";
 import UnattendedBadge from "@/components/emergencies/UnattendedBadge";
@@ -46,6 +46,15 @@ const responderStepStyle: Record<string, { label: string; variant: BadgeVariant;
 };
 
 const defaultResponderStep = { label: "Assigned", variant: "default" as BadgeVariant, color: "text-muted" };
+
+function initials(name: string) {
+  return name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 export default function EmergencyDetails({
   id,
@@ -102,7 +111,7 @@ function EmergencyDetailsView({
   Icon: LucideIcon;
   status: { variant: BadgeVariant; solid: boolean };
   hasCoords: boolean;
-  responders: { id: string; name: string; status: string }[];
+  responders: { id: string; name: string; status: string; avatarUrl: string | null }[];
   assignedIds: Set<string>;
   nearestBarangay: { id: string; name: string } | null;
 }) {
@@ -230,7 +239,10 @@ function EmergencyDetailsView({
                   const step = responderStepStyle[responder.status] ?? defaultResponderStep;
                   return (
                     <li key={responder.id} className="flex items-center gap-3">
-                      <ShieldCheck size={22} className={`shrink-0 ${step.color}`} />
+                      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary text-xs font-semibold text-white shadow-xs">
+                        {initials(responder.name)}
+                        <AvatarPhoto src={responder.avatarUrl} alt={`Photo of ${responder.name}`} />
+                      </span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium text-foreground">{responder.name}</p>
                         <p className="text-xs text-muted">
@@ -276,9 +288,13 @@ function EmergencyDetailsView({
                 <ul className="space-y-3">
                   {nearbyResponders.map((responder) => (
                     <li key={responder.id} className="flex items-center gap-3">
-                      <span
-                        className={`h-2 w-2 shrink-0 rounded-full ${responder.isOnDuty ? "bg-success" : "bg-muted"}`}
-                      />
+                      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary text-xs font-semibold text-white shadow-xs">
+                        {initials(responder.name)}
+                        <AvatarPhoto src={responder.avatarUrl} alt={`Photo of ${responder.name}`} />
+                        <span
+                          className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-surface ${responder.isOnDuty ? "bg-success" : "bg-muted"}`}
+                        />
+                      </span>
                       <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{responder.name}</p>
                       <Badge variant={responder.isOnDuty ? "success" : "default"}>
                         {responder.isOnDuty ? "On Duty" : "Off Duty"}

@@ -16,10 +16,6 @@ export default function NotificationsMenu() {
   // dropdown below is already scrollable (max-h-96 overflow-y-auto), so a
   // larger limit both fixes the count and surfaces more real history.
   const { items, unreadCount, markRead, markAllRead } = useAdminNotifications(20);
-  // The dropdown is an inbox: read notifications drop out of it (so "Mark
-  // all as read" clears it right away). Full history, read or not, stays on
-  // the Notifications page behind "View all activity".
-  const unreadItems = items.filter((item) => !item.read);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,7 +58,7 @@ export default function NotificationsMenu() {
           </div>
 
           <div className="max-h-96 overflow-y-auto">
-            {unreadItems.map(({ activity, key }) => {
+            {items.map(({ activity, key, read }) => {
               const style = ACTIVITY_TYPE_STYLE[activity.type];
               const Icon = style.icon;
               return (
@@ -73,7 +69,7 @@ export default function NotificationsMenu() {
                     markRead(activity);
                     setOpen(false);
                   }}
-                  className="flex items-start gap-3 border-b border-(--glass-border) bg-primary-light/10 px-4 py-3 transition-colors last:border-b-0 hover:bg-primary-light/20"
+                  className={`flex items-start gap-3 border-b border-(--glass-border) px-4 py-3 transition-colors last:border-b-0 hover:bg-primary-light/20 ${read ? "" : "bg-primary-light/10"}`}
                 >
                   <Icon size={20} className={`mt-0.5 shrink-0 ${style.color}`} />
 
@@ -83,12 +79,12 @@ export default function NotificationsMenu() {
                     <p className="mt-0.5 text-xs text-muted">{timeAgo(activity.occurredAt)}</p>
                   </div>
 
-                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                  {!read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
                 </Link>
               );
             })}
 
-            {unreadItems.length === 0 && (
+            {items.length === 0 && (
               <p className="px-4 py-8 text-center text-sm text-muted">You&apos;re all caught up.</p>
             )}
           </div>
