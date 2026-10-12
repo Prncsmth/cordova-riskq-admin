@@ -11,9 +11,9 @@ import { ACTIVITY_TYPE_STYLE, ACTIVITY_TYPE_HREF } from "@/lib/adminActivity";
 import { timeAgo } from "@/lib/utils";
 import type { AdminActivityType } from "@/hooks/useRecentActivity";
 
-// The backend's cap for GET /admin/activity (admin.service.ts's
-// getRecentActivity) -- paged client-side below.
-const FEED_LIMIT = 100;
+// GET /notifications returns at most the 50 newest (last 24 hours) --
+// paged client-side below.
+const FEED_LIMIT = 50;
 const typeFilters = ["All", ...Object.keys(ACTIVITY_TYPE_STYLE)] as (AdminActivityType | "All")[];
 
 export default function NotificationsPage() {
@@ -22,6 +22,22 @@ export default function NotificationsPage() {
   const [typeFilter, setTypeFilter] = useState<(typeof typeFilters)[number]>("All");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  // Notifications with a mark-read request in flight (button disabled).
+  const [marking, setMarking] = useState<Set<string>>(new Set());
+
+  async function handleMarkRead(key: string, activity: (typeof items)[number]["activity"]) {
+    if (marking.has(key)) return;
+    setMarking((prev) => new Set(prev).add(key));
+    try {
+      await markRead(activity);
+    } finally {
+      setMarking((prev) => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
+    }
+  }
 
   const filtered = useMemo(() => {
     return items.filter(({ activity }) => {
@@ -141,10 +157,11 @@ export default function NotificationsPage() {
               const style = ACTIVITY_TYPE_STYLE[activity.type];
               const Icon = style.icon;
               return (
+                // Opening it navigates only; marking read is its own action,
+                // and a read one stays listed until it's 24 hours old.
                 <Link
                   key={key}
                   href={ACTIVITY_TYPE_HREF[activity.type]}
-                  onClick={() => markRead(activity)}
                   className={`flex items-start gap-3 p-4 transition-colors hover:bg-background/50 ${read ? "" : "bg-primary-light/10"}`}
                 >
                   <Icon size={20} className={`mt-0.5 shrink-0 ${style.color}`} />
@@ -155,7 +172,23 @@ export default function NotificationsPage() {
                     <p className="mt-1 text-xs text-text-tertiary">{timeAgo(activity.occurredAt)}</p>
                   </div>
 
-                  {!read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
+                  {!read && (
+                    <div className="flex shrink-0 items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          void handleMarkRead(key, activity);
+                        }}
+                        disabled={marking.has(key)}
+                        className="rounded-lg px-2.5 py-1 text-xs font-semibold text-primary transition hover:bg-primary-light/40 disabled:opacity-50"
+                      >
+                        {marking.has(key) ? "Marking…" : "Mark as read"}
+                      </button>
+                      <span className="h-2 w-2 rounded-full bg-primary" aria-label="Unread" />
+                    </div>
+                  )}
                 </Link>
               );
             })}
