@@ -2,7 +2,7 @@ import { Megaphone } from "lucide-react";
 import Card from "@/components/ui/Card";
 import type { AnnouncementAudience, AnnouncementPriority } from "@/types/announcement";
 
-const priorities: AnnouncementPriority[] = ["Normal", "Urgent"];
+import { ANNOUNCEMENT_SEVERITIES, SEVERITY_STYLES } from "@/lib/announcementSeverity";
 // "Specific Barangay" is no longer offered for new announcements. An older
 // one already targeting a barangay still lists it while being edited (see
 // below) so saving it doesn't silently retarget it.
@@ -84,18 +84,20 @@ export default function AnnouncementForm({
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-tertiary">Priority</label>
-            <div className="flex gap-1.5">
-              {priorities.map((p) => (
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-tertiary">Severity</label>
+            {/* Chosen deliberately by the publisher -- never inferred from
+                the text. Critical is for an immediate threat to life. */}
+            <div className="flex gap-1.5" role="radiogroup" aria-label="Severity">
+              {ANNOUNCEMENT_SEVERITIES.map((p) => (
                 <button
                   key={p}
                   type="button"
+                  role="radio"
+                  aria-checked={priority === p}
                   onClick={() => onPriorityChange(p)}
-                  className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold transition-all duration-150 active:scale-[0.97] ${
+                  className={`flex-1 rounded-xl px-2 py-2 text-sm font-semibold transition-all duration-150 active:scale-[0.97] ${
                     priority === p
-                      ? p === "Urgent"
-                        ? "bg-danger text-white shadow-xs"
-                        : "bg-primary text-white shadow-xs"
+                      ? SEVERITY_STYLES[p].selected
                       : "border border-border bg-surface text-muted hover:bg-primary-light/30"
                   }`}
                 >
@@ -103,6 +105,7 @@ export default function AnnouncementForm({
                 </button>
               ))}
             </div>
+            <p className="mt-1.5 text-xs text-muted">{SEVERITY_STYLES[priority].description}</p>
           </div>
 
           <div>

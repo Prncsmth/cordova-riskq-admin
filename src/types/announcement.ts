@@ -1,4 +1,5 @@
-export type AnnouncementPriority = "Normal" | "Urgent";
+// Severity, chosen by the publishing admin (backend: announcementPriority.ts).
+export type AnnouncementPriority = "Information" | "Warning" | "Critical";
 
 export type AnnouncementAudience = "All Users" | "Responders Only" | "Specific Barangay";
 

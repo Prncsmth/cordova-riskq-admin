@@ -8,6 +8,7 @@ import AnnouncementTable from "@/components/announcements/AnnouncementTable";
 import { useAnnouncements } from "@/hooks/useAnnouncements";
 import { usePaginationState } from "@/hooks/usePaginationState";
 import type { Announcement, AnnouncementAudience, AnnouncementPriority } from "@/types/announcement";
+import { toSeverity } from "@/lib/announcementSeverity";
 
 export default function AnnouncementsPage() {
   const pagination = usePaginationState();
@@ -21,7 +22,7 @@ export default function AnnouncementsPage() {
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [priority, setPriority] = useState<AnnouncementPriority>("Normal");
+  const [priority, setPriority] = useState<AnnouncementPriority>("Information");
   const [audience, setAudience] = useState<AnnouncementAudience>("All Users");
   // Only ever set from an older announcement being edited -- new ones can't
   // target a barangay any more (see AnnouncementForm's audiences).
@@ -37,7 +38,7 @@ export default function AnnouncementsPage() {
   function resetForm() {
     setTitle("");
     setBody("");
-    setPriority("Normal");
+    setPriority("Information");
     setAudience("All Users");
     setBarangay("");
     setEditingId(null);
@@ -47,7 +48,7 @@ export default function AnnouncementsPage() {
     setEditingId(announcement.id);
     setTitle(announcement.title);
     setBody(announcement.content);
-    setPriority(announcement.priority);
+    setPriority(toSeverity(announcement.priority));
     setAudience(announcement.audience);
     setBarangay(announcement.barangayName ?? "");
   }

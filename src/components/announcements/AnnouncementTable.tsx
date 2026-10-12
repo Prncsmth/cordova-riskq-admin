@@ -2,12 +2,13 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Megaphone, Pencil, Trash2 } from "lucide-react";
+import { Search, Pencil, Trash2 } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Pagination from "@/components/ui/Pagination";
 import type { Announcement, AnnouncementPriority } from "@/types/announcement";
+import { ANNOUNCEMENT_SEVERITIES, SEVERITY_STYLES, toSeverity } from "@/lib/announcementSeverity";
 
-const priorityFilters = ["All", "Normal", "Urgent"] as const;
+const priorityFilters: ("All" | AnnouncementPriority)[] = ["All", ...ANNOUNCEMENT_SEVERITIES];
 
 export default function AnnouncementTable({
   announcements,
@@ -111,15 +112,18 @@ export default function AnnouncementTable({
         </div>
 
         <div className="divide-y divide-border/70">
-          {announcements.map((a) => (
+          {announcements.map((a) => {
+            const severity = SEVERITY_STYLES[toSeverity(a.priority)];
+            const SeverityIcon = severity.icon;
+            return (
             <div key={a.id} className="flex items-start gap-3 p-4 transition-colors hover:bg-background/50">
-              <Megaphone size={20} className={`shrink-0 ${a.priority === "Urgent" ? "text-danger" : "text-primary"}`} />
+              <SeverityIcon size={20} className={`shrink-0 ${severity.text}`} />
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-foreground">{a.title}</p>
-                  <Badge variant={a.priority === "Urgent" ? "danger" : "default"} solid={a.priority === "Urgent"}>
-                    {a.priority}
+                  <Badge variant={severity.badge} solid={toSeverity(a.priority) === "Critical"}>
+                    {severity.label}
                   </Badge>
                 </div>
                 <p className="mt-1 line-clamp-2 text-sm text-muted">{a.content}</p>
@@ -149,7 +153,8 @@ export default function AnnouncementTable({
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
 
           {announcements.length === 0 && (
             <p className="p-10 text-center text-sm text-muted">No announcements match your search and filters.</p>
