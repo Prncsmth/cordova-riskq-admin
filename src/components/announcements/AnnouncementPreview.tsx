@@ -20,11 +20,8 @@ export default function AnnouncementPreview({ title, body, priority, audience }:
       <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Live Preview</p>
       <p className="mt-0.5 text-xs text-muted">How this will appear to {audience.toLowerCase()}</p>
 
-      <div
-        className={`mt-4 rounded-2xl border p-4 shadow-sm ${
-          severity.card
-        }`}
-      >
+      {/* The card itself stays neutral; the icon and badge carry the severity color. */}
+      <div className="mt-4 rounded-2xl border border-border bg-background/60 p-4 shadow-sm">
         <div className="flex items-start gap-3">
           <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-white shadow-xs ring-1 ring-black/5">
             <Image src="/images/logo.png" alt="" fill sizes="32px" className="object-contain p-1" />

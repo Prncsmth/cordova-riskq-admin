@@ -17,8 +17,7 @@ type SeverityStyle = {
   badge: BadgeVariant;
   // The selected button in the form.
   selected: string;
-  // The preview card's border/background, and its icon circle.
-  card: string;
+  // The preview's icon circle.
   iconCircle: string;
   // The megaphone/icon color in the list.
   text: string;
@@ -31,7 +30,6 @@ export const SEVERITY_STYLES: Record<AnnouncementPriority, SeverityStyle> = {
     icon: Info,
     badge: "info",
     selected: "bg-info text-white shadow-xs",
-    card: "border-border bg-background/60",
     iconCircle: "bg-info",
     text: "text-info",
   },
@@ -41,7 +39,6 @@ export const SEVERITY_STYLES: Record<AnnouncementPriority, SeverityStyle> = {
     icon: TriangleAlert,
     badge: "warning",
     selected: "bg-warning text-white shadow-xs",
-    card: "border-warning/30 bg-warning-light/60",
     iconCircle: "bg-warning",
     text: "text-warning",
   },
@@ -51,7 +48,6 @@ export const SEVERITY_STYLES: Record<AnnouncementPriority, SeverityStyle> = {
     icon: Siren,
     badge: "danger",
     selected: "bg-danger text-white shadow-xs",
-    card: "border-danger/30 bg-danger-light/60",
     iconCircle: "bg-danger",
     text: "text-danger",
   },
