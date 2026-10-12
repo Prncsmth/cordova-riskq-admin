@@ -93,22 +93,17 @@ export default function AuditLogTable({
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5">
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value as (typeof typeFilters)[number])}
+          className="rounded-xl border border-border bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+        >
           {typeFilters.map((type) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => setTypeFilter(type)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95 ${
-                typeFilter === type
-                  ? "bg-primary text-white shadow-xs"
-                  : "bg-background text-muted hover:bg-primary-light/40 hover:text-primary"
-              }`}
-            >
+            <option key={type} value={type}>
               {type === "All" ? "All" : ACTIVITY_TYPE_STYLE[type].label}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
       </div>
 
       <div className="overflow-x-auto">
