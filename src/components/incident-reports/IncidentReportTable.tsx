@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, Flame, CloudRain, Car, HeartPulse, FileText } from "lucide-react";
+import { Search, Flame, CloudRain, Car, HeartPulse, FileText, Maximize2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
@@ -143,6 +143,7 @@ export default function IncidentReportTable({
               <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Location</th>
               <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">When</th>
               <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Status</th>
+              <th className="p-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-tertiary">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/70">
@@ -161,12 +162,7 @@ export default function IncidentReportTable({
                       <Icon size={20} className={`shrink-0 ${style.color}`} />
                       <div className="min-w-0">
                         <p className="font-medium text-foreground">{report.type}</p>
-                        <Link
-                          href={`/emergencies/${report.id}`}
-                          className="text-xs font-medium text-primary hover:text-primary-dark"
-                        >
-                          {report.id}
-                        </Link>
+                        <p className="text-xs text-muted">{report.id}</p>
                       </div>
                     </div>
                   </td>
@@ -181,13 +177,23 @@ export default function IncidentReportTable({
                       {unattended && <UnattendedBadge />}
                     </div>
                   </td>
+                  <td className="p-4">
+                    <Link
+                      href={`/emergencies/${report.id}`}
+                      title="View this incident report's full details"
+                      className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-background px-2.5 py-1 text-xs font-semibold text-muted transition hover:text-foreground"
+                    >
+                      <Maximize2 size={12} />
+                      View
+                    </Link>
+                  </td>
                 </tr>
               );
             })}
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-10 text-center text-sm text-muted">
+                <td colSpan={6} className="p-10 text-center text-sm text-muted">
                   No reports match your filters.
                 </td>
               </tr>
