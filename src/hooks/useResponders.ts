@@ -21,6 +21,8 @@ type AdminUserRow = {
   name: string | null;
   email: string;
   mobile: string | null;
+  // Absent on an older backend.
+  avatarUrl?: string | null;
   role: string;
   unit: string | null;
   assignedBarangay: string | null;
@@ -38,6 +40,7 @@ function toResponder(row: AdminUserRow): Responder {
     name: row.name ?? "",
     email: row.email,
     phone: row.mobile,
+    avatarUrl: row.avatarUrl ?? null,
     isOnDuty: row.isOnDuty,
     unit: row.unit === "BDRRMO" || row.unit === "MDRRMO" ? row.unit : null,
     assignedBarangay: row.assignedBarangay,

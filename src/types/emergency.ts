@@ -21,6 +21,8 @@ export interface Emergency {
   id: string;
   type: EmergencyType;
   description?: string;
+  // The reporter's photo (Cloudinary URL), when one was attached.
+  photoUrl?: string;
   latitude: number;
   longitude: number;
   locationName: string;

@@ -5,6 +5,8 @@ export interface User {
   name: string;
   email: string;
   phone?: string;
+  // Their profile photo, when they've set one (optional for citizens).
+  avatarUrl?: string | null;
   role: UserRole;
   createdAt: string;
 }

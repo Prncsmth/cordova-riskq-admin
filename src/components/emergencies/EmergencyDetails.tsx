@@ -9,6 +9,7 @@ import {
   ShieldQuestion,
   Siren,
   MessageSquareText,
+  ImageIcon,
   Maximize2,
   Users,
 } from "lucide-react";
@@ -174,6 +175,33 @@ function EmergencyDetailsView({
               Details
             </div>
             <p className="mt-2 text-sm font-medium leading-relaxed text-foreground">{emergency.description}</p>
+          </div>
+        )}
+
+        {emergency.photoUrl && (
+          <div className="mt-6 rounded-xl border border-border/70 bg-background/60 p-4">
+            <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+              <ImageIcon size={13} />
+              Photo from reporter
+            </div>
+            {/* Opens the full-size photo in a new tab. A plain <img>: the
+                photo is already sized by Cloudinary, and next/image would
+                need its own remote-host config for no gain here. */}
+            <a
+              href={emergency.photoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 block overflow-hidden rounded-lg border border-border/70"
+              title="Open full-size photo"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={emergency.photoUrl}
+                alt="Photo of the incident, sent by the reporter"
+                loading="lazy"
+                className="max-h-80 w-full bg-black/5 object-contain"
+              />
+            </a>
           </div>
         )}
 

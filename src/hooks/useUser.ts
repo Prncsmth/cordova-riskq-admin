@@ -10,6 +10,8 @@ type RawUser = {
   name: string | null;
   email: string;
   mobile: string | null;
+  // Absent on an older backend.
+  avatarUrl?: string | null;
   role: User["role"];
   createdAt: string;
 };
@@ -20,6 +22,7 @@ function toUser(row: RawUser): User {
     name: row.name ?? "",
     email: row.email,
     phone: row.mobile ?? undefined,
+    avatarUrl: row.avatarUrl ?? null,
     role: row.role,
     createdAt: row.createdAt,
   };

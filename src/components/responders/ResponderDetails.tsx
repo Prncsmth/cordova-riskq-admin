@@ -14,6 +14,7 @@ import { incidentSourceLabel } from "@/lib/incidentSource";
 import { formatMinutes } from "@/lib/incidentStats";
 import { formatDate, timeAgo } from "@/lib/utils";
 import { CORDOVA_BARANGAY_NAMES } from "@/constants/barangays";
+import AvatarPhoto from "@/components/ui/AvatarPhoto";
 
 function initials(name: string) {
   return name
@@ -106,11 +107,12 @@ export default function ResponderDetails({
       <Card>
         <div className="flex flex-wrap items-center gap-5">
           <div
-            className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-bold text-white shadow-xs ${
+            className={`relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full text-xl font-bold text-white shadow-xs ${
               responder.isOnDuty ? "bg-success" : "bg-muted"
             }`}
           >
             {initials(responder.name)}
+            <AvatarPhoto src={responder.avatarUrl} alt={`Photo of ${responder.name}`} />
           </div>
 
           <div className="min-w-0 flex-1">

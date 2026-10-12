@@ -50,7 +50,8 @@ const REPORT_ONLY_CSP = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${MAPBOX.join(" ")}`,
+  // res.cloudinary.com: the reporter's incident photo (EmergencyDetails).
+  `img-src 'self' data: blob: https://res.cloudinary.com ${MAPBOX.join(" ")}`,
   "font-src 'self' data:",
   "media-src 'self'",
   `connect-src 'self' ${[...backendOrigins, ...MAPBOX].join(" ")}${isProd ? "" : " ws: http://localhost:*"}`,

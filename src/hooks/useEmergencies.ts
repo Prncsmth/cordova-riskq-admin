@@ -16,6 +16,8 @@ type RawIncident = {
   // a defensive fallback: toEmergency() treats a missing value as "report".
   source?: string;
   details?: string | null;
+  // Absent on an older backend, which had no photo support.
+  photoUrl?: string | null;
   locationLabel: string;
   latitude?: number | null;
   longitude?: number | null;
@@ -48,6 +50,7 @@ function toEmergency(raw: RawIncident): Emergency {
     id: raw.id,
     type: categoryToEmergencyType(raw.category),
     description: raw.details ?? undefined,
+    photoUrl: raw.photoUrl ?? undefined,
     latitude: raw.latitude ?? 0,
     longitude: raw.longitude ?? 0,
     locationName: raw.locationLabel,

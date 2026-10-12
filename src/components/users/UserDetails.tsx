@@ -4,6 +4,7 @@ import { Mail, Phone, Calendar, Hash } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
+import AvatarPhoto from "@/components/ui/AvatarPhoto";
 import { useUser } from "@/hooks/useUser";
 import { formatDate, timeAgo } from "@/lib/utils";
 import type { User } from "@/types/user";
@@ -70,8 +71,9 @@ export default function UserDetails({ id }: { id: string }) {
     <div className="grid gap-6">
       <Card>
         <div className="flex flex-wrap items-center gap-5">
-          <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-bold text-white shadow-xs ${ROLE_AVATAR_STYLE[user.role]}`}>
+          <div className={`relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full text-xl font-bold text-white shadow-xs ${ROLE_AVATAR_STYLE[user.role]}`}>
             {initials(user.name)}
+            <AvatarPhoto src={user.avatarUrl} alt={`Photo of ${user.name}`} />
           </div>
 
           <div className="min-w-0 flex-1">

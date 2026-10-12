@@ -8,6 +8,7 @@ import Pagination from "@/components/ui/Pagination";
 import type { Responder, ResponderUnit } from "@/types/responder";
 import type { BarangayFilter } from "@/hooks/useResponders";
 import { CORDOVA_BARANGAY_NAMES } from "@/constants/barangays";
+import AvatarPhoto from "@/components/ui/AvatarPhoto";
 import { formatDate } from "@/lib/utils";
 
 type DutyFilter = "all" | "on-duty" | "off-duty";
@@ -142,8 +143,9 @@ export default function ResponderTable({
                 <tr key={responder.id} className="transition-colors hover:bg-background/70">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white shadow-xs">
+                      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary text-xs font-semibold text-white shadow-xs">
                         {initials(responder.name)}
+                        <AvatarPhoto src={responder.avatarUrl} alt={`Photo of ${responder.name}`} />
                       </span>
                       <div className="min-w-0">
                         <p className="font-medium text-foreground">{responder.name}</p>
