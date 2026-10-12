@@ -238,6 +238,14 @@ function EmergencyDetailsView({
                         </p>
                       </div>
                       <Badge variant={step.variant}>{step.label}</Badge>
+                      <Link
+                        href={`/responders/${responder.id}`}
+                        title="View this responder's profile"
+                        className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-background px-2.5 py-1 text-xs font-semibold text-muted transition hover:text-foreground"
+                      >
+                        <Maximize2 size={12} />
+                        View
+                      </Link>
                     </li>
                   );
                 })}
@@ -275,6 +283,14 @@ function EmergencyDetailsView({
                       <Badge variant={responder.isOnDuty ? "success" : "default"}>
                         {responder.isOnDuty ? "On Duty" : "Off Duty"}
                       </Badge>
+                      <Link
+                        href={`/responders/${responder.id}`}
+                        title="View this responder's profile"
+                        className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-background px-2.5 py-1 text-xs font-semibold text-muted transition hover:text-foreground"
+                      >
+                        <Maximize2 size={12} />
+                        View
+                      </Link>
                     </li>
                   ))}
                 </ul>
