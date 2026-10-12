@@ -7,12 +7,17 @@ import AdminSidebar from "./AdminSidebar";
 import { EmergencyAlertProvider } from "./EmergencyAlertProvider";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useSocketConnection } from "@/hooks/useSocket";
 
 function AdminLayoutInner({ children }: { children: ReactNode }) {
   const { collapsed } = useSidebar();
   const pathname = usePathname();
   const router = useRouter();
   const { authenticated, isHydrated } = useAuth();
+  // Owns the shared socket's connect/disconnect lifecycle for the whole
+  // authenticated session -- see useSocketConnection's own comment for why
+  // this can't be left to each page-level hook's own mount/unmount.
+  useSocketConnection();
   // Treat the Live Map route as a fullscreen workspace: hide header and
   // remove page padding so the map can fill the viewport next to the sidebar.
   // Use a contains check since the route may include prefixes or trailing
