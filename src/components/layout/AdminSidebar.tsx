@@ -54,7 +54,7 @@ export default function AdminSidebar() {
         <div className="flex items-center gap-3">
 
           {/* Logo */}
-          <div className="relative h-[42px] w-[42px] shrink-0 drop-shadow-sm">
+          <div className="relative h-10.5 w-10.5 shrink-0 drop-shadow-sm">
             <Image
               src="/images/logo.png"
               alt="Cordova RISKQ Logo"
@@ -72,7 +72,7 @@ export default function AdminSidebar() {
             }`}
           >
             <h1 className={`${archivoBlack.className} flex flex-col text-xl leading-none tracking-[-1px]`}>
-              <span className="mb-[-2px] inline-flex items-center" style={{ color: "var(--brand-cordova)" }}>
+              <span className="-mb-0.5 inline-flex items-center" style={{ color: "var(--brand-cordova)" }}>
                 C
                 <Image
                   src="/images/cordova-logo.png"
