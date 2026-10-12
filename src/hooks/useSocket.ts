@@ -4,7 +4,19 @@ import { useEffect, useSyncExternalStore } from "react";
 import { socket } from "@/lib/socket";
 import { useAuth } from "@/hooks/useAuth";
 
-export function useSocket() {
+// Owns the shared socket's connect/disconnect lifecycle. Call this exactly
+// once, from a component that stays mounted for the entire authenticated
+// session (AdminLayout) -- not from useSocket() itself, which many
+// independent page-level hooks (useResponders, useSupportRequests,
+// useEmergencies, ...) call just to read/listen on the shared instance. It
+// used to be bundled into useSocket(), so each of those hooks' own
+// mount/unmount effect called connect()/disconnect() on the same singleton:
+// navigating away from any one of them tore the connection down for every
+// other still-mounted consumer relying on it (e.g. EmergencyAlertProvider),
+// which is why a page with no socket-consuming hook of its own, like
+// Announcements, could land on a connection some other page's unmount had
+// just killed and never reconnect it.
+export function useSocketConnection() {
   const { token } = useAuth();
 
   useEffect(() => {
@@ -20,7 +32,9 @@ export function useSocket() {
       socket.disconnect();
     };
   }, [token]);
+}
 
+export function useSocket() {
   return socket;
 }
 
