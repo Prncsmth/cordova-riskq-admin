@@ -1,4 +1,18 @@
-import { Activity, BellRing, FileWarning, ShieldCheck, CheckCircle2, Building2, UserPlus, Headset } from "lucide-react";
+import {
+  Activity,
+  BellRing,
+  FileWarning,
+  ShieldCheck,
+  CheckCircle2,
+  Building2,
+  UserPlus,
+  Headset,
+  Megaphone,
+  PencilLine,
+  Trash2,
+  MapPinned,
+  UserCog,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AdminActivity, AdminActivityType } from "@/hooks/useRecentActivity";
 
@@ -13,6 +27,12 @@ export const ACTIVITY_TYPE_STYLE: Record<
   evacuation_center_updated: { icon: Building2, label: "Evacuation Center", color: "text-warning" },
   user_registered: { icon: UserPlus, label: "New User", color: "text-primary" },
   support_request: { icon: Headset, label: "Support Request", color: "text-info" },
+  announcement_created: { icon: Megaphone, label: "Announcement Published", color: "text-primary" },
+  announcement_updated: { icon: PencilLine, label: "Announcement Edited", color: "text-warning" },
+  announcement_deleted: { icon: Trash2, label: "Announcement Deleted", color: "text-danger" },
+  responder_barangay_updated: { icon: MapPinned, label: "Responder Assigned", color: "text-info" },
+  user_role_updated: { icon: UserCog, label: "User Role Changed", color: "text-primary" },
+  support_request_status_updated: { icon: Headset, label: "Support Request Updated", color: "text-success" },
 };
 
 const DEFAULT_ACTIVITY_STYLE = { icon: Activity, label: "Activity", color: "text-muted" };
@@ -38,6 +58,12 @@ export const ACTIVITY_TYPE_HREF: Record<AdminActivityType, string> = {
   evacuation_center_updated: "/evacuation-centers",
   user_registered: "/users",
   support_request: "/support-requests",
+  announcement_created: "/announcements",
+  announcement_updated: "/announcements",
+  announcement_deleted: "/announcements",
+  responder_barangay_updated: "/responders",
+  user_role_updated: "/users",
+  support_request_status_updated: "/support-requests",
 };
 
 // AdminActivity items have no id of their own (derived, not stored) -- this

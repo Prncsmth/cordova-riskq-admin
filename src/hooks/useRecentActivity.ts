@@ -12,7 +12,14 @@ export type AdminActivityType =
   | "incident_resolved"
   | "evacuation_center_updated"
   | "user_registered"
-  | "support_request";
+  | "support_request"
+  // Admin-initiated actions (backend's AdminAuditLog), merged into this same feed.
+  | "announcement_created"
+  | "announcement_updated"
+  | "announcement_deleted"
+  | "responder_barangay_updated"
+  | "user_role_updated"
+  | "support_request_status_updated";
 
 export type AdminActivity = {
   type: AdminActivityType;

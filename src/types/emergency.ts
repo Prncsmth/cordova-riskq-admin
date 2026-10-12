@@ -39,7 +39,7 @@ export interface Emergency {
   responderIds?: string[];
   // The same active roster with names and each responder's own step
   // (joined/on_the_way/arrived) -- what EmergencyDetails renders live.
-  responders?: { id: string; name: string; status: string }[];
+  responders?: { id: string; name: string; status: string; avatarUrl: string | null }[];
   createdAt: string;
   updatedAt: string;
 }

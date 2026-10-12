@@ -28,7 +28,7 @@ type RawIncident = {
   // is just an ID (a holdover from before the multi-responder roster
   // replaced the old single-acceptor model); this is what actually lets a
   // name be shown instead of that raw ID.
-  responders?: { id: string; name: string; status: string }[];
+  responders?: { id: string; name: string; status: string; avatarUrl: string | null }[];
   createdAt: string;
   updatedAt: string;
 };
