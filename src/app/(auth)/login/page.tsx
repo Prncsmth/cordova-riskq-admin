@@ -39,18 +39,17 @@ export default function LoginPage() {
 
   return (
     <main className="relative flex min-h-screen overflow-hidden bg-background">
-      {/* LEFT HERO — campaign poster. The panel is a bit wider than the square
-          poster, so cover-scaling crops from the bottom (object-top keeps the
-          logo and headline); max-w caps how much gets cropped on short,
-          wide screens. */}
-      <section className="relative hidden h-screen w-[62%] max-w-[120vh] shrink-0 overflow-hidden lg:block">
+      {/* LEFT HERO — square poster. The panel is square at full viewport height
+          so the whole image fits with no cropping; on narrow screens the
+          max-w cap trims equally from both sides, keeping it centered. */}
+      <section className="relative hidden h-screen aspect-square max-w-[62%] shrink-0 overflow-hidden lg:block">
         <Image
           src="/images/adminimages.png"
-          alt="Cordova RISKQ — Geolocation-based emergency response for Cordova, Cebu. A real-time platform for monitoring incidents, dispatching responders, and coordinating emergency operations."
+          alt="Cordova RISKQ — MDRRMO Cordova, Cebu"
           fill
-          sizes="62vw"
+          sizes="100vh"
           priority
-          className="object-cover object-left-top"
+          className="object-cover object-center"
         />
       </section>
 
