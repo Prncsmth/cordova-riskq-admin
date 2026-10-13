@@ -45,7 +45,7 @@ export default function LoginPage() {
           wide screens. */}
       <section className="relative hidden h-screen w-[62%] max-w-[120vh] shrink-0 overflow-hidden lg:block">
         <Image
-          src="/images/login-hero-v3.webp"
+          src="/images/adminimages.png"
           alt="Cordova RISKQ — Geolocation-based emergency response for Cordova, Cebu. A real-time platform for monitoring incidents, dispatching responders, and coordinating emergency operations."
           fill
           sizes="62vw"
