@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
-import { useEmergencies } from "@/hooks/useEmergencies";
+import { useEffect, useMemo, useState } from "react";
+import { toEmergency as liveIncidentToEmergency, useEmergencies, type RawIncident } from "@/hooks/useEmergencies";
 import { useIncidentHistory, type HistoryRecord } from "@/hooks/useIncidentHistory";
+import { useSocket } from "@/hooks/useSocket";
 import { categoryToEmergencyType } from "@/lib/incidentCategory";
+import { HISTORY_EMERGENCY_STATUSES, mergeEmergencyLists } from "@/lib/mergeEmergencyLists";
 import type { Emergency } from "@/types/emergency";
 
 function toEmergency(record: HistoryRecord): Emergency {
@@ -29,14 +31,32 @@ function toEmergency(record: HistoryRecord): Emergency {
 // GET /incidents exposes). This adds completed/cancelled ones from
 // GET /admin/history so "Resolved"/"Cancelled" status filters actually work.
 export function useEmergenciesWithHistory() {
+  const socket = useSocket();
   const { emergencies, loading: loadingLive, error: liveError } = useEmergencies();
   const { records, loading: loadingHistory, error: historyError } = useIncidentHistory();
+  // Incidents that closed while this page was open. useEmergencies drops a
+  // closed incident from the live list, and the history above is a one-time
+  // load -- without this, a report a responder just resolved vanished from
+  // the list until the next reload instead of reading "Resolved".
+  const [closedLive, setClosedLive] = useState<Map<string, Emergency>>(() => new Map());
 
-  const allEmergencies = useMemo<Emergency[]>(() => {
-    return [...emergencies, ...records.map(toEmergency)].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-  }, [emergencies, records]);
+  useEffect(() => {
+    function handleIncidentUpdate(raw: RawIncident) {
+      const emergency = liveIncidentToEmergency(raw);
+      if (!HISTORY_EMERGENCY_STATUSES.includes(emergency.status)) return;
+      setClosedLive((prev) => new Map(prev).set(emergency.id, emergency));
+    }
+
+    socket.on("admin:incidentUpdate", handleIncidentUpdate);
+    return () => {
+      socket.off("admin:incidentUpdate", handleIncidentUpdate);
+    };
+  }, [socket]);
+
+  const allEmergencies = useMemo<Emergency[]>(
+    () => mergeEmergencyLists(emergencies, records.map(toEmergency), [...closedLive.values()]),
+    [emergencies, records, closedLive],
+  );
 
   return {
     emergencies: allEmergencies,

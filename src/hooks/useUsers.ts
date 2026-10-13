@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import { userDisplayName } from "@/lib/userDisplayName";
 import type { usePaginationState } from "@/hooks/usePaginationState";
 import { User, UserRole } from "@/types/user";
 
@@ -17,7 +18,7 @@ type AdminUserRow = {
 function toUser(row: AdminUserRow): User {
   return {
     id: row.id,
-    name: row.name ?? "",
+    name: userDisplayName(row.name, row.email),
     email: row.email,
     role: row.role,
     createdAt: row.createdAt,
@@ -35,14 +36,11 @@ export function useUsers(pagination: ReturnType<typeof usePaginationState>) {
   const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    // Unreachable once rendered -- see useEmergencies.ts's matching guard.
+    if (!token) return;
 
     let cancelled = false;
     setLoading(true);
-    setError(null);
 
     const params = new URLSearchParams({ page: String(page), limit: String(pageSize) });
     if (search) params.set("search", search);
@@ -56,6 +54,9 @@ export function useUsers(pagination: ReturnType<typeof usePaginationState>) {
           setUsers(response.users.map(toUser));
           setTotal(response.total);
           setNewThisWeek(response.newThisWeek);
+          // Cleared here, not up front -- a stale error from a previous
+          // failed fetch must still disappear once this one succeeds.
+          setError(null);
         }
       })
       .catch((err) => {

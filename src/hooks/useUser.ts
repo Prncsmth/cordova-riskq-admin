@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import { userDisplayName } from "@/lib/userDisplayName";
 import type { User } from "@/types/user";
 
 type RawUser = {
@@ -19,7 +20,7 @@ type RawUser = {
 function toUser(row: RawUser): User {
   return {
     id: row.id,
-    name: row.name ?? "",
+    name: userDisplayName(row.name, row.email),
     email: row.email,
     phone: row.mobile ?? undefined,
     avatarUrl: row.avatarUrl ?? null,
@@ -35,17 +36,17 @@ export function useUser(id: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    // Unreachable once rendered -- see useEmergencies.ts's matching guard.
+    if (!token) return;
 
     let cancelled = false;
-    setError(null);
 
     apiFetch<{ success: true; user: RawUser }>(`/admin/users/${id}`, { token })
       .then((response) => {
-        if (!cancelled) setUser(toUser(response.user));
+        if (!cancelled) {
+          setUser(toUser(response.user));
+          setError(null);
+        }
       })
       .catch((err) => {
         if (!cancelled) {

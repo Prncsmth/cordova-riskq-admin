@@ -8,7 +8,7 @@ import { categoryToEmergencyType } from "@/lib/incidentCategory";
 import { TERMINAL_EMERGENCY_STATUSES } from "@/lib/emergencyStyles";
 import { Emergency, EmergencyStatus } from "@/types/emergency";
 
-type RawIncident = {
+export type RawIncident = {
   id: string;
   category: string;
   // "sos" | "report" -- returned by both GET /incidents and GET /incidents/:id
@@ -43,7 +43,7 @@ const STATUS_TO_EMERGENCY_STATUS: Record<string, EmergencyStatus> = {
   expired: "Expired",
 };
 
-function toEmergency(raw: RawIncident): Emergency {
+export function toEmergency(raw: RawIncident): Emergency {
   const acceptedResponder = raw.responders?.find((r) => r.id === raw.acceptedByResponderId);
 
   return {
@@ -74,17 +74,26 @@ export function useEmergencies() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    // Unreachable once rendered: every dashboard page is gated behind
+    // AdminLayout's authenticated check, which already requires a token.
+    // During the brief pre-hydration window it can still be null for a
+    // moment -- staying `loading` here (not flipping it false) is correct:
+    // the effect re-runs once hydration resolves the real token (it's a
+    // dep below) and the fetch actually happens, instead of flashing an
+    // empty "not loading" list first.
+    if (!token) return;
 
     let cancelled = false;
-    setError(null);
 
     apiFetch<{ success: true; incidents: RawIncident[] }>("/incidents", { token })
       .then((response) => {
-        if (!cancelled) setEmergencies(response.incidents.map(toEmergency));
+        if (!cancelled) {
+          setEmergencies(response.incidents.map(toEmergency));
+          // Cleared here instead of synchronously up front -- a stale
+          // error from a previous failed fetch must still disappear once
+          // this one succeeds.
+          setError(null);
+        }
       })
       .catch((err) => {
         if (!cancelled) {
@@ -135,17 +144,18 @@ export function useEmergency(id: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    // See useEmergencies' matching guard above for why this is unreachable
+    // once rendered, and why `loading` is deliberately left alone here.
+    if (!token) return;
 
     let cancelled = false;
-    setError(null);
 
     apiFetch<{ success: true; incident: RawIncident }>(`/incidents/${id}`, { token })
       .then((response) => {
-        if (!cancelled) setEmergency(toEmergency(response.incident));
+        if (!cancelled) {
+          setEmergency(toEmergency(response.incident));
+          setError(null);
+        }
       })
       .catch((err) => {
         if (!cancelled) {
