@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import { userDisplayName } from "@/lib/userDisplayName";
 import { useSocket } from "@/hooks/useSocket";
 import type { usePaginationState } from "@/hooks/usePaginationState";
 import { Responder } from "@/types/responder";
@@ -37,7 +38,7 @@ export type BarangayFilter = "all" | string;
 function toResponder(row: AdminUserRow): Responder {
   return {
     id: row.id,
-    name: row.name ?? "",
+    name: userDisplayName(row.name, row.email),
     email: row.email,
     phone: row.mobile,
     avatarUrl: row.avatarUrl ?? null,
@@ -62,14 +63,11 @@ export function useResponders(
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    // Unreachable once rendered -- see useEmergencies.ts's matching guard.
+    if (!token) return;
 
     let cancelled = false;
     setLoading(true);
-    setError(null);
 
     const params = new URLSearchParams({ role: "responder", page: String(page), limit: String(pageSize) });
     if (search) params.set("search", search);
@@ -86,6 +84,9 @@ export function useResponders(
         if (!cancelled) {
           setResponders(response.users.map(toResponder));
           setTotal(response.total);
+          // Cleared here, not up front -- a stale error from a previous
+          // failed fetch must still disappear once this one succeeds.
+          setError(null);
         }
       })
       .catch((err) => {
@@ -151,10 +152,8 @@ export function useResponderSummary() {
   }, [token]);
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    // Unreachable once rendered -- see useEmergencies.ts's matching guard.
+    if (!token) return;
 
     let cancelled = false;
     setLoading(true);
@@ -193,17 +192,17 @@ export function useResponder(id: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    // Unreachable once rendered -- see useEmergencies.ts's matching guard.
+    if (!token) return;
 
     let cancelled = false;
-    setError(null);
 
     apiFetch<{ success: true; user: AdminUserRow }>(`/admin/users/${id}`, { token })
       .then((response) => {
-        if (!cancelled) setResponder(toResponder(response.user));
+        if (!cancelled) {
+          setResponder(toResponder(response.user));
+          setError(null);
+        }
       })
       .catch((err) => {
         if (!cancelled) {
