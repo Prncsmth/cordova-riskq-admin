@@ -112,7 +112,7 @@ export default function LoginPage() {
               </button>
             </div>
 
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center text-sm">
               <label className="flex items-center gap-2 text-foreground">
                 <input
                   type="checkbox"
@@ -123,9 +123,6 @@ export default function LoginPage() {
                 Remember me
               </label>
 
-              <button type="button" className="font-medium text-primary hover:text-primary-dark">
-                Forgot password?
-              </button>
             </div>
 
             <button
