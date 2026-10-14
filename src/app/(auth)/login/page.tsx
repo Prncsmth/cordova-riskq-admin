@@ -39,23 +39,24 @@ export default function LoginPage() {
 
   return (
     <main className="relative flex min-h-screen overflow-hidden bg-background">
-      {/* LEFT HERO — square poster in a panel slightly wider than tall (120vh),
+      {/* LEFT HERO — square poster in a panel slightly wider than tall (110vh),
           so cover-scaling trims only a thin strip from the top and bottom;
           on narrow screens the max-w cap trims the sides instead. */}
-      <section className="relative hidden h-screen w-[120vh] max-w-[66%] shrink-0 overflow-hidden lg:block">
+      <section className="relative hidden h-screen w-[110vh] max-w-[64%] shrink-0 overflow-hidden lg:block">
         <Image
-          src="/images/adminimages.png"
+          src="/images/leftpanel.png"
           alt="Cordova RISKQ — MDRRMO Cordova, Cebu"
           fill
-          sizes="120vh"
+          sizes="110vh"
+          unoptimized
           priority
-          className="object-cover object-center"
+          className="object-cover object-[center_40%]"
         />
       </section>
 
       {/* Soft red wave in the bottom-right of the light side */}
       <div
-        className="pointer-events-none absolute -bottom-48 -right-48 h-[32rem] w-[52rem] rounded-[50%]"
+        className="pointer-events-none absolute -bottom-48 -right-48 h-128 w-208 rounded-[50%]"
         style={{ background: "radial-gradient(closest-side, rgba(200,16,46,0.12), transparent)" }}
       />
 
