@@ -26,7 +26,7 @@ export default function AuditLogsPage() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Audit Logs</h1>
         <p className="text-sm text-muted">
-          System activity across incidents, responders, evacuation centers, and users.
+          Admin actions (who changed what) and system activity across incidents, responders, evacuation centers, and users.
         </p>
       </div>
 

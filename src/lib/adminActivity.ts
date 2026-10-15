@@ -12,6 +12,11 @@ import {
   Trash2,
   MapPinned,
   UserCog,
+  Phone,
+  BellOff,
+  LogIn,
+  UserPen,
+  KeyRound,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AdminActivity, AdminActivityType } from "@/hooks/useRecentActivity";
@@ -33,6 +38,11 @@ export const ACTIVITY_TYPE_STYLE: Record<
   responder_barangay_updated: { icon: MapPinned, label: "Responder Assigned", color: "text-info" },
   user_role_updated: { icon: UserCog, label: "User Role Changed", color: "text-primary" },
   support_request_status_updated: { icon: Headset, label: "Support Request Updated", color: "text-success" },
+  hotline_updated: { icon: Phone, label: "Hotline Updated", color: "text-warning" },
+  sos_alert_closed: { icon: BellOff, label: "SOS Alert Closed", color: "text-success" },
+  admin_login: { icon: LogIn, label: "Admin Sign-in", color: "text-muted" },
+  admin_profile_updated: { icon: UserPen, label: "Admin Profile Updated", color: "text-primary" },
+  admin_password_changed: { icon: KeyRound, label: "Admin Password Changed", color: "text-danger" },
 };
 
 const DEFAULT_ACTIVITY_STYLE = { icon: Activity, label: "Activity", color: "text-muted" };
@@ -64,6 +74,11 @@ export const ACTIVITY_TYPE_HREF: Record<AdminActivityType, string> = {
   responder_barangay_updated: "/responders",
   user_role_updated: "/users",
   support_request_status_updated: "/support-requests",
+  hotline_updated: "/hotlines",
+  sos_alert_closed: "/sos-alerts",
+  admin_login: "/audit-logs",
+  admin_profile_updated: "/settings",
+  admin_password_changed: "/settings",
 };
 
 // AdminActivity items have no id of their own (derived, not stored) -- this

@@ -2,7 +2,7 @@
 
 import CountUp from "react-countup";
 import { motion } from "framer-motion";
-import { AlertTriangle, BellRing, ShieldCheck, HeartHandshake } from "lucide-react";
+import { AlertTriangle, BellRing, ShieldCheck, CircleCheckBig } from "lucide-react";
 import { useEmergenciesWithHistory } from "@/hooks/useEmergenciesWithHistory";
 import { useResponderSummary } from "@/hooks/useResponders";
 import { isToday } from "@/lib/utils";
@@ -13,11 +13,10 @@ export default function StatsCards() {
 
   const activeIncidents = emergencies.filter((e) => e.status === "Active").length;
   const sosAlertsToday = emergencies.filter((e) => e.source === "sos" && isToday(e.createdAt)).length;
-  // Proxy metric, not a real headcount -- no field anywhere records how many
-  // people an incident/SOS actually helped, so this counts resolved cases
-  // instead (both incident-report- and SOS-sourced, since both live in the
-  // same emergencies list) as a stand-in until that's tracked for real.
-  const peopleAssisted = emergencies.filter((e) => e.status === "Resolved").length;
+  // Resolved cases, both incident-report- and SOS-sourced (both live in the
+  // same emergencies list). Labeled as cases, not people: nothing records how
+  // many people an incident actually helped.
+  const resolvedCases = emergencies.filter((e) => e.status === "Resolved").length;
 
   const cards = [
     {
@@ -39,10 +38,10 @@ export default function StatsCards() {
       icon: ShieldCheck,
     },
     {
-      title: "People Assisted",
-      value: peopleAssisted,
+      title: "Resolved Cases",
+      value: resolvedCases,
       color: "text-info",
-      icon: HeartHandshake,
+      icon: CircleCheckBig,
     },
   ];
 
