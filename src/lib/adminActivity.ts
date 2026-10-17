@@ -17,6 +17,7 @@ import {
   LogIn,
   UserPen,
   KeyRound,
+  Star,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AdminActivity, AdminActivityType } from "@/hooks/useRecentActivity";
@@ -38,6 +39,7 @@ export const ACTIVITY_TYPE_STYLE: Record<
   responder_barangay_updated: { icon: MapPinned, label: "Responder Assigned", color: "text-info" },
   user_role_updated: { icon: UserCog, label: "User Role Changed", color: "text-primary" },
   support_request_status_updated: { icon: Headset, label: "Support Request Updated", color: "text-success" },
+  review_moderated: { icon: Star, label: "Review Moderated", color: "text-warning" },
   hotline_updated: { icon: Phone, label: "Hotline Updated", color: "text-warning" },
   sos_alert_closed: { icon: BellOff, label: "SOS Alert Closed", color: "text-success" },
   admin_login: { icon: LogIn, label: "Admin Sign-in", color: "text-muted" },
@@ -74,6 +76,7 @@ export const ACTIVITY_TYPE_HREF: Record<AdminActivityType, string> = {
   responder_barangay_updated: "/responders",
   user_role_updated: "/users",
   support_request_status_updated: "/support-requests",
+  review_moderated: "/reviews",
   hotline_updated: "/hotlines",
   sos_alert_closed: "/sos-alerts",
   admin_login: "/audit-logs",

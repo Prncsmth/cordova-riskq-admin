@@ -18,6 +18,7 @@ import {
   Phone,
   ScrollText,
   Headset,
+  Star,
 } from "lucide-react";
 import SidebarGroup from "./SidebarGroup";
 import SidebarItem from "./SidebarItem";
@@ -130,6 +131,7 @@ export default function AdminSidebar() {
           items={[
             { href: "/announcements", label: "Announcements", icon: Megaphone },
             { href: "/support-requests", label: "Support Requests", icon: Headset },
+            { href: "/reviews", label: "Reviews", icon: Star },
           ]}
         />
 
